@@ -1,6 +1,6 @@
 exports.config = ({
 	"Console": {
-		"level": "silly",
+		"level": "debug",
 		"colorize": true,
 		"timestamp": true,
 		"json": false,

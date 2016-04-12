@@ -20,7 +20,7 @@ SET check_function_bodies = false;
 -- object: public.module_type | type: TYPE --
 -- DROP TYPE IF EXISTS public.module_type CASCADE;
 CREATE TYPE public.module_type AS
- ENUM ('component','service');
+ ENUM ('component','middleware','service','template');
 -- ddl-end --
 ALTER TYPE public.module_type OWNER TO postgres;
 -- ddl-end --
