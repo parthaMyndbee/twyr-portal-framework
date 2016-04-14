@@ -93,10 +93,11 @@ var fileConfigurationService = prime({
 
 			self['$cacheMap'][configPath] = config;
 			if(callback) callback(null, config);
+
 			return null;
 		})
 		.catch(function (err) {
-			console.error(module + ' Load Configuration From File Error: ', err);
+			console.error(module.name + ' Load Configuration From File Error: ', err);
 			if(callback) callback(err);
 		});
 	},

@@ -23,65 +23,84 @@ var promises = require('bluebird'),
 // Get what we need - environment, and the configuration specific to that environment
 var env = (process.env.NODE_ENV || 'development').toLowerCase(),
 	config = require(path.join(__dirname, 'config', env, 'index-config')).config,
-	numCPUs = require('os').cpus().length;
+	numForks = Math.floor(require('os').cpus().length * config['loadFactor']);
 
 var timeoutMonitor = {},
 	clusterId = uuid.v4().toString().replace(/-/g, ''),
 	cluster = promises.promisifyAll(require('cluster'));
 
+// One log to rule them all, one log to find them...
+var onlineCount = 0,
+	port = 0;
+
+process.title = config['title'];
+
 // Instantiate the application, and start the execution
 if (cluster.isMaster) {
 	cluster
-		.on('fork', function(worker) {
-			console.log('\nForked Twyr Portal #' + worker.id);
-			timeoutMonitor[worker.id] = setTimeout(function() {
-				console.error('Twyr Portal #' + worker.id + ' did not start in time! KILL!!');
-				worker.kill();
-			}, 5000);
-		})
-		.on('online', function(worker, address) {
-			console.log('Twyr Portal #' + worker.id + ': Now online!\n');
-			clearTimeout(timeoutMonitor[worker.id]);
-		})
-		.on('listening', function(worker, address) {
-			clearTimeout(timeoutMonitor[worker.id]);
+	.on('fork', function(worker) {
+		console.log('\nForked Twyr Portal #' + worker.id);
+		timeoutMonitor[worker.id] = setTimeout(function() {
+			console.error('Twyr Portal #' + worker.id + ' did not start in time! KILL!!');
+			worker.kill();
+		}, 300000);
+	})
+	.on('online', function(worker, address) {
+		console.log('Twyr Portal #' + worker.id + ': Now online!\n');
+		clearTimeout(timeoutMonitor[worker.id]);
+	})
+	.on('listening', function(worker, address) {
+		console.log('Twyr Portal #' + worker.id + ': Now listening\n');
+		clearTimeout(timeoutMonitor[worker.id]);
 
-			var networkInterfaces = require('os').networkInterfaces(),
-				forPrint = [];
+		port = address.port;
+	})
+	.on('disconnect', function(worker) {
+		console.log('Twyr Portal #' + worker.id + ': Disconnected');
+		clearTimeout(timeoutMonitor[worker.id]);
+		if (cluster.isMaster && config['restart']) cluster.fork();
+	})
+	.on('exit', function(worker, code, signal) {
+		console.log('Twyr Portal #' + worker.id + ': Exited with code: ' + code + ' on signal: ' + signal);
+		clearTimeout(timeoutMonitor[worker.id]);
+	})
+	.on('death', function(worker) {
+		console.error('Twyr Portal #' + worker.pid + ': Death!');
+		clearTimeout(timeoutMonitor[worker.id]);
+	});
 
-			for(var intIdx in networkInterfaces) {
-				var thisNetworkInterface = networkInterfaces[intIdx];
-				for(var addIdx in thisNetworkInterface) {
-					var thisAddress = thisNetworkInterface[addIdx];
-					forPrint.push({
-						'Interface': intIdx,
-						'Protocol': thisAddress.family,
-						'Address': thisAddress.address,
-						'Port': address.port
-					});
-				}
+	// Setup listener for online counts
+	cluster.on('message', function(msg) {
+		if(msg != 'worker-online')
+			return;
+
+		onlineCount++;
+		if(onlineCount < numForks)
+			return;
+
+		var networkInterfaces = require('os').networkInterfaces(),
+			forPrint = [];
+
+		for(var intIdx in networkInterfaces) {
+			var thisNetworkInterface = networkInterfaces[intIdx];
+			for(var addIdx in thisNetworkInterface) {
+				var thisAddress = thisNetworkInterface[addIdx];
+				forPrint.push({
+					'Interface': intIdx,
+					'Protocol': thisAddress.family,
+					'Address': thisAddress.address,
+					'Port': port
+				});
 			}
+		}
 
-			console.log('Twyr Portal #' + worker.id + ': Now listening at:\n');
-			if (forPrint.length) printf.printTable(forPrint);
-			console.log('\n');
-		})
-		.on('disconnect', function(worker) {
-			console.log('Twyr Portal #' + worker.id + ': Disconnected');
-			clearTimeout(timeoutMonitor[worker.id]);
-			if (cluster.isMaster && config['restart']) cluster.fork();
-		})
-		.on('exit', function(worker, code, signal) {
-			console.log('Twyr Portal #' + worker.id + ': Exited with code: ' + code + ' on signal: ' + signal);
-			clearTimeout(timeoutMonitor[worker.id]);
-		})
-		.on('death', function(worker) {
-			console.error('Twyr Portal #' + worker.pid + ': Death!');
-			clearTimeout(timeoutMonitor[worker.id]);
-		});
+		console.log('\n\n' + process.title + ' Listening On:');
+		if (forPrint.length) printf.printTable(forPrint);
+		console.log('\n\n');
+	});
 
 	// Fork workers.
-	for (var i = 0; i < (numCPUs * config['loadFactor']); i++) {
+	for (var i = 0; i < numForks; i++) {
 		cluster.fork();
 	}
 
@@ -163,6 +182,7 @@ else {
 		})
 		.finally(function () {
 			console.log(allStatuses.join('\n'));
+			process.send('worker-online');
 			return null;
 		});
 	};
