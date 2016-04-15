@@ -9,7 +9,7 @@ exports.config = ({
 	"subservices": {
 		"database": {
 			"client": "pg",
-			"debug": true,
+			"debug": false,
 			"connection": {
 				"host": "127.0.0.1",
 				"port": "5432",
