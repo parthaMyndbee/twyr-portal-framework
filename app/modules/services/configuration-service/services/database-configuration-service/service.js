@@ -377,6 +377,9 @@ var databaseConfigurationService = prime({
 	},
 
 	'_databaseNotification': function(data) {
+		if(!this['$cachedMap'][data.payload])
+			return null;
+
 		if(data.channel == 'config-change') {
 			this._databaseConfigurationChange(data.payload);
 			return;

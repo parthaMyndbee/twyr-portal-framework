@@ -1,7 +1,7 @@
 {
 	"name": "twyr-portal-framework",
 	"version": "0.7.1",
-	"description": "The Twy'r Portal Framework",
+	"description": "The Server Architecture and Design Template for a Portal Server",
 	"keywords": [
 		"twyr",
 		"portal",
