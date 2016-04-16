@@ -160,15 +160,20 @@ var expressService = prime({
 			self['$server'] = protocol.createServer(self.$config.ssl, webServer);
 		}
 
-		// Step 7: Add event handlers...
-		self.$server.on('connection', self._serverConnection.bind(self));
-		self.$server.on('error', self._serverError.bind(self));
+		// Step 7: Setup start flow listening
+		self.$server.once('error', function(error) {
+			if(callback) callback(error);
+		});
 
-		// Step 8: Start listening
+		self.$server.once('listening', function() {
+			self.$server.on('connection', self._serverConnection.bind(self));
+			self.$server.on('error', self._serverError.bind(self));
+
+			expressService.parent.start.call(self, dependencies, callback);
+		});
+
+		// Step 8: Start listening...
 		self.$server.listen(self.$config.port || 8000);
-
-		// Start sub-modules, if any
-		expressService.parent.start.call(self, dependencies, callback);
 	},
 
 	'getInterface': function() {
