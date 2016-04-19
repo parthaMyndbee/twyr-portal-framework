@@ -237,6 +237,7 @@ var expressService = prime({
 		// Miscellaneous...
 		self['$express']['$server'] =  self['$server'];
 		self['$express']['$session'] =  self['$session'];
+		self['$express']['$sessionStore'] = self['$sessionStore'];
 		self['$express']['$cookieParser'] = self['$cookieParser'];
 	},
 
@@ -246,11 +247,13 @@ var expressService = prime({
 		this.$server.once('close', function() {
 			delete self['$express']['$server'];
 			delete self['$express']['$session'];
+			delete self['$express']['$sessionStore'];
 			delete self['$express']['$cookieParser'];
 
 			delete self['$server'];
 			delete self['$express'];
 			delete self['$session'];
+			delete self['$sessionStore'];
 			delete self['$cookieParser'];
 
 			if(callback) callback(null, true);
