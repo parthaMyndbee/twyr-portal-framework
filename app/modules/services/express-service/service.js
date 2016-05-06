@@ -184,7 +184,6 @@ var expressService = prime({
 
 			requestDomain.on('error', function(error) {
 				loggerSrvc.error('Error servicing request "' + request.path + '":\nQuery: ', request.query, '\nBody: ', request.body, '\nParams: ', request.params, '\nError: ', error);
-				response.status(500).redirect('/error');
 			});
 
 			next();
@@ -256,6 +255,8 @@ var expressService = prime({
 		var self = this;
 
 		this.$server.once('close', function() {
+			self['$express']['_router']['stack']['length'] = 0;
+
 			delete self['$express']['$server'];
 			delete self['$express']['$session'];
 			delete self['$express']['$sessionStore'];

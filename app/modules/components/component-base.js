@@ -36,87 +36,20 @@ var twyrComponentBase = prime({
 		base.call(this, module, loader);
 	},
 
-	'start': function(dependencies, callback) {
-		// console.log(this.name + ' Start');
-
-		var self = this;
-		twyrComponentBase.parent.start.call(self, dependencies, function(err, status) {
-			if(err) {
-				if(callback) callback(err);
-				return;
-			}
-
-			this['$router'] = require('express').Router();
-			self._setupRouter();
-
-			if(callback) callback(null, status);
-		});
+	'getClientsideAssets': function(user, renderFunc, callback) {
+		if(callback) callback(null, { 'routeHandler': '', 'componentModel': '', 'template': '' });
 	},
 
-	'getRouter': function () {
-		return this.$router;
+	'assembleClientsideAssets': function(routes, mvcs, templates, callback) {
+		if(callback) callback(null, '');
 	},
 
-	'stop': function(callback) {
-		// console.log(this.name + ' Stop');
+	'_checkPermission': function(user, permission, tenant, callback) {
+		if(tenant && !callback) {
+			callback = tenant;
+			tenant = null;
+		}
 
-		var self = this;
-		twyrComponentBase.parent.stop.call(self, function(err, status) {
-			if(err) {
-				if(callback) callback(err);
-				return;
-			}
-
-			self._deleteRoutes();
-			if(callback) callback(null, status);
-		});
-	},
-
-	'_setupRouter': function() {
-		var router = this['$router'],
-			logger = require('morgan'),
-			loggerSrvc = this.dependencies['logger-service'],
-			self = this;
-
-		var loggerStream = {
-			'write': function(message, encoding) {
-				loggerSrvc.silly(message);
-			}
-		};
-
-		router
-		.use(logger('combined', {
-			'stream': loggerStream
-		}))
-		.use(function(request, response, next) {
-			if(self['$enabled']) {
-				next();
-				return;
-			}
-
-			response.status(403).json({ 'error': self.name + ' is disabled' });
-		});
-
-		self._addRoutes();
-		Object.keys(self.$components).forEach(function(subComponentName) {
-			var subRouter = (self.$components[subComponentName]).getRouter(),
-				mountPath = self.$config ? (self.$config.componentMountPath || '/') : '/';
-
-			self.$router.use(path.join(mountPath, subComponentName), subRouter);
-		});
-	},
-
-	'_addRoutes': function() {
-		return;
-	},
-
-	'_deleteRoutes': function() {
-		// NOTICE: Undocumented Express API. Be careful upgrading :-)
-		if(!this.$router) return;
-		this.$router.stack.length = 0;
-	},
-
-	'_checkPermission': function(user, tenant, permission, callback) {
 		if(!user) {
 			if(callback) callback(null, false);
 			return;
@@ -132,13 +65,8 @@ var twyrComponentBase = prime({
 			return;
 		}
 
-		if(tenant && !callback) {
-			callback = tenant;
-			tenant = null;
-		}
-
+		var allowed = false;
 		if(!tenant) {
-			var allowed = false;
 			Object.keys(user.tenants).forEach(function(userTenant) {
 				allowed = allowed || ((user.tenants[userTenant]['permissions']).indexOf(permission) >= 0);
 			});
@@ -147,15 +75,35 @@ var twyrComponentBase = prime({
 			return;
 		}
 
+		if(!user.tenants[tenant]) {
+			if(callback) callback(null, false);
+			return;
+		}
+
+		if((user.tenants[tenant]['permissions']).indexOf(permission)) {
+			if(callback) callback(null, true);
+			return;
+		}
+
+		if(user.tenants[tenant]['tenantParents']) {
+			allowed = false;
+			user.tenants[tenant]['tenantParents'].forEach(function(tenantParent) {
+				if(!user.tenants[tenantParent]) return;
+				allowed = allowed || ((user.tenants[tenantParent]['permissions']).indexOf(permission) >= 0);
+			});
+
+			if(callback) callback(null, allowed);
+			return;
+		}
+
+		// Should NEVER execute - tenantParents should be set when the User logs in
 		var database = this.dependencies['database-service'];
 		database.knex.raw('SELECT id FROM fn_get_tenant_ancestors(?);', [tenant])
 		.then(function(tenantParents) {
-			tenantParents = tenantParents.rows;
-
-			var allowed = false;
-			tenantParents.forEach(function(tenantParent) {
-				if(!user.tenants[tenantParent]) return;
-				allowed = allowed || ((user.tenants[tenantParent]['permissions']).indexOf(permission) >= 0);
+			allowed = false;
+			tenantParents.rows.forEach(function(tenantParent) {
+				if(!user.tenants[tenantParent.id]) return;
+				allowed = allowed || ((user.tenants[tenantParent.id]['permissions']).indexOf(permission) >= 0);
 			});
 
 			if(callback) callback(null, allowed);

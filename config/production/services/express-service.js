@@ -27,6 +27,10 @@ exports.config = ({
 		'rejectUnauthorized': false
 	},
 
+	'corsAllowedDomains': [
+		'https://api.twyrframework.com'
+	],
+
 	'templateEngine': 'ejs',
 
 	'maxRequestSize': 1e6,

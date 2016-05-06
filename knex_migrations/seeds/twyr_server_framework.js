@@ -107,7 +107,7 @@ exports.seed = function(knex, Promise) {
 				return [ groupId.rows[0]['id'] ];
 			}
 
-			return knex('groups').insert({ 'tenant_id': rootTenantId, 'parent_id': adminGroupId, 'name': 'registered-users', 'display_name': 'Twy\'r Registered Users', 'description': 'The Registered User Group for the root tenant' }).returning('id');
+			return knex('groups').insert({ 'tenant_id': rootTenantId, 'parent_id': adminGroupId, 'name': 'registered-users', 'display_name': 'Twy\'r Registered Users', 'description': 'The Registered User Group for the root tenant', 'default_for_new_user': true }).returning('id');
 		})
 		.then(function(groupId) {
 			registeredGroupId = groupId[0];
