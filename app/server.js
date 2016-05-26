@@ -136,6 +136,11 @@ var app = prime({
 			selectedTemplate.configuration.components = _.map(emberStuff, 'component').join('\n').trim();
 			selectedTemplate.configuration.templates = _.map(emberStuff, 'template').join('\n').trim();
 
+			selectedTemplate.configuration.baseYear = self.$config.baseYear;
+			selectedTemplate.configuration.currentYear = (new Date()).getUTCFullYear();
+			selectedTemplate.configuration.developmentMode = ((process.env.NODE_ENV || 'development').toLowerCase() == 'development');
+			selectedTemplate.configuration.apiServer = self.$config.apiServer;
+
 			return selectedTemplate;
 		})
 		// Step 6: Render the template HTML with the widgets in their positions

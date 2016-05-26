@@ -25,5 +25,13 @@ exports.config = ({
 
 	'templates': {
 		'path': './modules/templates'
-	}
+	},
+
+	'apiServer': {
+		'protocol': 'https',
+		'host': 'api.twyrframework.com',
+		'port': 443
+	},
+
+	'baseYear': '2014'
 });

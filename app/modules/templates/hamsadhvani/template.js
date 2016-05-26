@@ -20,6 +20,7 @@ var base = require('./../template-base').baseTemplate,
 /**
  * Module dependencies, required for this module
  */
+var path = require('path');
 
 var hamsadhvaniTemplate = prime({
 	'inherits': base,

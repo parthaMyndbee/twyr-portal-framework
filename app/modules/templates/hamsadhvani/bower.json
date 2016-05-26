@@ -34,7 +34,6 @@
     "ember": "*",
     "ember-data": "*",
     "fontawesome": "*",
-    "handlebars": "*",
     "ionicons": "*",
     "jquery": "*",
     "loader.js": "ember-cli/loader.js",

@@ -6,28 +6,180 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title><%= title %></title>
-
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
 		<script type="application/javascript" src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script type="application/javascript" src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 	<![endif]-->
+
+	<!-- Title: Will change based on the actual slogan or whatever -->
+	<title><%= title%></title>
+
+	<!-- HTML Normalize CSS Styles -->
+	<link href="/bhairavi/bower_components/normalize-css/normalize.css" rel="stylesheet" type="text/css" />
+
+	<!-- Google Fonts for the text on the Portal -->
+	<link href="https://fonts.googleapis.com/css?family=Keania+One" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Cantarell:400,400italic,700,700italic" rel="stylesheet" type="text/css">
+
+	<!-- Bootstrap CSS Styles -->
+	<link href="/bhairavi/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="/bhairavi/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Font Awesome, for the Glyphs -->
+	<link href="/bhairavi/bower_components/fontawesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Ionicons -->
+	<link href="/bhairavi/bower_components/ionicons/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Portal AdminLTE Theme CSS Styles -->
+	<link href="/bhairavi/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Portal AdminLTE Skin CSS Styles -->
+	<link href="/bhairavi/css/skins/skin-black-light.min.css" rel="stylesheet" type="text/css" />
+
+	<style>
+	.sidebar-mini .content-wrapper {
+		margin: 0px !important;
+	}
+
+	.sidebar-mini.sidebar-collapse .content-wrapper {
+		margin: 0px !important;
+	}
+
+	.sidebar-mini .main-footer {
+		margin: 0px !important;
+	}
+
+	.sidebar-mini.sidebar-collapse .main-footer {
+		margin: 0px !important;
+	}
+	</style>
 </head>
 <body class="skin-black-light sidebar-mini">
-	<ul>
-	<% Object.keys(positions).forEach(function(position) { %>
-		<li><%= position %></li>
-		<ol>
-		<% positions[position].forEach(function(widget){ %>
-			<li>{{<%= widget %>}}</li>
-		<% }) %>
-		</ol>
-		<br />
-	<% }) %>
-	</ul>
+<script type="text/x-handlebars">
+<div class="wrapper">
 
-	<script type="application/javascript" src="/bhairavi/bower_components/jquery/dist/jquery.min.js" />
+<header class="main-header">
+	{{#link-to "application" class="logo"}}
+		<span class="logo-mini">
+			<b>T</b>wy&apos;r
+		</span>
+		<span class="logo-lg">
+			<b>Twy&apos;r</b> Framework
+		</span>
+	{{/link-to}}
+
+	<nav class="navbar navbar-static-top">
+		<a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+			<span class="sr-only">Toggle navigation</span>
+		</a>
+
+		<div class="navbar-custom-menu">
+		</div>
+    </nav>
+</header>
+
+<div class="content-wrapper">
+	{{outlet}}
+</div>
+
+<footer class="main-footer">
+	<div class="pull-right hidden-xs">
+		Copyright&copy; <%= baseYear %>-<%= currentYear %> {{#link-to "application"}}Twy&apos;r Framework{{/link-to}}. All rights reserved.
+	</div>
+	<b>&nbsp;</b>
+</footer>
+
+</div>
+</script>
+
+<!-- jQuery JS Library - everything depends on it -->
+<script type="application/javascript" src="/bhairavi/bower_components/jquery/dist/jquery.min.js"></script>
+
+<!-- Setup ALL Ajax Requests to send credential information -->
+<script type="application/javascript">
+$.ajaxSetup({
+	'cache': <%= !developmentMode %>,
+	'xhrFields': {
+		'withCredentials': true
+	}
+});
+</script>
+
+<!-- Miscellaneous client-side data -->
+<script type="application/javascript">
+window.developmentMode = <%= developmentMode %>;
+window.apiServer = '<%= apiServer.protocol %>://<%= apiServer.host %>:<%= apiServer.port %>/';
+</script>
+
+<!-- Bootstrap JS Library - the base theme stuff -->
+<script type="application/javascript" src="/bhairavi/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<!-- Portal JS Library - the AdminLTE theme stuff -->
+<script type="application/javascript" src="/bhairavi/js/AdminLTE.min.js"></script>
+
+<!-- Ember.js, for the client-side MVC Framework -->
+<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/ember/ember.debug.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/ember-data/ember-data.js"></script>
+<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/ember/ember.min.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/ember-data/ember-data.min.js"></script>
+<% } %>
+<script type="application/javascript" src="/bhairavi/bower_components/ember/ember-template-compiler.js"></script>
+<script type="application/javascript" src="/bhairavi/bower_components/loader.js/lib/loader/loader.js"></script>
+
+<script type="application/javascript">
+define(
+	"twyrPortal/application",
+	["exports"],
+	function(exports) {
+		if(window.developmentMode) console.log('DEFINE: twyrPortal/application');
+		var twyrApplication = window.Ember.Application.extend({
+			'modulePrefix': 'twyrPortal',
+		});
+
+		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/create');
+		var App = twyrApplication.create({
+			LOG_RESOLVER: window.developmentMode,
+			LOG_ACTIVE_GENERATION: window.developmentMode,
+			LOG_TRANSITIONS: window.developmentMode,
+			LOG_TRANSITIONS_INTERNAL: window.developmentMode,
+			LOG_VIEW_LOOKUPS: window.developmentMode
+		});
+
+		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/router');
+		App.Router.reopen({
+			'location': 'history'
+		});
+
+		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/adapter');
+		App.ApplicationAdapter = window.DS.RESTAdapter.extend({
+			'namespace': '',
+			'host': window.apiServer.substring(0, window.apiServer.length - 1),
+
+			'ajaxError': function(jqXHR) {
+				if (jqXHR && jqXHR.status == 422) {
+					var jsonErrors = window.Ember.$.parseJSON(jqXHR.responseText)["errors"];
+					return new window.DS.InvalidError(jsonErrors);
+				}
+				else {
+					var error = this._super(jqXHR);
+					return error;
+				}
+			}
+		});
+
+		if(window.developmentMode) console.log('EXPORT: twyrPortal/application');
+		exports['default'] = App;
+	}
+);
+
+// Start off the Application...
+if(window.developmentMode) console.log('Starting the twyrPortal Ember App');
+window.twyrPortal = require('twyrPortal/application')['default'];
+</script>
 </body>
 </html>
