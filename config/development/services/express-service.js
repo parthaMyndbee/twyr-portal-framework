@@ -4,7 +4,8 @@ exports.config = ({
 		"cert": "./ssl/portal.crt",
 		"rejectUnauthorized": false
 	},
-	"port": 9090,
+	"port": 8080,
+	"favicon": "./favicon.ico",
 	"session": {
 		"key": "twyr-portal",
 		"ttl": 86400,
@@ -22,11 +23,11 @@ exports.config = ({
 		"secure": false,
 		"httpOnly": false
 	},
-	'corsAllowedDomains': [
-		'http://local-api.twyrframework.com:9090'
-	],
 	"maxRequestSize": 1000000,
 	"requestTimeout": 25,
 	"templateEngine": "ejs",
-	"connectionTimeout": 30
+	"connectionTimeout": 20,
+	"corsAllowedDomains": [
+		"http://local-api.twyrframework.com:8080"
+	]
 });

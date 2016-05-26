@@ -36,4 +36,5 @@ exports.config = ({
 	'maxRequestSize': 1e6,
 	'requestTimeout': 25,
 	'connectionTimeout': 30,
+	'favicon': './favicon.ico'
 });

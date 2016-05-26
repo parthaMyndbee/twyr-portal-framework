@@ -137,6 +137,10 @@ var fileConfigurationService = prime({
 		if(callback) callback(null, enabled);
 	},
 
+	'getModuleId': function(module, callback) {
+		if(callback) callback(null, null);
+	},
+
 	'_onNewConfiguration': function(filePath) {
 		var self = this,
 			rootPath = path.dirname(require.main.filename),

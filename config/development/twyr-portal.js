@@ -21,5 +21,9 @@ exports.config = ({
 
 	'components': {
 		'path': './modules/components'
+	},
+
+	'templates': {
+		'path': './modules/templates'
 	}
 });

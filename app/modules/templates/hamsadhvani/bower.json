@@ -1,0 +1,46 @@
+{
+  "name": "twyr-portal-framework-hamsadhvani-template",
+  "version": "0.7.1",
+  "authors": [
+    {
+      "name": "Vish Desai",
+      "email": "vishwakarma_d@hotmail.com"
+    }
+  ],
+  "description": "The Twy'r Portal Framework Hamsadhvani Template",
+  "main": [
+    "./bower_components/bootflat/bootstrap/bootstrap.min.css",
+    "./bower_components/bootflat/js/bootstrap.min.js"
+  ],
+  "keywords": [
+    "twyr",
+    "portal",
+    "framework"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twyr/twyr-portal-framework.git"
+  },
+  "license": "MITNFA",
+  "homepage": "https://twyr.github.io",
+  "private": false,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "bootstrap": "*",
+    "ember": "*",
+    "ember-data": "*",
+    "fontawesome": "*",
+    "handlebars": "*",
+    "ionicons": "*",
+    "jquery": "*",
+    "loader.js": "ember-cli/loader.js",
+    "normalize-css": "*",
+    "validatorjs": "*"
+  },
+  "devDependencies": {},
+  "resolutions": {}
+}

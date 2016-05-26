@@ -52,6 +52,7 @@ var moduleLoader = prime({
 		promiseResolutions.push(self._loadUtilitiesAsync(configSrvc));
 		promiseResolutions.push(self._loadServicesAsync(configSrvc));
 		promiseResolutions.push(self._loadComponentsAsync(configSrvc));
+		promiseResolutions.push(self._loadTemplatesAsync(configSrvc));
 
 		promises.all(promiseResolutions)
 		.then(function(status) {
@@ -71,6 +72,7 @@ var moduleLoader = prime({
 
 		promiseResolutions.push(self._initializeServicesAsync());
 		promiseResolutions.push(self._initializeComponentsAsync());
+		promiseResolutions.push(self._initializeTemplatesAsync());
 
 		promises.all(promiseResolutions)
 		.then(function(status) {
@@ -99,6 +101,12 @@ var moduleLoader = prime({
 			if(!status) throw status;
 			finalStatus.push(status);
 
+			return self._startTemplatesAsync();
+		})
+		.then(function(status) {
+			if(!status) throw status;
+			finalStatus.push(status);
+
 			if(callback) callback(null, self._filterStatus(finalStatus));
 			return null;
 		})
@@ -111,7 +119,13 @@ var moduleLoader = prime({
 		var self = this,
 			finalStatus = [];
 
-		self._stopComponentsAsync()
+		self._stopTemplatesAsync()
+		.then(function(status) {
+			if(!status) throw status;
+			finalStatus.push(status);
+
+			return self._stopComponentsAsync();
+		})
 		.then(function(status) {
 			if(!status) throw status;
 			finalStatus.push(status);
@@ -134,6 +148,7 @@ var moduleLoader = prime({
 		var promiseResolutions = [],
 			self = this;
 
+		promiseResolutions.push(self._uninitializeTemplatesAsync());
 		promiseResolutions.push(self._uninitializeComponentsAsync());
 		promiseResolutions.push(self._uninitializeServicesAsync());
 
@@ -153,6 +168,7 @@ var moduleLoader = prime({
 		var promiseResolutions = [],
 			self = this;
 
+		promiseResolutions.push(self._unloadTemplatesAsync());
 		promiseResolutions.push(self._unloadComponentsAsync());
 		promiseResolutions.push(self._unloadServicesAsync());
 		promiseResolutions.push(self._unloadUtilitiesAsync());
@@ -348,6 +364,59 @@ var moduleLoader = prime({
 		});
 	},
 
+	'_loadTemplates': function(configSrvc, callback) {
+		var promiseResolutions = [],
+			templateNames = [],
+			self = this;
+
+		try {
+			if(!(this.$module.$config && this.$module.$config.templates && this.$module.$config.templates.path)) {
+				if(callback) callback(null, { 'self': this.$module.name, 'type': 'templates', 'status': null });
+				return;
+			}
+
+			if(!this.$module.$templates) {
+				this.$module['$templates'] = {};
+			}
+
+			var definedTemplates = this._findFiles(path.join(this.$basePath, this.$module.$config.templates.path), 'template.js');
+			for(var idx in definedTemplates) {
+				// Check validity of the definition...
+				var Template = require(definedTemplates[idx]).template;
+				if(!Template) continue;
+
+				if(!Template.prototype.name || !Template.prototype.dependencies)
+					continue;
+
+				if(!Template.prototype.load || !Template.prototype.initialize || !Template.prototype.start || !Template.prototype.stop || !Template.prototype.uninitialize || !Template.prototype.unload)
+					continue;
+
+				// Ok... valid definition. Construct the template
+				var templateInstance = new Template(this.$module);
+
+				// Store the promisified object...
+				this.$module.$templates[templateInstance.name] = promises.promisifyAll(templateInstance);
+
+				// Ask the template to load itself...
+				templateNames.push(templateInstance.name);
+				promiseResolutions.push(templateInstance.loadAsync(configSrvc));
+			}
+		}
+		catch(err) {
+			if(callback) callback(err, { 'self': self.$module.name, 'type': 'templates', 'status': err });
+		}
+
+		// Wait for the templates to load...
+		this._processPromisesAsync(templateNames, promiseResolutions)
+		.then(function(result) {
+			if(callback) callback(null, { 'self': self.$module.name, 'type': 'templates', 'status': result });
+			return null;
+		})
+		.catch(function(err) {
+			if(callback) callback(err, { 'self': self.$module.name, 'type': 'templates', 'status': err });
+		});
+	},
+
 	'_initializeServices': function(callback) {
 		var promiseResolutions = [],
 			serviceNames = [],
@@ -391,6 +460,29 @@ var moduleLoader = prime({
 		})
 		.catch(function(err) {
 			if(callback) callback(err, { 'self': self.$module.name, 'type': 'components', 'status': err });
+		});
+	},
+
+	'_initializeTemplates': function(callback) {
+		var promiseResolutions = [],
+			templateNames = [],
+			self = this;
+
+		for(var templateIdx in this.$module.$templates) {
+			var thisTemplate = this.$module.$templates[templateIdx];
+
+			templateNames.push(thisTemplate.name);
+			promiseResolutions.push(thisTemplate.initializeAsync());
+		}
+
+		// Wait for the templates to initialize...
+		this._processPromisesAsync(templateNames, promiseResolutions)
+		.then(function(result) {
+			if(callback) callback(null, { 'self': self.$module.name, 'type': 'templates', 'status': result });
+			return null;
+		})
+		.catch(function(err) {
+			if(callback) callback(err, { 'self': self.$module.name, 'type': 'templates', 'status': err });
 		});
 	},
 
@@ -513,8 +605,8 @@ var moduleLoader = prime({
 			self = this;
 
 		// Start each component
-		Object.keys(this.$module.$components).forEach(function(thisComponentName) {
-			var thisComponent = this.$module.$components[thisComponentName],
+		Object.keys(self.$module.$components).forEach(function(thisComponentName) {
+			var thisComponent = self.$module.$components[thisComponentName],
 				thisComponentDependencies = {};
 
 			if(!thisComponent.dependencies) {
@@ -566,6 +658,68 @@ var moduleLoader = prime({
 		})
 		.catch(function(err) {
 			if(callback) callback(err, { 'self': self.$module.name, 'type': 'components', 'status': err });
+		});
+	},
+
+	'_startTemplates': function(callback) {
+		var promiseResolutions = [],
+			templateNames = [],
+			self = this;
+
+		// Start each template
+		Object.keys(this.$module.$templates).forEach(function(thisTemplateName) {
+			var thisTemplate = self.$module.$templates[thisTemplateName],
+				thisTemplateDependencies = {};
+
+			if(!thisTemplate.dependencies) {
+				templateNames.push(thisTemplate.name);
+				promiseResolutions.push(thisTemplate.startAsync.bind(thisTemplate, thisTemplateDependencies));
+				return;
+			}
+
+			thisTemplate.dependencies.forEach(function(thisTemplateDependency) {
+				var currentModule = self.$module,
+					currentDependency = null;
+
+				while(!!currentModule && !currentDependency) {
+					if(!currentModule.$services) {
+						currentModule = currentModule.$module;
+						continue;
+					}
+
+					currentDependency = currentModule.$services[thisTemplateDependency];
+					if(!currentDependency) currentModule = currentModule.$module;
+				}
+
+				if(currentDependency) {
+					var interfaceMethod = (function() {
+						if(!this['$enabled']) return null;
+						return (this.getInterface ? this.getInterface() : this);
+					}).bind(currentDependency);
+
+					Object.defineProperty(thisTemplateDependencies, thisTemplateDependency, {
+						'__proto__': null,
+						'configurable': true,
+						'enumerable': true,
+						'get': interfaceMethod
+					});
+
+					currentDependency['$dependants'].push(thisTemplate);
+				}
+			});
+
+			templateNames.push(thisTemplate.name);
+			promiseResolutions.push(thisTemplate.startAsync(thisTemplateDependencies));
+		});
+
+		// Wait for the templates to start...
+		this._processPromisesAsync(templateNames, promiseResolutions)
+		.then(function(result) {
+			if(callback) callback(null, { 'self': self.$module.name, 'type': 'templates', 'status': result });
+			return null;
+		})
+		.catch(function(err) {
+			if(callback) callback(err, { 'self': self.$module.name, 'type': 'templates', 'status': err });
 		});
 	},
 
@@ -671,6 +825,30 @@ var moduleLoader = prime({
 		});
 	},
 
+	'_stopTemplates': function(callback) {
+		var promiseResolutions = [],
+			templateNames = [],
+			self = this;
+
+		// Step 1: Stop each template
+		for(var templateIdx in this.$module.$templates) {
+			var thisTemplate = this.$module.$templates[templateIdx];
+
+			templateNames.push(thisTemplate.name);
+			promiseResolutions.push(thisTemplate.stopAsync());
+		}
+
+		// Wait for the templates to stop...
+		this._processPromisesAsync(templateNames, promiseResolutions)
+		.then(function(result) {
+			if(callback) callback(null, { 'self': self.$module.name, 'type': 'templates', 'status': result });
+			return null;
+		})
+		.catch(function(err) {
+			if(callback) callback(err, { 'self': self.$module.name, 'type': 'templates', 'status': err });
+		});
+	},
+
 	'_uninitializeServices': function(callback) {
 		var promiseResolutions = [],
 			serviceNames = [],
@@ -714,6 +892,29 @@ var moduleLoader = prime({
 		})
 		.catch(function(err) {
 			if(callback) callback(err, { 'self': self.$module.name, 'type': 'components', 'status': err });
+		});
+	},
+
+	'_uninitializeTemplates': function(callback) {
+		var promiseResolutions = [],
+			templateNames = [],
+			self = this;
+
+		for(var templateIdx in this.$module.$templates) {
+			var thisTemplate = this.$module.$templates[templateIdx];
+
+			templateNames.push(thisTemplate.name);
+			promiseResolutions.push(thisTemplate.uninitializeAsync());
+		}
+
+		// Wait for the templates to uninitialize...
+		this._processPromisesAsync(templateNames, promiseResolutions)
+		.then(function(result) {
+			if(callback) callback(null, { 'self': self.$module.name, 'type': 'templates', 'status': result });
+			return null;
+		})
+		.catch(function(err) {
+			if(callback) callback(err, { 'self': self.$module.name, 'type': 'templates', 'status': err });
 		});
 	},
 
@@ -788,6 +989,38 @@ var moduleLoader = prime({
 		})
 		.finally(function() {
 			delete self.$module['$components'];
+			return null;
+		});
+	},
+
+	'_unloadTemplates': function(callback) {
+		var promiseResolutions = [],
+			templateNames = [],
+			self = this;
+
+		// Step 1: Unload each template
+		for(var templateIdx in this.$module.$templates) {
+			var thisTemplate = this.$module.$templates[templateIdx];
+
+			templateNames.push(thisTemplate.name);
+			promiseResolutions.push(thisTemplate.unloadAsync());
+		}
+
+		// Step 2: Wait for templates to unload...
+		this._processPromisesAsync(templateNames, promiseResolutions)
+		.then(function(status) {
+			for(var idx in self.$module.$templates) {
+				delete self.$module.$templates[idx];
+			}
+
+			if(callback) callback(null, { 'self': self.$module.name, 'type': 'templates', 'status': status });
+			return null;
+		})
+		.catch(function(err) {
+			if(callback) callback(err, { 'self': self.$module.name, 'type': 'templates', 'status': err });
+		})
+		.finally(function() {
+			delete self.$module['$templates'];
 			return null;
 		});
 	},

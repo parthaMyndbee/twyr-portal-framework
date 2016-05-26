@@ -36,12 +36,14 @@ var twyrComponentBase = prime({
 		base.call(this, module, loader);
 	},
 
-	'getClientsideAssets': function(user, renderFunc, callback) {
-		if(callback) callback(null, { 'routeHandler': '', 'componentModel': '', 'template': '' });
-	},
-
-	'assembleClientsideAssets': function(routes, mvcs, templates, callback) {
-		if(callback) callback(null, '');
+	'getClientsideAssets': function(user, mediaType, routeHandlers, components, renderer, callback) {
+		if(callback) callback(null, {
+			'route': '',
+			'routeHandler': '',
+			'model': '',
+			'component': '',
+			'template': ''
+		});
 	},
 
 	'_checkPermission': function(user, permission, tenant, callback) {

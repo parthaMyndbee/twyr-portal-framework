@@ -107,7 +107,9 @@ var expressService = prime({
 			compress = require('compression'),
 			cors = require('cors'),
 			debounce = require('connect-debounce'),
+			device = require('express-device'),
 			engines = require('consolidate'),
+			favicon = require('serve-favicon'),
 			flash = require('connect-flash'),
 			logger = require('morgan'),
 			methodOverride = require('method-override'),
@@ -161,6 +163,7 @@ var expressService = prime({
 		self['$express'] = webServer;
 
 		webServer.set('view engine', self.$config.templateEngine);
+		webServer.set('view options', { 'layout': false });
 //		webServer.set('views', path.join(__dirname, self.$config.templateDir));
 		webServer.engine(self.$config.templateEngine, engines[self.$config.templateEngine]);
 
@@ -190,6 +193,7 @@ var expressService = prime({
 		})
 		.use(debounce())
 		.use(cors(corsOptions))
+		.use(favicon(path.join(__dirname, self.$config.favicon)))
 		.use(acceptOverride())
 		.use(methodOverride())
 		.use(compress())
@@ -215,8 +219,12 @@ var expressService = prime({
 			'extended': true,
 			'limit': self.$config.maxRequestSize
 		}))
+		.use(device.capture())
 		.use(dependencies['auth-service'].initialize())
 		.use(dependencies['auth-service'].session());
+
+		// Convenience....
+		device.enableDeviceHelpers(webServer);
 
 		// Step 6: Create the Server
 		var protocol = require(self.$config.protocol || 'http');

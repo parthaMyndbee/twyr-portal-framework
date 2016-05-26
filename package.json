@@ -48,6 +48,7 @@
 		"deepmerge": "*",
 		"dependency-graph" :"*",
 		"express": ">= 4.0",
+		"express-device": "*",
 		"ejs": "*",
 		"express-session": "*",
 		"fs-extra": "*",
@@ -70,6 +71,8 @@
 		"pg": "*",
 		"prime":"*",
 		"redis": "*",
+		"serve-favicon": "*",
+		"serve-static": "*",
 		"winston": "*"
 	},
 	"devDependencies": {
