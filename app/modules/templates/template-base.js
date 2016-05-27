@@ -62,6 +62,8 @@ var twyrTemplateBase = prime({
 		var self = this,
 			tmplPath = path.join(self.basePath, 'index.ejs');
 
+		console.log(self.name + '::configuration: ' + JSON.stringify(configuration, null, '\t'));
+
 		renderer(tmplPath, configuration)
 		.then(function(renderedHTML) {
 			if(callback) callback(null, renderedHTML);

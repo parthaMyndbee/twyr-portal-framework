@@ -9,9 +9,15 @@
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-		<script type="application/javascript" src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-		<script type="application/javascript" src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<script type="application/javascript" src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	<script type="application/javascript" src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 	<![endif]-->
+
+	<!-- Miscellaneous client-side data -->
+	<script type="application/javascript">
+	window.developmentMode = <%= developmentMode %>;
+	window.apiServer = '<%= apiServer.protocol %>://<%= apiServer.host %>:<%= apiServer.port %>/';
+	</script>
 
 	<!-- Title: Will change based on the actual slogan or whatever -->
 	<title><%= title%></title>
@@ -39,147 +45,223 @@
 	<!-- Portal AdminLTE Skin CSS Styles -->
 	<link href="/bhairavi/css/skins/skin-black-light.min.css" rel="stylesheet" type="text/css" />
 
+	<!-- Overriding styles -->
 	<style>
-	.sidebar-mini .content-wrapper {
-		margin: 0px !important;
-	}
-
-	.sidebar-mini.sidebar-collapse .content-wrapper {
-		margin: 0px !important;
-	}
-
-	.sidebar-mini .main-footer {
-		margin: 0px !important;
-	}
-
-	.sidebar-mini.sidebar-collapse .main-footer {
-		margin: 0px !important;
+	.skin-black-light .main-header>.logo {
+		border-right: 0px;
 	}
 	</style>
 </head>
-<body class="skin-black-light sidebar-mini">
-<script type="text/x-handlebars">
-<div class="wrapper">
+<body class="skin-black-light">
+	<script type="text/x-handlebars">
+	<div class="wrapper">
+		<header class="main-header">
+			{{#link-to "application" class="logo"}}
+				<span class="logo-lg">
+					<b>Twy&apos;r</b> Framework
+				</span>
+			{{/link-to}}
 
-<header class="main-header">
-	{{#link-to "application" class="logo"}}
-		<span class="logo-mini">
-			<b>T</b>wy&apos;r
-		</span>
-		<span class="logo-lg">
-			<b>Twy&apos;r</b> Framework
-		</span>
-	{{/link-to}}
+			<!-- Position: settings -->
+			<nav class="navbar navbar-static-top">
+				<div class="navbar-custom-menu">
+					<ul class="nav navbar-nav">
+						<% if(positions.settings && positions.settings.length) { %>
+							<% positions.settings.forEach(function(settingsWidget) { %>
+								{{<%= settingsWidget %>}}
+							<% }) %>
+						<% } %>
+					</ul>
+				</div>
+			</nav>
+		</header>
 
-	<nav class="navbar navbar-static-top">
-		<a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-			<span class="sr-only">Toggle navigation</span>
-		</a>
+		<!-- Position: error -->
+		<div id="bhairavi-error-position" style="position:fixed; top:10px; left:25%; min-width:50%; width:50%; max-width:50%; z-index:9999; text-align:center; display:inline-block;">
+			<div id="bhairavi-status-message" class="callout" style="display:none; border-radius:0px; width:100%;">
+				<span></span>
+			</div>
 
-		<div class="navbar-custom-menu">
+			<div id="bhairavi-error-message" class="callout callout-danger" style="display:none; border-radius:0px; width:100%;">
+				{{#each errorModel.errors.id as |error|}}
+					<span>{{error.message}}</span>
+				{{/each}}
+			</div>
 		</div>
-    </nav>
-</header>
 
-<div class="content-wrapper">
-	{{outlet}}
-</div>
+		<!-- Position: menubar -->
+		<% if(positions.menubar && positions.menubar.length) { %>
+		<div class="row" style="min-height:0px; margin:0px; border:0px; padding:0px;">
+			<div class = "col-sm-12" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.menubar.forEach(function(menuWidget) { %>
+					{{<%= menuWidget %>}}
+				<% }) %>
+			</div>
+		</div>
+		<% } %>
 
-<footer class="main-footer">
-	<div class="pull-right hidden-xs">
-		Copyright&copy; <%= baseYear %>-<%= currentYear %> {{#link-to "application"}}Twy&apos;r Framework{{/link-to}}. All rights reserved.
+		<!-- Position: module1, module2, module3 -->
+		<% if(firstRowModules) { %>
+		<div class="row" style="min-height:0px; margin:0px; border:0px; padding:0px;">
+			<% if(positions.module1 && positions.module1.length) { %>
+			<div class="col-sm-<%= firstRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module1.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+
+			<% if(positions.module2 && positions.module2.length) { %>
+			<div class="col-sm-<%= firstRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module2.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+
+			<% if(positions.module3 && positions.module3.length) { %>
+			<div class="col-sm-<%= firstRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module3.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+		</div>
+		<% } %>
+
+		<!-- Position: module4, module5, module6 -->
+		<% if(secondRowModules) { %>
+		<div class="row" style="min-height:0px; margin:0px; border:0px; padding:0px;">
+			<% if(positions.module4 && positions.module4.length) { %>
+			<div class="col-sm-<%= secondRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module4.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+
+			<% if(positions.module5 && positions.module5.length) { %>
+			<div class="col-sm-<%= secondRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module5.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+
+			<% if(positions.module6 && positions.module6.length) { %>
+			<div class="col-sm-<%= secondRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module6.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+		</div>
+		<% } %>
+
+		<div class="row" style="min-height:240px;">
+			<!-- Position: left-sidebar -->
+			<% if(positions['left-sidebar'] && positions['left-sidebar'].length) { %>
+			<div class="col-sm-2">
+				<% positions['left-sidebar'].forEach(function(sidebarWidget) { %>
+					{{<%= sidebarWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+
+			<!-- Main component area -->
+			<div class="col-sm-<%= mainContentWidth %>">
+			{{outlet}}
+			</div>
+
+			<!-- Position: right-sidebar -->
+			<% if(positions['right-sidebar'] && positions['right-sidebar'].length) { %>
+			<div class="col-sm-2">
+				<% positions['right-sidebar'].forEach(function(sidebarWidget) { %>
+					{{<%= sidebarWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+		</div>
+
+		<!-- Position: module7, module8, module9 -->
+		<% if(bottomRowModules) { %>
+		<div class="row" style="min-height:0px; margin:0px; border:0px; padding:0px;">
+			<% if(positions.module7 && positions.module7.length) { %>
+			<div class="col-sm-<%= bottomRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module7.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+
+			<% if(positions.module8 && positions.module8.length) { %>
+			<div class="col-sm-<%= bottomRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module8.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+
+			<% if(positions.module9 && positions.module9.length) { %>
+			<div class="col-sm-<%= bottomRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+				<% positions.module9.forEach(function(moduleWidget) { %>
+					{{<%= moduleWidget %>}}
+				<% }) %>
+			</div>
+			<% } %>
+		</div>
+		<% } %>
+
+		<!-- Position: footer -->
+		<footer class="main-footer" style="margin-left:0px;">
+			<div class="pull-right hidden-xs">
+				Copyright&copy; <%= baseYear %>-<%= currentYear %> {{#link-to "application"}}Twy&apos;r Framework{{/link-to}}. All rights reserved.
+			</div>
+			<% if(positions.footer && positions.footer.length) { %>
+				<% positions.footer.forEach(function(widget){ %>
+					{{<%= widget %>}}
+				<% }) %>
+			<% } else { %>
+				<p>&nbsp;</p>
+			<% } %>
+		</footer>
 	</div>
-	<b>&nbsp;</b>
-</footer>
+	</script>
 
-</div>
-</script>
+	<!-- jQuery JS Library - everything depends on it -->
+	<script type="application/javascript" src="/bhairavi/bower_components/jquery/dist/jquery.min.js"></script>
 
-<!-- jQuery JS Library - everything depends on it -->
-<script type="application/javascript" src="/bhairavi/bower_components/jquery/dist/jquery.min.js"></script>
+	<!-- Setup ALL Ajax Requests to send credential information -->
+	<script type="application/javascript">
+	$.ajaxSetup({
+		'cache': <%= !developmentMode %>,
+		'xhrFields': {
+			'withCredentials': true
+		}
+	});
+	</script>
 
-<!-- Setup ALL Ajax Requests to send credential information -->
-<script type="application/javascript">
-$.ajaxSetup({
-	'cache': <%= !developmentMode %>,
-	'xhrFields': {
-		'withCredentials': true
-	}
-});
-</script>
+	<!-- Bootstrap JS Library - the base theme stuff -->
+	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
-<!-- Miscellaneous client-side data -->
-<script type="application/javascript">
-window.developmentMode = <%= developmentMode %>;
-window.apiServer = '<%= apiServer.protocol %>://<%= apiServer.host %>:<%= apiServer.port %>/';
-</script>
-
-<!-- Bootstrap JS Library - the base theme stuff -->
-<script type="application/javascript" src="/bhairavi/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-<!-- Portal JS Library - the AdminLTE theme stuff -->
-<script type="application/javascript" src="/bhairavi/js/AdminLTE.min.js"></script>
-
-<!-- Ember.js, for the client-side MVC Framework -->
-<% if(developmentMode) { %>
+	<!-- Ember.js, for the client-side MVC Framework -->
+	<% if(developmentMode) { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/ember/ember.debug.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/ember-data/ember-data.js"></script>
-<% } else { %>
+	<% } else { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/ember/ember.min.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/ember-data/ember-data.min.js"></script>
-<% } %>
-<script type="application/javascript" src="/bhairavi/bower_components/ember/ember-template-compiler.js"></script>
-<script type="application/javascript" src="/bhairavi/bower_components/loader.js/lib/loader/loader.js"></script>
+	<% } %>
+	<script type="application/javascript" src="/bhairavi/bower_components/ember/ember-template-compiler.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/loader.js/lib/loader/loader.js"></script>
 
-<script type="application/javascript">
-define(
-	"twyrPortal/application",
-	["exports"],
-	function(exports) {
-		if(window.developmentMode) console.log('DEFINE: twyrPortal/application');
-		var twyrApplication = window.Ember.Application.extend({
-			'modulePrefix': 'twyrPortal',
-		});
+	<!-- ROUTES -->
+	<!-- ROUTE_HANDLERS -->
+	<!-- MODELS -->
+	<!-- COMPONENTS -->
+	<!-- TEMPLATES -->
 
-		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/create');
-		var App = twyrApplication.create({
-			LOG_RESOLVER: window.developmentMode,
-			LOG_ACTIVE_GENERATION: window.developmentMode,
-			LOG_TRANSITIONS: window.developmentMode,
-			LOG_TRANSITIONS_INTERNAL: window.developmentMode,
-			LOG_VIEW_LOOKUPS: window.developmentMode
-		});
-
-		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/router');
-		App.Router.reopen({
-			'location': 'history'
-		});
-
-		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/adapter');
-		App.ApplicationAdapter = window.DS.RESTAdapter.extend({
-			'namespace': '',
-			'host': window.apiServer.substring(0, window.apiServer.length - 1),
-
-			'ajaxError': function(jqXHR) {
-				if (jqXHR && jqXHR.status == 422) {
-					var jsonErrors = window.Ember.$.parseJSON(jqXHR.responseText)["errors"];
-					return new window.DS.InvalidError(jsonErrors);
-				}
-				else {
-					var error = this._super(jqXHR);
-					return error;
-				}
-			}
-		});
-
-		if(window.developmentMode) console.log('EXPORT: twyrPortal/application');
-		exports['default'] = App;
-	}
-);
-
-// Start off the Application...
-if(window.developmentMode) console.log('Starting the twyrPortal Ember App');
-window.twyrPortal = require('twyrPortal/application')['default'];
-</script>
+	<!-- App.js - script to init/start the Twyr Ember App -->
+	<script type="application/javascript" src="/bhairavi/js/app.js"></script>
 </body>
 </html>
