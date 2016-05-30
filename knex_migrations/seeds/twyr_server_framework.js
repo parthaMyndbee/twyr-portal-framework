@@ -46,7 +46,46 @@ exports.seed = function(knex, Promise) {
 
 			return Promise.all([
 				parentId,
-				knex("module_templates").insert({ 'module_id': parentId, 'name': 'bhairavi', 'description': 'The Twy\'r Portal default template', 'media_type': 'all', 'user_type': 'all', 'is_default': true, 'configuration': { 'title': 'Twy\'r Portal: Bhairavi Template' } }),
+				knex("module_templates").insert({ 'module_id': parentId, 'name': 'bhairavi', 'description': 'The Twy\'r Portal default public template', 'media_type': 'all', 'user_type': 'public', 'is_default': true, 'configuration': { 'title': 'Twy\'r Portal: Bhairavi Template' } }).returning('id')
+				.then(function(templateId) {
+					templateId = templateId[0];
+					return Promise.all([
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'settings' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'menubar' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module1' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module2' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module3' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module4' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module5' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module6' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'left-sidebar' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'right-sidebar' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module7' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module8' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module9' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'footer' })
+					]);
+				}),
+				knex("module_templates").insert({ 'module_id': parentId, 'name': 'hamsadhvani', 'description': 'The Twy\'r Portal default registered template', 'media_type': 'all', 'user_type': 'registered', 'is_default': true, 'configuration': { 'title': 'Twy\'r Portal: Bhairavi Template' } }).returning('id')
+				.then(function(templateId) {
+					templateId = templateId[0];
+					return Promise.all([
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'settings' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'menubar' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module1' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module2' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module3' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module4' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module5' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module6' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'left-sidebar' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'right-sidebar' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module7' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module8' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'module9' }),
+						knex("template_positions").insert({ 'template_id': templateId, 'name': 'footer' })
+					]);
+				})
 			]);
 		});
 	})
@@ -69,7 +108,7 @@ exports.seed = function(knex, Promise) {
 			return [ userId.rows[0]['id'] ];
 		}
 
-		return knex("users").insert({ 'email': 'root@twyr.com', 'password': '', 'first_name': 'Root', 'last_name': 'Twyr', 'nickname': 'root' }).returning('id');
+		return knex("users").insert({ 'email': 'root@twyr.com', 'password': '$2a$10$vXn2EzX54o06fl0VTOxJk..4XNqCGxW6KQjIn4ZJIkblFrz7ohQ9S', 'first_name': 'Root', 'last_name': 'Twyr', 'nickname': 'root' }).returning('id');
 	})
 	.then(function(userId) {
 		rootUserId = userId[0];

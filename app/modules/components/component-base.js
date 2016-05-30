@@ -130,15 +130,7 @@ var twyrComponentBase = prime({
 			return dbSrvc.raw('SELECT id, module_id, name, media_type, user_type, configuration FROM module_templates WHERE module_id = ? AND is_default = true;', [id])
 		})
 		.then(function(moduleTemplates) {
-			if(!moduleTemplates.rows.length) {
-				throw new Error('No client side assets for: ' + self.name);
-				return null;
-			}
-
-			return moduleTemplates.rows;
-		})
-		.then(function(possibleTemplates) {
-			if(callback) callback(null, possibleTemplates);
+			if(callback) callback(null, moduleTemplates.rows);
 			return null;
 		})
 		.catch(function(err) {
@@ -148,7 +140,7 @@ var twyrComponentBase = prime({
 	},
 
 	'_selectTemplates': function(user, mediaType, possibleTemplates, callback) {
-		if(callback) callback(null, []);
+		if(callback) callback(null, possibleTemplates);
 	},
 
 	'_renderTemplateWidgets': function(user, selectedTemplate, renderer, callback) {
@@ -157,13 +149,13 @@ var twyrComponentBase = prime({
 
 		self._getTemplateWidgetsAsync(user, selectedTemplate)
 		.then(function(tmplWithWidgets) {
-			return (self.$templates[selectedTemplate.name]).renderAsync(renderer, tmplWithWidgets.configuration);
+			return (self.$templates[tmplWithWidgets.name]).renderAsync(renderer, tmplWithWidgets.configuration);
 		})
 		.then(function(renderedTemplate) {
 			if(callback) callback(null, renderedTemplate);
 		})
 		.catch(function(err) {
-			loggerSrvc.error(self.name + '::_renderTemplateWidgets:\nError: ', err);
+			loggerSrvc.error(self.name + '::_renderTemplateWidgets:\nUser: ', user, '\nSelected Template: ', selectedTemplate, '\nError: ', err);
 			if(callback) callback(err);
 		});
 	},
@@ -199,7 +191,7 @@ var twyrComponentBase = prime({
 			return null;
 		})
 		.catch(function(err) {
-			loggerSrvc.error(self.name + '::_getTemplateWidgets:\nError: ', err);
+			loggerSrvc.error(self.name + '::_getTemplateWidgets:\nUser: ', user, '\nTemplate: ', template, '\nError: ', err);
 			if(callback) callback(err);
 		});
 	},
