@@ -95,6 +95,11 @@ var hamsadhvaniTemplate = prime({
 		if(positions['right-sidebar'] && positions['right-sidebar'].length)
 			configuration.mainContentWidth -= 2;
 
+		// General stuff...
+		configuration.baseYear = this.$module.$config.baseYear;
+		configuration.currentYear = (new Date()).getUTCFullYear();
+		configuration.developmentMode = ((process.env.NODE_ENV || 'development').toLowerCase() == 'development');
+
 		// Call parent for actual rendering
 		hamsadhvaniTemplate.parent.render.call(this, renderer, configuration, function(err, renderedTmpl) {
 			if(err) {
