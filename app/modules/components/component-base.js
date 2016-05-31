@@ -46,6 +46,7 @@ var twyrComponentBase = prime({
 		this._getEmberRouteHandlersAsync = promises.promisify(this._getEmberRouteHandlers.bind(this));
 		this._getEmberModelsAsync = promises.promisify(this._getEmberModels.bind(this));
 		this._getEmberComponentsAsync = promises.promisify(this._getEmberComponents.bind(this));
+		this._getEmberComponentHTMLsAsync = promises.promisify(this._getEmberComponentHTMLs.bind(this));
 
 		this._checkPermissionAsync = promises.promisify(this._checkPermission.bind(this));
 		base.call(this, module, loader);
@@ -78,6 +79,7 @@ var twyrComponentBase = prime({
 			promiseResolutions.push(self._getEmberRouteHandlersAsync(user, renderer));
 			promiseResolutions.push(self._getEmberModelsAsync(user, renderer));
 			promiseResolutions.push(self._getEmberComponentsAsync(user, renderer));
+			promiseResolutions.push(self._getEmberComponentHTMLsAsync(user, renderer));
 			promiseResolutions.push(renderedTemplates);
 
 			return promises.all(promiseResolutions);
@@ -90,7 +92,8 @@ var twyrComponentBase = prime({
 					'routeHandler': results[1],
 					'model': results[2],
 					'component': results[3],
-					'template': results[4]
+					'componentHTML': results[4],
+					'template': results[5]
 				};
 
 			promiseResolutions.push(selfEmberAssets);
@@ -108,7 +111,8 @@ var twyrComponentBase = prime({
 			selfEmberAssets.routeHandler = selfEmberAssets.routeHandler.concat(_.map(results, 'routeHandler')).join('\n').trim();
 			selfEmberAssets.model = selfEmberAssets.model.concat(_.map(results, 'model')).join('\n').trim();
 			selfEmberAssets.component = selfEmberAssets.component.concat(_.map(results, 'component')).join('\n').trim();
-			selfEmberAssets.template = selfEmberAssets.route.concat(_.map(results, 'template')).join('\n').trim();
+			selfEmberAssets.componentHTML = selfEmberAssets.componentHTML.concat(_.map(results, 'componentHTML')).join('\n').trim();
+			selfEmberAssets.template = selfEmberAssets.template.concat(_.map(results, 'template')).join('\n').trim();
 
 			if(callback) callback(null, selfEmberAssets);
 			return null;
@@ -209,6 +213,10 @@ var twyrComponentBase = prime({
 	},
 
 	'_getEmberComponents': function(user, renderer, callback){
+		if(callback) callback(null, []);
+	},
+
+	'_getEmberComponentHTMLs': function(user, renderer, callback){
 		if(callback) callback(null, []);
 	},
 

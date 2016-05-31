@@ -44,12 +44,19 @@
 
 	<!-- Portal AdminLTE Skin CSS Styles -->
 	<link href="/bhairavi/css/skins/skin-black-light.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Overriding styles -->
+	<style>
+	.skin-black-light .main-header>.logo {
+		border-right: 0px;
+	}
+	</style>
 </head>
 <body class="skin-black-light">
 	<script type="text/x-handlebars">
 	<div class="wrapper">
 		<header class="main-header">
-			{{#link-to "application" class="logo" style="border-right:0px;"}}
+			{{#link-to "application" class="logo"}}
 				<span class="logo-lg">
 					<b>Twy&apos;r</b> Framework
 				</span>
@@ -151,10 +158,10 @@
 		</div>
 		<% } %>
 
-		<div class="row" style="min-height:240px;">
+		<div class="row" style="margin:0px; padding:10px;">
 			<!-- Position: left-sidebar -->
 			<% if(positions['left-sidebar'] && positions['left-sidebar'].length) { %>
-			<div class="col-sm-2">
+			<div class="col-sm-2" style="padding:0px;">
 				<% positions['left-sidebar'].forEach(function(sidebarWidget) { %>
 					{{<%= sidebarWidget %>}}
 				<% }) %>
@@ -162,13 +169,13 @@
 			<% } %>
 
 			<!-- Main component area -->
-			<div class="col-sm-<%= mainContentWidth %>">
+			<div class="col-sm-<%= mainContentWidth %>" style="padding:0px;">
 			{{outlet}}
 			</div>
 
 			<!-- Position: right-sidebar -->
 			<% if(positions['right-sidebar'] && positions['right-sidebar'].length) { %>
-			<div class="col-sm-2">
+			<div class="col-sm-2" style="padding:0px;">
 				<% positions['right-sidebar'].forEach(function(sidebarWidget) { %>
 					{{<%= sidebarWidget %>}}
 				<% }) %>
@@ -221,8 +228,21 @@
 	</div>
 	</script>
 
+	<!-- Ember Component HTMLs -->
+	<!-- COMPONENTHTMLS -->
+
+	<!-- Ember HTMLbars Templates -->
+	<!-- TEMPLATES -->
+
+	<!-- loader.js - ES6 Module definition -->
+	<script type="application/javascript" src="/bhairavi/bower_components/loader.js/lib/loader/loader.js"></script>
+
 	<!-- jQuery JS Library - everything depends on it -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/jquery/dist/jquery.js"></script>
+	<% } else { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/jquery/dist/jquery.min.js"></script>
+	<% } %>
 
 	<!-- Setup ALL Ajax Requests to send credential information -->
 	<script type="application/javascript">
@@ -235,7 +255,11 @@
 	</script>
 
 	<!-- Bootstrap JS Library - the base theme stuff -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+	<% } else { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	<% } %>
 
 	<!-- Ember.js, for the client-side MVC Framework -->
 	<% if(developmentMode) { %>
@@ -245,9 +269,30 @@
 	<script type="application/javascript" src="/bhairavi/bower_components/ember/ember.min.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/ember-data/ember-data.min.js"></script>
 	<% } %>
-	<script type="application/javascript" src="/bhairavi/bower_components/ember/ember-template-compiler.js"></script>
-	<script type="application/javascript" src="/bhairavi/bower_components/loader.js/lib/loader/loader.js"></script>
 
+	<!-- Ember.js shims, to create ES6 modules -->
+	<script type="application/javascript" src="/bhairavi/bower_components/ember-cli-shims/app-shims.js"></script>
+
+	<!-- ES5 shims... -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/es5-shim/es5-shim.js"></script>
+	<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/es5-shim/es5-shim.min.js"></script>
+	<% } %>
+
+	<!-- Ember Template Compiler - convert scripts to HTMLBars -->
+	<script type="application/javascript" src="/bhairavi/bower_components/ember/ember-template-compiler.js"></script>
+
+	<!-- Ember Load Initializers - start the App in a happy place -->
+	<script type="application/javascript" src="/bhairavi/js/ember-load-initializers.js"></script>
+
+	<!-- Ember Resolver - use the defines... -->
+	<script type="application/javascript" src="/bhairavi/js/ember-resolver.js"></script>
+
+	<!-- App.js - script to init/start the Twyr Ember App -->
+	<script type="application/javascript" src="/bhairavi/js/app.js"></script>
+
+	<script type="application/javascript">
 	<!-- Ember Routes -->
 	<!-- ROUTES -->
 
@@ -260,10 +305,7 @@
 	<!-- Ember Components -->
 	<!-- COMPONENTS -->
 
-	<!-- Ember HTMLbars Templates -->
-	<!-- TEMPLATES -->
-
-	<!-- App.js - script to init/start the Twyr Ember App -->
-	<script type="application/javascript" src="/bhairavi/js/app.js"></script>
+	require('twyr-portal/application')['default'];
+	</script>
 </body>
 </html>

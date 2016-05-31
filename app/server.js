@@ -121,7 +121,7 @@ var app = prime({
 
 			promiseResolutions.push(self._getEmberRMCAsync(user, mediaType, renderer));
 			Object.keys(self.$components).forEach(function(componentName) {
-				(self.$components[componentName])._getEmberRMCAsync(user, mediaType, renderer);
+				promiseResolutions.push((self.$components[componentName])._getEmberRMCAsync(user, mediaType, renderer));
 			});
 
 			return promises.all(promiseResolutions);
@@ -134,6 +134,7 @@ var app = prime({
 			selectedTemplate.configuration.routeHandlers = _.map(emberStuff, 'routeHandler').join('\n').trim();
 			selectedTemplate.configuration.models = _.map(emberStuff, 'model').join('\n').trim();
 			selectedTemplate.configuration.components = _.map(emberStuff, 'component').join('\n').trim();
+			selectedTemplate.configuration.componentHTMLs = _.map(emberStuff, 'componentHTML').join('\n').trim();
 			selectedTemplate.configuration.templates = _.map(emberStuff, 'template').join('\n').trim();
 
 			selectedTemplate.configuration.apiServer = self.$config.apiServer;
@@ -263,6 +264,7 @@ var app = prime({
 			'routeHandler': '',
 			'model': '',
 			'component': '',
+			'componentHTML': '',
 			'template': ''
 		});
 	},

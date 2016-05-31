@@ -32,7 +32,9 @@
   "dependencies": {
     "bootstrap": "*",
     "ember": "*",
+    "ember-cli-shims": "*",
     "ember-data": "*",
+    "es5-shim": "*",
     "fontawesome": "*",
     "ionicons": "*",
     "jquery": "*",

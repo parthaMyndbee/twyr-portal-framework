@@ -1,48 +1,71 @@
 define(
-	"twyrPortal/application",
-	["exports"],
-	function(exports) {
-		if(window.developmentMode) console.log('DEFINE: twyrPortal/application');
-		var twyrApplication = window.Ember.Application.extend({
-			'modulePrefix': 'twyrPortal',
+	'twyr-portal/resolver',
+	['exports', 'ember-resolver'],
+	function (exports, _emberResolver) {
+		exports['default'] = _emberResolver['default'];
+	}
+);
+
+define(
+	'twyr-portal/router',
+	['exports', 'ember'],
+	function (exports, _ember) {
+		if(window.developmentMode) console.log('DEFINE: twyr-portal/application/router');
+		var Router = _ember['default'].Router.extend({
+			location: 'history'
 		});
 
-		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/create');
-		var App = twyrApplication.create({
-			LOG_RESOLVER: window.developmentMode,
-			LOG_ACTIVE_GENERATION: window.developmentMode,
-			LOG_TRANSITIONS: window.developmentMode,
-			LOG_TRANSITIONS_INTERNAL: window.developmentMode,
-			LOG_VIEW_LOOKUPS: window.developmentMode
-		});
+		exports['default'] = Router;
+	}
+);
 
-		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/router');
-		App.Router.reopen({
-			'location': 'history'
-		});
+define(
+	'twyr-portal/initializers/container-debug-adapter',
+	['exports', 'ember-resolver/container-debug-adapter'],
+	function (exports, _emberResolverContainerDebugAdapter) {
+		exports['default'] = {
+			'name': 'container-debug-adapter',
 
-		if(window.developmentMode) console.log('DEFINE: twyrPortal/application/adapter');
-		App.ApplicationAdapter = window.DS.RESTAdapter.extend({
-			'namespace': '',
-			'host': window.apiServer.substring(0, window.apiServer.length - 1),
-
-			'ajaxError': function(jqXHR) {
-				if (jqXHR && jqXHR.status == 422) {
-					var jsonErrors = window.Ember.$.parseJSON(jqXHR.responseText)["errors"];
-					return new window.DS.InvalidError(jsonErrors);
-				}
-				else {
-					var error = this._super(jqXHR);
-					return error;
-				}
+			'initialize': function initialize() {
+				var app = arguments[1] || arguments[0];
+				app.register('container-debug-adapter:main', _emberResolverContainerDebugAdapter['default']);
+				app.inject('container-debug-adapter:main', 'namespace', 'application:main');
 			}
+		};
+	}
+);
+
+define(
+	'twyr-portal/application',
+	['exports', 'ember', 'twyr-portal/resolver', 'ember-load-initializers', 'ember-data/adapters/json-api'],
+	function(exports, _ember, _twyrPortalResolver, _emberLoadInitializers, _jsonAPIAdapter) {
+		if(window.developmentMode) console.log('DEFINE: twyr-portal/application');
+		var twyrApplication = _ember['default'].Application.extend({
+			'modulePrefix': 'twyr-portal',
+		    'Resolver': _twyrPortalResolver['default']
 		});
 
-		if(window.developmentMode) console.log('EXPORT: twyrPortal/application');
+		(0, _emberLoadInitializers['default'])(twyrApplication, 'twyr-portal');
+
+		if(window.developmentMode) console.log('DEFINE: twyr-portal/application/create');
+		var App = twyrApplication.create({
+			'name': 'twyr-portal',
+			'version': '0.7.1',
+			'LOG_RESOLVER': window.developmentMode,
+			'LOG_ACTIVE_GENERATION': window.developmentMode,
+			'LOG_TRANSITIONS': window.developmentMode,
+			'LOG_TRANSITIONS_INTERNAL': window.developmentMode,
+			'LOG_VIEW_LOOKUPS': window.developmentMode
+		});
+
+		if(window.developmentMode) console.log('DEFINE: twyr-portal/application/adapter');
+		App.ApplicationAdapter = _jsonAPIAdapter['default'].extend({
+			'namespace': '',
+			'host': window.apiServer.substring(0, window.apiServer.length - 1)
+		});
+
+		if(window.developmentMode) console.log('EXPORT: twyr-portal/application');
 		exports['default'] = App;
 	}
 );
 
-// Start off the Application...
-if(window.developmentMode) console.log('Starting the twyrPortal Ember App');
-window.twyrPortal = require('twyrPortal/application')['default'];

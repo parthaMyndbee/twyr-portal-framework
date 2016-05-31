@@ -111,12 +111,14 @@ var hamsadhvaniTemplate = prime({
 				routeHandlersRegExp = new RegExp("<!-- ROUTE_HANDLERS -->", 'g'),
 				modelsRegExp = new RegExp("<!-- MODELS -->", 'g'),
 				componentsRegExp = new RegExp("<!-- COMPONENTS -->", 'g'),
+				componentHTMLsRegExp = new RegExp("<!-- COMPONENTHTMLS -->", 'g'),
 				templatesRegExp = new RegExp("<!-- TEMPLATES -->", 'g');
 
 			renderedTmpl = renderedTmpl.replace(routesRegExp, configuration.routes);
 			renderedTmpl = renderedTmpl.replace(routeHandlersRegExp, configuration.routeHandlers);
 			renderedTmpl = renderedTmpl.replace(modelsRegExp, configuration.models);
 			renderedTmpl = renderedTmpl.replace(componentsRegExp, configuration.components);
+			renderedTmpl = renderedTmpl.replace(componentHTMLsRegExp, configuration.componentHTMLs);
 			renderedTmpl = renderedTmpl.replace(templatesRegExp, configuration.templates);
 
 			if(callback) callback(null, renderedTmpl);
