@@ -11,10 +11,12 @@ define(
 					'dataType': 'json',
 
 					'success': function(data) {
+						window.Cookies.remove('twyr-portal', { 'path': '/', 'domain': '.twyrframework.com' });
 						window.location.href = '/';
 					},
 
 					'error': function(err) {
+						window.Cookies.remove('twyr-portal', { 'path': '/', 'domain': '.twyrframework.com' });
 						window.location.href = '/';
 					}
 				});

@@ -38,6 +38,7 @@
     "fontawesome": "*",
     "ionicons": "*",
     "jquery": "*",
+    "js-cookie": "*",
     "loader.js": "ember-cli/loader.js",
     "normalize-css": "*",
     "validate.js": "*"

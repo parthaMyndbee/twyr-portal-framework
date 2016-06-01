@@ -52,33 +52,53 @@
 	}
 	</style>
 </head>
-<body class="skin-black-light">
+<body class="skin-black-light layout-top-nav">
 	<script type="text/x-handlebars">
 	<div class="wrapper">
 		<header class="main-header">
-			{{#link-to "application" class="logo"}}
-				<span class="logo-lg">
-					<b>Twy&apos;r</b> Framework
-				</span>
-			{{/link-to}}
-
-			<!-- Position: settings -->
 			<nav class="navbar navbar-static-top">
-				<div class="navbar-custom-menu">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					{{#link-to "application" class="logo navbar-brand"}}
+						<b>Twy&apos;r</b> Framework
+					{{/link-to}}
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+						<i class="fa fa-bars"></i>
+					</button>
+				</div>
+				<div class="collapse navbar-collapse" id="navbar-collapse">
+					<!-- Position: menubar -->
 					<ul class="nav navbar-nav">
+						<% if(positions.menubar && positions.menubar.length) { %>
+							<% positions.menubar.forEach(function(menubarWidget, index) { %>
+								<% if (index == 0) { %>
+								<li class="active">{{<%= menubarWidget %>}}</li>
+								<% } else { %>
+								<li>{{<%= menubarWidget %>}}</li>
+								<% } %>
+							<% }) %>
+						<% } %>
+					</ul>
+					<!-- Position: settings -->
+					<ul class="nav navbar-nav navbar-right">
 						<% if(positions.settings && positions.settings.length) { %>
-							<% positions.settings.forEach(function(settingsWidget) { %>
-								<li class="user">{{<%= settingsWidget %>}}</li>
+							<% positions.settings.forEach(function(settingsWidget, index) { %>
+								<% if (index == 0) { %>
+								<li class="active">{{<%= settingsWidget %>}}</li>
+								<% } else { %>
+								<li>{{<%= settingsWidget %>}}</li>
+								<% } %>
 							<% }) %>
 						<% } %>
 					</ul>
 				</div>
+			</div>
 			</nav>
 		</header>
 
 		<!-- Position: error -->
 		<div id="hamsadhvani-error-position" style="position:fixed; top:10px; left:25%; min-width:50%; width:50%; max-width:50%; z-index:9999; text-align:center; display:inline-block;">
-			<div id="hamsadhvani-status-message" class="callout" style="display:none; border-radius:0px; width:100%;">
+			<div id="hamsadhvani-status-message" class="callout callout-info" style="display:none; border-radius:0px; width:100%;">
 				<span></span>
 			</div>
 
@@ -88,17 +108,6 @@
 				{{/each}}
 			</div>
 		</div>
-
-		<!-- Position: menubar -->
-		<% if(positions.menubar && positions.menubar.length) { %>
-		<div class="row" style="min-height:0px; margin:0px; border:0px; padding:0px;">
-			<div class = "col-sm-12" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
-				<% positions.menubar.forEach(function(menuWidget) { %>
-					{{<%= menuWidget %>}}
-				<% }) %>
-			</div>
-		</div>
-		<% } %>
 
 		<!-- Position: module1, module2, module3 -->
 		<% if(firstRowModules) { %>
@@ -267,6 +276,9 @@
 	<% } else { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<% } %>
+
+	<!-- jQuery Plugins -->
+	<script type="application/javascript" src="/bhairavi/bower_components/js-cookie/src/js.cookie.js"></script>
 
 	<!-- Ember.js, for the client-side MVC Framework -->
 	<% if(developmentMode) { %>
