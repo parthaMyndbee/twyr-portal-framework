@@ -24,7 +24,7 @@ exports.seed = function(knex, Promise) {
 		})
 		.then(function(publicPermId) {
 			publicPermId = publicPermId.rows[0].id;
-			return knex("module_widgets").insert({ 'module_id': componentId, 'permission_id': publicPermId, 'ember_component': 'login-component', 'display_name': 'Twy\'r Login', 'description': 'The Twy\'r Portal Login Widget' }).returning('id');
+			return knex("module_widgets").insert({ 'module_id': componentId, 'permission_id': publicPermId, 'ember_component': 'login-widget', 'display_name': 'Twy\'r Login', 'description': 'The Twy\'r Portal Login Widget' }).returning('id');
 		})
 		.then(function(loginComponentId) {
 			loginWidgetId = loginComponentId[0];
@@ -39,7 +39,7 @@ exports.seed = function(knex, Promise) {
 		})
 		.then(function(registeredPermId) {
 			registeredPermId = registeredPermId.rows[0].id;
-			return knex("module_widgets").insert({ 'module_id': componentId, 'permission_id': registeredPermId, 'ember_component': 'logout-component', 'display_name': 'Twy\'r Logout', 'description': 'The Twy\'r Portal Logout Widget' }).returning('id');
+			return knex("module_widgets").insert({ 'module_id': componentId, 'permission_id': registeredPermId, 'ember_component': 'logout-widget', 'display_name': 'Twy\'r Logout', 'description': 'The Twy\'r Portal Logout Widget' }).returning('id');
 		})
 		.then(function(logoutComponentId) {
 			logoutWidgetId = logoutComponentId[0];

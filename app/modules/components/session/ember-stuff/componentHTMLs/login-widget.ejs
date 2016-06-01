@@ -5,6 +5,20 @@
 	<h3 class="box-title">Twy&apos;r Login</h3>
 </div>
 
+<div id="div-login-component-alert-message" class="box-body callout callout-danger" style="display:none; border-radius:0px;">
+	<i class="fa fa-ban"></i>
+	<span id="login-component-alert-message">Alert!</span>
+</div>
+
+<div id="div-login-component-progress-message" class="box-body callout callout-info" style="display:none; border-radius:0px;">
+	<i class="fa fa-spinner fa-spin"></i>
+	<span id="login-component-progress-message">Progress...</span>
+</div>
+
+<div id="div-login-component-success-message" class="box-body callout callout-success" style="display:none; border-radius:0px;">
+	<span id="login-component-success-message">Success!</span>
+</div>
+
 <div id="div-box-body-login" class="box-body">
 	<form role="form">
 	<div class="form-group">
@@ -19,7 +33,7 @@
 		<div class="col-md-6" style="text-align:left;">
 			<a href="#" {{action "controller-action" "showResetPasswordForm"}}>Forgot Password</a>
 			<br />
-			<a href="#" {{action "controller-action" "showRegisterForm"}}>Register Account</a>
+			<a href="#" {{action "controller-action" "showNewAccountForm"}}>Register Account</a>
 		</div>
 		<div class="col-md-6" style="text-align:right;">
 			<button id="login-button-submit" type="submit" class="btn btn-block" style="margin-top:5px;" {{action "controller-action" "doLogin"}}>Login</button>
@@ -38,7 +52,7 @@
 		<div class="col-md-6" style="text-align:left;">
 			<a href="#" {{action "controller-action" "showLoginForm"}}>Twy&apos;r Login</a>
 			<br />
-			<a href="#" {{action "controller-action" "showRegisterForm"}}>Register Account</a>
+			<a href="#" {{action "controller-action" "showNewAccountForm"}}>Register Account</a>
 		</div>
 		<div class="col-md-6" style="text-align:right;">
 			<button id="reset-password-button-submit" type="submit" class="btn btn-md" style="margin-top:5px;" {{action "controller-action" "resetPassword"}}>Reset</button>

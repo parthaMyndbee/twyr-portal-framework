@@ -40,7 +40,7 @@
     "jquery": "*",
     "loader.js": "ember-cli/loader.js",
     "normalize-css": "*",
-    "validatorjs": "*"
+    "validate.js": "*"
   },
   "devDependencies": {}
 }

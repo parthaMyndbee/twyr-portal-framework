@@ -16,7 +16,7 @@
 
 exports.strategy = (function() {
 	var self = this,
-		auth = self.$passport,
+		auth = self.getInterface(),
 		logger = self.dependencies['logger-service'];
 
 	auth.serializeUser(function(user, done) {

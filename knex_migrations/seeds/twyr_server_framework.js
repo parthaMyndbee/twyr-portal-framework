@@ -66,7 +66,7 @@ exports.seed = function(knex, Promise) {
 						knex("template_positions").insert({ 'template_id': templateId, 'name': 'footer' })
 					]);
 				}),
-				knex("module_templates").insert({ 'module_id': parentId, 'name': 'hamsadhvani', 'description': 'The Twy\'r Portal default registered template', 'media_type': 'all', 'user_type': 'registered', 'is_default': true, 'configuration': { 'title': 'Twy\'r Portal: Bhairavi Template' } }).returning('id')
+				knex("module_templates").insert({ 'module_id': parentId, 'name': 'hamsadhvani', 'description': 'The Twy\'r Portal default registered template', 'media_type': 'all', 'user_type': 'registered', 'is_default': true, 'configuration': { 'title': 'Twy\'r Portal: Hamsadhvani Template' } }).returning('id')
 				.then(function(templateId) {
 					templateId = templateId[0];
 					return Promise.all([

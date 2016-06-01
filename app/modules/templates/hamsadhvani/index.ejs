@@ -68,7 +68,7 @@
 					<ul class="nav navbar-nav">
 						<% if(positions.settings && positions.settings.length) { %>
 							<% positions.settings.forEach(function(settingsWidget) { %>
-								{{<%= settingsWidget %>}}
+								<li class="user">{{<%= settingsWidget %>}}</li>
 							<% }) %>
 						<% } %>
 					</ul>
@@ -77,12 +77,12 @@
 		</header>
 
 		<!-- Position: error -->
-		<div id="bhairavi-error-position" style="position:fixed; top:10px; left:25%; min-width:50%; width:50%; max-width:50%; z-index:9999; text-align:center; display:inline-block;">
-			<div id="bhairavi-status-message" class="callout" style="display:none; border-radius:0px; width:100%;">
+		<div id="hamsadhvani-error-position" style="position:fixed; top:10px; left:25%; min-width:50%; width:50%; max-width:50%; z-index:9999; text-align:center; display:inline-block;">
+			<div id="hamsadhvani-status-message" class="callout" style="display:none; border-radius:0px; width:100%;">
 				<span></span>
 			</div>
 
-			<div id="bhairavi-error-message" class="callout callout-danger" style="display:none; border-radius:0px; width:100%;">
+			<div id="hamsadhvani-error-message" class="callout callout-danger" style="display:none; border-radius:0px; width:100%;">
 				{{#each errorModel.errors.id as |error|}}
 					<span>{{error.message}}</span>
 				{{/each}}
@@ -236,6 +236,13 @@
 
 	<!-- loader.js - ES6 Module definition -->
 	<script type="application/javascript" src="/bhairavi/bower_components/loader.js/lib/loader/loader.js"></script>
+
+	<!-- Validate.js - easier form value validations -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/validate.js/validate.js"></script>
+	<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/validate.js/validate.min.js"></script>
+	<% } %>
 
 	<!-- jQuery JS Library - everything depends on it -->
 	<% if(developmentMode) { %>

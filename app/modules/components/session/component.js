@@ -53,7 +53,15 @@ var sessionComponent = prime({
 			return;
 		}
 
-		if(callback) callback(null, []);
+		filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/components/logout-widget.js'), 'utf8')
+		.then(function(logoutComponentJS) {
+			if(callback) callback(null, [logoutComponentJS]);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error(self.name + '::_getEmberComponents:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
 	},
 
 	'_getEmberComponentHTMLs': function(user, renderer, callback) {
@@ -74,7 +82,15 @@ var sessionComponent = prime({
 			return;
 		}
 
-		if(callback) callback(null, []);
+		filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/componentHTMLs/logout-widget.ejs'), 'utf8')
+		.then(function(loginComponentHTML) {
+			if(callback) callback(null, [loginComponentHTML]);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error(self.name + '::_getEmberComponentHTMLs:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
 	},
 
 	'name': 'session',
