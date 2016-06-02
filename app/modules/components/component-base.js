@@ -125,8 +125,8 @@ var twyrComponentBase = prime({
 
 	'_getConfiguredTemplates': function(callback) {
 		var self = this,
-			configSrvc = (self.$services['configuration-service']).getInterface(),
-			dbSrvc = (self.$services['database-service']).getInterface().knex,
+			configSrvc = (self.dependencies['configuration-service']),
+			dbSrvc = (self.dependencies['database-service']).knex,
 			loggerSrvc = self.dependencies['logger-service'];
 
 		configSrvc.getModuleIdAsync(self)

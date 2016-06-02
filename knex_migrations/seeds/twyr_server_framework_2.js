@@ -47,7 +47,7 @@ exports.seed = function(knex, Promise) {
 		})
 		.then(function(tmplPositionId) {
 			tmplPositionId = tmplPositionId.rows[0].id;
-			return knex("widget_template_position").insert({ 'template_position_id': tmplPositionId, 'module_widget_id': logoutWidgetId, 'display_order': 0 });
+			return knex("widget_template_position").insert({ 'template_position_id': tmplPositionId, 'module_widget_id': logoutWidgetId, 'display_order': 10000 });
 		});
 	});
 };

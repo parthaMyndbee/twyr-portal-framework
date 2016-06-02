@@ -35,6 +35,9 @@ var twyrTemplateBase = prime({
 		if(this.dependencies.indexOf('express-service') < 0)
 			this.dependencies.push('express-service');
 
+		if(this.dependencies.indexOf('logger-service') < 0)
+			this.dependencies.push('logger-service');
+
 		this['$router'] = require('express').Router();
 		base.call(this, module, loader);
 	},
