@@ -107,7 +107,7 @@ var twyrComponentBase = prime({
 		.then(function(results) {
 			var selfEmberAssets = results.shift();
 
-			selfEmberAssets.route = selfEmberAssets.route.concat(_.map(results, 'route')).join('\n').trim();
+			selfEmberAssets.route = selfEmberAssets.route.concat(_.map(results, 'route'));
 			selfEmberAssets.routeHandler = selfEmberAssets.routeHandler.concat(_.map(results, 'routeHandler')).join('\n').trim();
 			selfEmberAssets.model = selfEmberAssets.model.concat(_.map(results, 'model')).join('\n').trim();
 			selfEmberAssets.component = selfEmberAssets.component.concat(_.map(results, 'component')).join('\n').trim();

@@ -31,14 +31,47 @@ var profileComponent = prime({
 	},
 
 	'_selectTemplates': function(user, mediaType, possibleTemplates, callback) {
-		console.log('\n\n\n\n' + this.name + '.$config: ' + JSON.stringify(this.$config, null, '\t'));
-
 		if(!user) {
 			if(callback) callback(null, []);
 			return null;
 		}
 
 		if(callback) callback(null, possibleTemplates);
+	},
+
+	'_getEmberRoutes': function(user, renderer, callback) {
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		if(callback) callback(null, [{
+			'name': 'profile',
+			'path': '/profile',
+
+			'parentRoute': null,
+			'subRoutes': []
+		}]);
+	},
+
+	'_getEmberRouteHandlers': function(user, renderer, callback) {
+		var loggerSrvc = this.dependencies['logger-service'],
+			self = this;
+
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/routeHandlers/default.js'), 'utf8')
+		.then(function(profileComponentJS) {
+			if(callback) callback(null, [profileComponentJS]);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error(self.name + '::_getEmberComponents:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
 	},
 
 	'_getEmberComponents': function(user, renderer, callback) {
@@ -70,7 +103,7 @@ var profileComponent = prime({
 			return null;
 		}
 
-		filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-widget.ejs'), 'utf8')
+		renderer(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-widget.ejs'), { 'fullname': user.firstName + ' ' + user.lastName })
 		.then(function(profileComponentHTML) {
 			if(callback) callback(null, [profileComponentHTML]);
 			return null;

@@ -30,12 +30,12 @@ var app = prime({
 		base.call(this, module);
 		this['$uuid'] = clusterId + '-' + workedId;
 
+		this._loadConfig();
+
 		this._getConfiguredTemplatesAsync = promises.promisify(this._getConfiguredTemplates.bind(this));
 		this._selectTemplateAsync = promises.promisify(this._selectTemplate.bind(this));
 		this._getTemplateWidgetsAsync = promises.promisify(this._getTemplateWidgets.bind(this));
 		this._getEmberRMCAsync = promises.promisify(this._getEmberRMC.bind(this));
-
-		this._loadConfig();
 	},
 
 	'start': function(dependencies, callback) {
@@ -129,8 +129,19 @@ var app = prime({
 		// Step 4: Add the Ember.js stuff into the rendered template
 		.then(function(emberStuff) {
 			var selectedTemplate = emberStuff.shift();
+			var returnedRoutes = [];
 
-			selectedTemplate.configuration.routes = _.map(emberStuff, 'route').join('\n').trim();
+			_.map(emberStuff, 'route').forEach(function(componentRoutes, index) {
+				var renderedRoutes = self._generateEmberRouteMap(componentRoutes);
+				if(renderedRoutes.trim() == '') return;
+
+				returnedRoutes.push(renderedRoutes);
+			});
+
+			console.log('returnedRoutes: ' + JSON.stringify(returnedRoutes, null, '\t'));
+			returnedRoutes = 'var Router = require(\'twyr-portal/router\')[\'default\'];\nRouter.map(function() {\n' + returnedRoutes.join('\n') + '\n});'
+
+			selectedTemplate.configuration.routes = returnedRoutes;
 			selectedTemplate.configuration.routeHandlers = _.map(emberStuff, 'routeHandler').join('\n').trim();
 			selectedTemplate.configuration.models = _.map(emberStuff, 'model').join('\n').trim();
 			selectedTemplate.configuration.components = _.map(emberStuff, 'component').join('\n').trim();
@@ -149,6 +160,7 @@ var app = prime({
 			if(callback) callback(null, selectedTemplate);
 		})
 		.catch(function(err) {
+			console.log(self.name + '::getClientsideAssets::error: ', err);
 			if(callback) callback(err);
 		});
 	},
@@ -260,13 +272,42 @@ var app = prime({
 
 	'_getEmberRMC': function(user, mediaType, renderer, callback) {
 		if(callback) callback(null, {
-			'route': '',
+			'route': [],
 			'routeHandler': '',
 			'model': '',
 			'component': '',
 			'componentHTML': '',
 			'template': ''
 		});
+	},
+
+	'_generateEmberRouteMap': function(routes) {
+		var routeMap = '',
+			self = this;
+
+		console.log('Routes: ' + JSON.stringify(routes));
+		routes.forEach(function(route) {
+			if(!route)
+				return;
+
+			if((route == '') || (!route.name) || (!route.path) || (route.name.trim() == '') || (route.path.trim() == ''))
+				return;
+
+			if(!route.subRoutes) {
+				routeMap += 'this.route(\'' + route.name + '\', { \'path\': \'' + route.path + '\' }' + ');\n';
+				return;
+			}
+
+			if(!route.subRoutes.length) {
+				routeMap += 'this.route(\'' + route.name + '\', { \'path\': \'' + route.path + '\' }' + ');\n';
+				return;
+			}
+
+			routeMap += 'this.route(\'' + route.name + '\', { \'path\': \'' + route.path + '\' }'  + ', function() {\n' + self._generateEmberRouteMap(route.subRoutes) + '\n}' + ');\n';
+		});
+
+		console.log('Route Map: ' + JSON.stringify(routeMap));
+		return routeMap;
 	},
 
 	'name': 'twyr-portal',
