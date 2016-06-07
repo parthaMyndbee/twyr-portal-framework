@@ -20,7 +20,8 @@ var base = require('./module-base').baseModule,
 /**
  * Module dependencies, required for this module
  */
-var path = require('path'),
+var filesystem = promises.promisifyAll(require('fs')),
+	path = require('path'),
 	_ = require('lodash');
 
 var app = prime({
@@ -36,6 +37,12 @@ var app = prime({
 		this._selectTemplateAsync = promises.promisify(this._selectTemplate.bind(this));
 		this._getTemplateWidgetsAsync = promises.promisify(this._getTemplateWidgets.bind(this));
 		this._getEmberRMCAsync = promises.promisify(this._getEmberRMC.bind(this));
+
+		this._getEmberRoutesAsync = promises.promisify(this._getEmberRoutes.bind(this));
+		this._getEmberRouteHandlersAsync = promises.promisify(this._getEmberRouteHandlers.bind(this));
+		this._getEmberModelsAsync = promises.promisify(this._getEmberModels.bind(this));
+		this._getEmberComponentsAsync = promises.promisify(this._getEmberComponents.bind(this));
+		this._getEmberComponentHTMLsAsync = promises.promisify(this._getEmberComponentHTMLs.bind(this));
 	},
 
 	'start': function(dependencies, callback) {
@@ -132,23 +139,19 @@ var app = prime({
 			var returnedRoutes = [];
 
 			_.map(emberStuff, 'route').forEach(function(componentRoutes, index) {
-				var renderedRoutes = self._generateEmberRouteMap(componentRoutes);
-				if(renderedRoutes.trim() == '') return;
-
-				returnedRoutes.push(renderedRoutes);
+				returnedRoutes = returnedRoutes.concat(componentRoutes);
 			});
 
-			console.log('returnedRoutes: ' + JSON.stringify(returnedRoutes, null, '\t'));
-			returnedRoutes = 'var Router = require(\'twyr-portal/router\')[\'default\'];\nRouter.map(function() {\n' + returnedRoutes.join('\n') + '\n});'
+			selectedTemplate.configuration.apiServer = self.$config.apiServer;
 
-			selectedTemplate.configuration.routes = returnedRoutes;
+			selectedTemplate.configuration.routes = 'var Router = require(\'twyr-portal/router\')[\'default\'];\nRouter.map(function() {\n' + self._generateEmberRouteMap(returnedRoutes) + '\n});';
 			selectedTemplate.configuration.routeHandlers = _.map(emberStuff, 'routeHandler').join('\n').trim();
 			selectedTemplate.configuration.models = _.map(emberStuff, 'model').join('\n').trim();
 			selectedTemplate.configuration.components = _.map(emberStuff, 'component').join('\n').trim();
 			selectedTemplate.configuration.componentHTMLs = _.map(emberStuff, 'componentHTML').join('\n').trim();
 			selectedTemplate.configuration.templates = _.map(emberStuff, 'template').join('\n').trim();
 
-			selectedTemplate.configuration.apiServer = self.$config.apiServer;
+			console.log('returnedRoutes: ' + JSON.stringify(returnedRoutes, null, '\t'));
 			return selectedTemplate;
 		})
 		// Step 6: Render the template HTML with the widgets in their positions
@@ -271,13 +274,83 @@ var app = prime({
 	},
 
 	'_getEmberRMC': function(user, mediaType, renderer, callback) {
-		if(callback) callback(null, {
-			'route': [],
-			'routeHandler': '',
-			'model': '',
-			'component': '',
-			'componentHTML': '',
-			'template': ''
+		var promiseResolutions = [],
+			self = this;
+
+		promiseResolutions.push(self._getEmberRoutesAsync(user, renderer));
+		promiseResolutions.push(self._getEmberRouteHandlersAsync(user, renderer));
+		promiseResolutions.push(self._getEmberModelsAsync(user, renderer));
+		promiseResolutions.push(self._getEmberComponentsAsync(user, renderer));
+		promiseResolutions.push(self._getEmberComponentHTMLsAsync(user, renderer));
+
+		promises.all(promiseResolutions)
+		.then(function(results) {
+			var selfEmberAssets = {
+					'route': results[0],
+					'routeHandler': results[1],
+					'model': results[2],
+					'component': results[3],
+					'componentHTML': results[4]
+				};
+
+			if(callback) callback(null, selfEmberAssets);
+			return null;
+		})
+		.catch(function(err) {
+			if(callback) callback(err);
+		});
+	},
+
+	'_getEmberRoutes': function(user, renderer, callback) {
+		if(callback) callback(null, []);
+	},
+
+	'_getEmberRouteHandlers': function(user, renderer, callback) {
+		var self = this,
+			emberStuff = self.$config['ember-stuff'].path;
+
+		filesystem.readFileAsync(path.join(this.basePath, emberStuff, 'routeHandlers/baseRoute.js'), 'utf8')
+		.then(function(baseRoute) {
+			if(callback) callback(null, [baseRoute]);
+			return null;
+		})
+		.catch(function(err) {
+			console.error(self.name + '::_getEmberRouteHandlers:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
+	},
+
+	'_getEmberModels': function(user, renderer, callback) {
+		var self = this,
+			emberStuff = self.$config['ember-stuff'].path;
+
+		filesystem.readFileAsync(path.join(this.basePath, emberStuff, 'models/baseModel.js'), 'utf8')
+		.then(function(baseModel) {
+			if(callback) callback(null, [baseModel]);
+			return null;
+		})
+		.catch(function(err) {
+			console.error(self.name + '::_getEmberModels:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
+	},
+
+	'_getEmberComponents': function(user, renderer, callback){
+		if(callback) callback(null, []);
+	},
+
+	'_getEmberComponentHTMLs': function(user, renderer, callback){
+		var self = this,
+			emberStuff = self.$config['ember-stuff'].path;
+
+		filesystem.readFileAsync(path.join(this.basePath, emberStuff, 'componentHTMLs/baseTemplates.ejs'), 'utf8')
+		.then(function(baseTemplates) {
+			if(callback) callback(null, [baseTemplates]);
+			return null;
+		})
+		.catch(function(err) {
+			console.error(self.name + '::_getEmberComponentHTMLs:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
 		});
 	},
 
@@ -285,7 +358,6 @@ var app = prime({
 		var routeMap = '',
 			self = this;
 
-		console.log('Routes: ' + JSON.stringify(routes));
 		routes.forEach(function(route) {
 			if(!route)
 				return;
@@ -306,7 +378,6 @@ var app = prime({
 			routeMap += 'this.route(\'' + route.name + '\', { \'path\': \'' + route.path + '\' }'  + ', function() {\n' + self._generateEmberRouteMap(route.subRoutes) + '\n}' + ');\n';
 		});
 
-		console.log('Route Map: ' + JSON.stringify(routeMap));
 		return routeMap;
 	},
 

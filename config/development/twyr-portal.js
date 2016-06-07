@@ -27,6 +27,10 @@ exports.config = ({
 		'path': './modules/templates'
 	},
 
+	'ember-stuff': {
+		'path': './modules/ember-stuff'
+	},
+
 	'apiServer': {
 		'protocol': 'http',
 		'host': 'local-api.twyrframework.com',

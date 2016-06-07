@@ -10,13 +10,13 @@ exports.seed = function(knex, Promise) {
 			return null;
 
 		portalId = parentId.rows[0].id;
-		return knex.raw('SELECT id FROM modules WHERE name = ? AND parent_id = ?', ['profile', portalId]);
+		return knex.raw('SELECT id FROM modules WHERE name = ? AND parent_id = ?', ['profiles', portalId]);
 	})
 	.then(function(existingComponentId) {
 		if(existingComponentId.rows.length)
 			return null;
 
-		return knex("modules").insert({ 'parent_id': portalId, 'type': 'component', 'name': 'profile', 'display_name': 'Profile Manager', 'description': 'The Twy\'r Portal User Profile Management Component' }).returning('id')
+		return knex("modules").insert({ 'parent_id': portalId, 'type': 'component', 'name': 'profiles', 'display_name': 'Profile Manager', 'description': 'The Twy\'r Portal User Profile Management Component' }).returning('id')
 		.then(function(sessionComponentId) {
 			componentId = sessionComponentId[0];
 			return knex("module_templates").insert({ 'module_id': componentId, 'name': 'default', 'description': 'The default Profile Management Template', 'media_type': 'all', 'user_type': 'registered', 'is_default': true }).returning('id');

@@ -1,10 +1,10 @@
 /*
- * Name			: app/modules/components/profile/component.js
+ * Name			: app/modules/components/profiles/component.js
  * Author		: Vish Desai (vishwakarma_d@hotmail.com)
  * Version		: 0.7.1
  * Copyright	: Copyright (c) 2014 - 2016 Vish Desai (https://www.linkedin.com/in/vishdesai).
  * License		: The MITNFA License (https://spdx.org/licenses/MITNFA.html).
- * Description	: The Twy'r Portal Profile Component - provides functionality to allow manage your own profile
+ * Description	: The Twy'r Portal Profile Component - provides functionality to allow users to manage their own profile
  *
  */
 
@@ -23,7 +23,7 @@ var base = require('./../component-base').baseComponent,
 var filesystem = promises.promisifyAll(require('fs-extra')),
 	path = require('path');
 
-var profileComponent = prime({
+var profilesComponent = prime({
 	'inherits': base,
 
 	'constructor': function(module) {
@@ -63,13 +63,33 @@ var profileComponent = prime({
 			return null;
 		}
 
-		filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/routeHandlers/default.js'), 'utf8')
+		renderer(path.join(this.basePath, 'ember-stuff/routeHandlers/default.ejs'), { 'userId': user.id })
 		.then(function(profileComponentJS) {
 			if(callback) callback(null, [profileComponentJS]);
 			return null;
 		})
 		.catch(function(err) {
 			loggerSrvc.error(self.name + '::_getEmberComponents:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
+	},
+
+	'_getEmberModels': function(user, renderer, callback) {
+		var loggerSrvc = this.dependencies['logger-service'],
+			self = this;
+
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/models/default.js'), 'utf8')
+		.then(function(profileModel) {
+			if(callback) callback(null, [profileModel]);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error(self.name + '::_getEmberModels:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
 			if(callback) callback(err);
 		});
 	},
@@ -103,7 +123,7 @@ var profileComponent = prime({
 			return null;
 		}
 
-		renderer(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-widget.ejs'), { 'fullname': user.firstName + ' ' + user.lastName })
+		renderer(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-widget.ejs'), { 'fullname': user.first_name + ' ' + user.last_name })
 		.then(function(profileComponentHTML) {
 			if(callback) callback(null, [profileComponentHTML]);
 			return null;
@@ -114,9 +134,9 @@ var profileComponent = prime({
 		});
 	},
 
-	'name': 'profile',
+	'name': 'profiles',
 	'basePath': __dirname,
 	'dependencies': ['configuration-service', 'database-service', 'logger-service']
 });
 
-exports.component = profileComponent;
+exports.component = profilesComponent;

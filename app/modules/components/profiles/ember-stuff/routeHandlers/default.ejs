@@ -4,9 +4,9 @@ define(
 	function(exports, _ember) {
 		if(window.developmentMode) console.log('DEFINE: eronkanPortal/routes/profile');
 		var ManageProfileRoute = _ember['default'].Route.extend({
-//			'model': function() {
-//				return this.store.find('profile', '<%= userId %>');
-//			},
+			'model': function() {
+				return this.store.findRecord('profile', '<%= userId %>');
+			}
 		});
 
 		exports['default'] = ManageProfileRoute;

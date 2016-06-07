@@ -40,6 +40,7 @@
     "jquery": "*",
     "js-cookie": "*",
     "loader.js": "ember-cli/loader.js",
+	"moment": "*",
     "normalize-css": "*",
     "validate.js": "*"
   },

@@ -97,12 +97,12 @@
 		</header>
 
 		<!-- Position: error -->
-		<div id="hamsadhvani-error-position" style="position:fixed; top:10px; left:25%; min-width:50%; width:50%; max-width:50%; z-index:9999; text-align:center; display:inline-block;">
-			<div id="hamsadhvani-status-message" class="callout callout-info" style="display:none; border-radius:0px; width:100%;">
+		<div id="template-error-position" style="position:fixed; top:10px; left:25%; min-width:50%; width:50%; max-width:50%; z-index:9999; text-align:center; display:inline-block;">
+			<div id="template-status-message" class="callout callout-info" style="display:none; border-radius:0px; width:100%;">
 				<span></span>
 			</div>
 
-			<div id="hamsadhvani-error-message" class="callout callout-danger" style="display:none; border-radius:0px; width:100%;">
+			<div id="template-error-message" class="callout callout-danger" style="display:none; border-radius:0px; width:100%;">
 				{{#each errorModel.errors.id as |error|}}
 					<span>{{error.message}}</span>
 				{{/each}}
@@ -269,6 +269,13 @@
 		}
 	});
 	</script>
+
+	<!-- Moment.js - for easier date/time manipulation -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/moment/moment.js"></script>
+	<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/moment/min/moment.min.js"></script>
+	<% } %>
 
 	<!-- Bootstrap JS Library - the base theme stuff -->
 	<% if(developmentMode) { %>
