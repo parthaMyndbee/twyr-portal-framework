@@ -34,14 +34,16 @@
     "ember": "*",
     "ember-cli-shims": "*",
     "ember-data": "*",
+	"eonasdan-bootstrap-datetimepicker": "latest",
     "es5-shim": "*",
     "fontawesome": "*",
     "ionicons": "*",
-    "jquery": "*",
+    "jquery": "< 3.0.0",
     "js-cookie": "*",
     "loader.js": "ember-cli/loader.js",
 	"moment": "*",
     "normalize-css": "*",
+    "select2": "*",
     "validate.js": "*"
   },
   "devDependencies": {}

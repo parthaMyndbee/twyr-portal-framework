@@ -41,7 +41,7 @@ define(
 				}
 				else {
 					buttonElem.removeClass('btn-primary');
-					buttonElem.attr('disabled');
+					buttonElem.attr('disabled', true);
 				}
 			}),
 
@@ -75,7 +75,7 @@ define(
 				}
 				else {
 					self.$('button#register-account-button-submit').removeClass('btn-primary');
-					self.$('button#register-account-button-submit').attr('disabled');
+					self.$('button#register-account-button-submit').attr('disabled', true);
 				}
 			}),
 

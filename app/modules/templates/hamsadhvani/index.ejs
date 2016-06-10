@@ -29,9 +29,15 @@
 	<link href="https://fonts.googleapis.com/css?family=Keania+One" rel="stylesheet" type="text/css">
 	<link href="https://fonts.googleapis.com/css?family=Cantarell:400,400italic,700,700italic" rel="stylesheet" type="text/css">
 
+	<!-- jQuery plugins -->
+	<link href="/bhairavi/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" type="text/css" />
+
 	<!-- Bootstrap CSS Styles -->
 	<link href="/bhairavi/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 	<link href="/bhairavi/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Bootstrap plugins -->
+	<link href="/bhairavi/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
 
 	<!-- Font Awesome, for the Glyphs -->
 	<link href="/bhairavi/bower_components/fontawesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
@@ -98,13 +104,14 @@
 
 		<!-- Position: error -->
 		<div id="template-error-position" style="position:fixed; top:10px; left:25%; min-width:50%; width:50%; max-width:50%; z-index:9999; text-align:center; display:inline-block;">
-			<div id="template-status-message" class="callout callout-info" style="display:none; border-radius:0px; width:100%;">
+			<div id="template-status-message" class="callout" style="display:none; border-radius:0px; width:100%;">
 				<span></span>
 			</div>
 
 			<div id="template-error-message" class="callout callout-danger" style="display:none; border-radius:0px; width:100%;">
-				{{#each errorModel.errors.id as |error|}}
-					<span>{{error.message}}</span>
+				{{#each errorModel.errors.messages as |message|}}
+					<span>{{message}}</span>
+					<br />
 				{{/each}}
 			</div>
 		</div>
@@ -270,6 +277,15 @@
 	});
 	</script>
 
+	<!-- jQuery plugins - for added functionality -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/select2/dist/js/select2.full.js"></script>
+	<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/select2/dist/js/select2.full.min.js"></script>
+	<% } %>
+
+	<script type="application/javascript" src="/bhairavi/bower_components/js-cookie/src/js.cookie.js"></script>
+
 	<!-- Moment.js - for easier date/time manipulation -->
 	<% if(developmentMode) { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/moment/moment.js"></script>
@@ -284,8 +300,8 @@
 	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<% } %>
 
-	<!-- jQuery Plugins -->
-	<script type="application/javascript" src="/bhairavi/bower_components/js-cookie/src/js.cookie.js"></script>
+	<!-- Bootstrap Plugins -->
+	<script type="application/javascript" src="/bhairavi/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 
 	<!-- Ember.js, for the client-side MVC Framework -->
 	<% if(developmentMode) { %>

@@ -23,10 +23,10 @@ exports.seed = function(knex, Promise) {
 		})
 		.then(function(templateId) {
 			templateId = templateId[0];
-			return knex("template_positions").insert({ 'template_id': templateId, 'name': 'module' });
+			return knex("module_template_positions").insert({ 'template_id': templateId, 'name': 'module' });
 		})
 		.then(function() {
-			return knex.raw('SELECT id FROM permissions WHERE module_id = ? AND name = ?', [portalId, 'registered']);
+			return knex.raw('SELECT id FROM module_permissions WHERE module_id = ? AND name = ?', [portalId, 'registered']);
 		})
 		.then(function(registeredPermId) {
 			registeredPermId = registeredPermId.rows[0].id;
@@ -34,11 +34,11 @@ exports.seed = function(knex, Promise) {
 		})
 		.then(function(profileWidgetId) {
 			widgetId = profileWidgetId[0];
-			return knex.raw('SELECT id FROM template_positions WHERE template_id = (SELECT id FROM module_templates WHERE module_id = ? AND user_type = \'registered\') AND name = \'settings\'', [portalId]);
+			return knex.raw('SELECT id FROM module_template_positions WHERE template_id = (SELECT id FROM module_templates WHERE module_id = ? AND user_type = \'registered\') AND name = \'settings\'', [portalId]);
 		})
 		.then(function(tmplPositionId) {
 			tmplPositionId = tmplPositionId.rows[0].id;
-			return knex("widget_template_position").insert({ 'template_position_id': tmplPositionId, 'module_widget_id': widgetId, 'display_order': 9999 });
+			return knex("module_widget_module_template_positions").insert({ 'template_position_id': tmplPositionId, 'module_widget_id': widgetId, 'display_order': 9999 });
 		});
 	});
 };

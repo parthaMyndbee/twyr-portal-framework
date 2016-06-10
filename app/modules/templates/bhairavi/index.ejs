@@ -83,8 +83,9 @@
 			</div>
 
 			<div id="template-error-message" class="callout callout-danger" style="display:none; border-radius:0px; width:100%;">
-				{{#each errorModel.errors.id as |error|}}
-					<span>{{error.message}}</span>
+				{{#each errorModel.errors.messages as |message|}}
+					<span>{{message}}</span>
+					<br />
 				{{/each}}
 			</div>
 		</div>

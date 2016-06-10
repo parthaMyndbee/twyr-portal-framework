@@ -1,0 +1,33 @@
+<script type="text/x-handlebars" data-template-name="components/profile-contacts-widget">
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">Contact Information</h3>
+	</div>
+
+	<div class="box-body no-padding">
+	<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Contact</th>
+			<th>Type</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>{{model.email}}</td>
+			<td>Twy&apos;r Login</td>
+			<td>&nbsp;</td>
+		</tr>
+		{{#each model.contacts as |contact|}}
+		<tr>
+			<td>{{contact.contact}}</td>
+			<td>{{contact.type}}</td>
+			<td>&nbsp;</td>
+		</tr>
+		{{/each}}
+	</tbody>
+	</table>
+	</div>
+</div>
+</script>

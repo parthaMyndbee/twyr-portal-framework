@@ -26,7 +26,6 @@ var defaultTemplate = prime({
 	'inherits': base,
 
 	'constructor': function(module) {
-		console.log(this.name + '::constructor');
 		base.call(this, module);
 	},
 

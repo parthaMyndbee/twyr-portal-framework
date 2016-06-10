@@ -1,17 +1,44 @@
 <script type="text/x-handlebars" data-template-name="profile">
 <div class="box box-default" style="text-align:left; box-shadow:none; margin-bottom:0px;">
 	<div class="box-header with-border">
-		<h3 class="box-title">Manage Profile</h3>
+		<h3 class="box-title">{{model.firstName}} ({{model.email}})</h3>
 	</div>
 
 	<div class="box-body">
-		<p>TODO</p>
+		<div class="col-sm-12">
+			{{change-password-widget model=model controller-action="controller-action"}}
+		</div>
+	</div>
+
+	<div class="box-body">
+		<div class="col-sm-3">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Profile Picture</h3>
+			</div>
+
+			<div class="box-body">
+			</div>
+		</div>
+		</div>
+
+		<div class="col-sm-3">
+			{{profile-basics-widget model=model controller-action="controller-action"}}
+		</div>
+
+		<div class="col-sm-3">
+			{{profile-contacts-widget model=model controller-action="controller-action"}}
+		</div>
+
+		<div class="col-sm-3">
+			&nbsp;
+		</div>
 	</div>
 
 	<% if(positions.module && positions.module.length) { %>
 	<div class="box-body">
 		<% positions.module.forEach(function(moduleWidget) { %>
-			{{<%= moduleWidget %>}}
+			{{<%= moduleWidget %> model=model controller-action="controller-action"}}
 		<% }) %>
 	</div>
 	<% } %>

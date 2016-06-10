@@ -33,7 +33,7 @@ define(
 			'display-status-message': function(data) {
 				this.resetStatusMessages(2);
 
-				if(data.type != 'error') {
+				if(data.type != 'ember-error') {
 					window.Ember.$('div#template-status-message').addClass('callout-' + data.type);
 					window.Ember.$('div#template-status-message span').html(data.message);
 

@@ -20,7 +20,7 @@ exports.seed = function(knex, Promise) {
 		return knex("modules").insert({ 'parent_id': portalId, 'type': 'component', 'name': 'session', 'display_name': 'Session', 'description': 'The Twy\'r Portal Session Management Component' }).returning('id')
 		.then(function(sessionComponentId) {
 			componentId = sessionComponentId[0];
-			return knex.raw('SELECT id FROM permissions WHERE module_id = ? AND name = ?', [portalId, 'public']);
+			return knex.raw('SELECT id FROM module_permissions WHERE module_id = ? AND name = ?', [portalId, 'public']);
 		})
 		.then(function(publicPermId) {
 			publicPermId = publicPermId.rows[0].id;
@@ -28,14 +28,14 @@ exports.seed = function(knex, Promise) {
 		})
 		.then(function(loginComponentId) {
 			loginWidgetId = loginComponentId[0];
-			return knex.raw('SELECT id FROM template_positions WHERE template_id = (SELECT id FROM module_templates WHERE module_id = ? AND user_type = \'public\') AND name = \'right-sidebar\'', [portalId]);
+			return knex.raw('SELECT id FROM module_template_positions WHERE template_id = (SELECT id FROM module_templates WHERE module_id = ? AND user_type = \'public\') AND name = \'right-sidebar\'', [portalId]);
 		})
 		.then(function(tmplPositionId) {
 			tmplPositionId = tmplPositionId.rows[0].id;
-			return knex("widget_template_position").insert({ 'template_position_id': tmplPositionId, 'module_widget_id': loginWidgetId, 'display_order': 0 });
+			return knex("module_widget_module_template_positions").insert({ 'template_position_id': tmplPositionId, 'module_widget_id': loginWidgetId, 'display_order': 0 });
 		})
 		.then(function() {
-			return knex.raw('SELECT id FROM permissions WHERE module_id = ? AND name = ?', [portalId, 'registered']);
+			return knex.raw('SELECT id FROM module_permissions WHERE module_id = ? AND name = ?', [portalId, 'registered']);
 		})
 		.then(function(registeredPermId) {
 			registeredPermId = registeredPermId.rows[0].id;
@@ -43,11 +43,11 @@ exports.seed = function(knex, Promise) {
 		})
 		.then(function(logoutComponentId) {
 			logoutWidgetId = logoutComponentId[0];
-			return knex.raw('SELECT id FROM template_positions WHERE template_id = (SELECT id FROM module_templates WHERE module_id = ? AND user_type = \'registered\') AND name = \'settings\'', [portalId]);
+			return knex.raw('SELECT id FROM module_template_positions WHERE template_id = (SELECT id FROM module_templates WHERE module_id = ? AND user_type = \'registered\') AND name = \'settings\'', [portalId]);
 		})
 		.then(function(tmplPositionId) {
 			tmplPositionId = tmplPositionId.rows[0].id;
-			return knex("widget_template_position").insert({ 'template_position_id': tmplPositionId, 'module_widget_id': logoutWidgetId, 'display_order': 10000 });
+			return knex("module_widget_module_template_positions").insert({ 'template_position_id': tmplPositionId, 'module_widget_id': logoutWidgetId, 'display_order': 10000 });
 		});
 	});
 };
