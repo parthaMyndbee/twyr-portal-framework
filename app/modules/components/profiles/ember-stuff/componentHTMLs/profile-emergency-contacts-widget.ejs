@@ -1,0 +1,55 @@
+<script type="text/x-handlebars" data-template-name="components/profile-emergency-contacts-widget">
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title">Emergency Contacts</h3>
+	</div>
+
+	<div class="box-body no-padding">
+	<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th style="width:40%;">Contact</th>
+			<th style="width:40%;">Relationship</th>
+			<th style="text-align:right; vertical-align:middle;">
+				<button type="button" class="btn btn-flat btn-sm btn-success" style="padding:4px; line-height:1;" {{action "controller-action" "add"}}>
+					<i class="fa fa-plus" style="margin-right:2px;" /><span>Add</span>
+				</button>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each model.profileEmergencyContacts as |emergencyContact|}}
+		{{#if emergencyContact.isNew}}
+		<tr>
+			<td class="form-group" style="vertical-align:middle;">
+				<select id="profile-emergency-contacts-widget-select-user-{{emergencyContact.id}}" class="form-control" />
+			</td>
+			<td style="vertical-align:middle;">
+				<select id="profile-emergency-contacts-widget-select-relationship-{{emergencyContact.id}}" class="form-control" />
+			</td>
+			<td style="text-align:right; vertical-align:middle;">
+				<button type="button" title="Save" class="btn btn-flat btn-sm btn-primary" style="padding:4px; line-height:1;" {{action "controller-action" "save" emergencyContact}}>
+					<i class="fa fa-save" />
+				</button>
+				<button type="button" title="Delete" class="btn btn-flat btn-sm btn-danger" style="padding:4px; line-height:1;" {{action "controller-action" "delete" emergencyContact}}>
+					<i class="fa fa-remove" />
+				</button>
+			</td>
+		</tr>
+		{{else}}
+		<tr>
+			<td style="vertical-align:middle;">{{emergencyContact.contact.fullName}}</td>
+			<td style="vertical-align:middle;">{{emergencyContact.displayRel}}</td>
+			<td style="text-align:right; vertical-align:middle;">
+				<button type="button" title="Delete" class="btn btn-flat btn-sm btn-danger" style="padding:4px; line-height:1;" {{action "controller-action" "delete" emergencyContact}}>
+					<i class="fa fa-remove" />
+				</button>
+			</td>
+		</tr>
+		{{/if}}
+		{{/each}}
+	</tbody>
+	</table>
+	</div>
+</div>
+</script>

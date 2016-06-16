@@ -53,13 +53,15 @@ define(
 	['exports', 'ember', 'ember-data/serializers/json-api'],
 	function (exports, _ember, _jsonAPISerializer) {
 		if(window.developmentMode) console.log('DEFINE: twyr-portal/serializers/application');
-		var Serializer = _jsonAPISerializer['default'].extend({
+		exports['default'] = _jsonAPISerializer['default'].extend({
 			'keyForAttribute': function(attr) {
+				return _ember['default'].String.underscore(attr);
+			},
+
+			'keyForRelationship': function(attr) {
 				return _ember['default'].String.underscore(attr);
 			}
 		});
-
-		exports['default'] = Serializer;
 	}
 );
 
@@ -85,6 +87,13 @@ define(
 			'LOG_TRANSITIONS_INTERNAL': window.developmentMode,
 			'LOG_VIEW_LOOKUPS': window.developmentMode
 		});
+
+		App.UUID = function() {
+			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+				return v.toString(16);
+			});
+		};
 
 		if(window.developmentMode) console.log('EXPORT: twyr-portal/application');
 		exports['default'] = App;

@@ -31,6 +31,7 @@
   ],
   "dependencies": {
     "bootstrap": "*",
+	"dropzone": "*",
     "ember": "*",
     "ember-cli-shims": "*",
     "ember-data": "*",
@@ -38,7 +39,7 @@
     "es5-shim": "*",
     "fontawesome": "*",
     "ionicons": "*",
-    "jquery": "< 3.0.0",
+    "jquery": "*",
     "js-cookie": "*",
     "loader.js": "ember-cli/loader.js",
 	"moment": "*",

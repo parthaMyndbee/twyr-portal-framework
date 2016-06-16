@@ -131,7 +131,7 @@ var twyrComponentBase = prime({
 
 		configSrvc.getModuleIdAsync(self)
 		.then(function(id) {
-			return dbSrvc.raw('SELECT id, module_id, name, media_type, user_type, configuration FROM module_templates WHERE module_id = ? AND is_default = true;', [id])
+			return dbSrvc.raw('SELECT id, module, name, media_type, user_type, configuration FROM module_templates WHERE module = ? AND is_default = true;', [id])
 		})
 		.then(function(moduleTemplates) {
 			if(callback) callback(null, moduleTemplates.rows);
@@ -171,13 +171,13 @@ var twyrComponentBase = prime({
 			loggerSrvc = self.dependencies['logger-service'];
 
 		if(user) {
-			widgetsSQL = 'SELECT Y.position, X.module_id, X.widget FROM (SELECT id AS widget_id, module_id, ember_component AS widget FROM module_widgets WHERE module_id IN (SELECT id FROM fn_get_module_descendants(?)) AND permission_id IN (SELECT permission_id FROM fn_get_user_permissions(?))) X INNER JOIN (SELECT A.template_id AS template_id, A.name AS position, B.module_widget_id AS widget_id, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position_id = A.id) WHERE A.template_id = ?) Y ON (Y.widget_id = X.widget_id) ORDER BY Y.position, Y.display_order;';
+			widgetsSQL = 'SELECT Y.position, X.module, X.widget FROM (SELECT id AS widget_id, module, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT permission FROM fn_get_user_permissions(?))) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
 		}
 		else {
-			widgetsSQL = 'SELECT Y.position, X.module_id, X.widget FROM (SELECT id AS widget_id, module_id, ember_component AS widget FROM module_widgets WHERE module_id IN (SELECT id FROM fn_get_module_descendants(?)) AND permission_id IN (SELECT id FROM module_permissions WHERE module_id = ? AND name = \'public\')) X INNER JOIN (SELECT A.template_id AS template_id, A.name AS position, B.module_widget_id AS widget_id, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position_id = A.id) WHERE A.template_id = ?) Y ON (Y.widget_id = X.widget_id) ORDER BY Y.position, Y.display_order;';
+			widgetsSQL = 'SELECT Y.position, X.module, X.widget FROM (SELECT id AS widget_id, module, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT id FROM module_permissions WHERE module = ? AND name = \'public\')) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
 		}
 
-		dbSrvc.raw(widgetsSQL, [template.module_id, (user ? user.id : template.module_id), template.id])
+		dbSrvc.raw(widgetsSQL, [template.module, (user ? user.id : template.module), template.id])
 		.then(function(widgets) {
 			var positions = {};
 

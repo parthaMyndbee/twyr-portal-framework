@@ -8,6 +8,7 @@ define(
 				this._super(...arguments);
 
 				var genderSelectElem = _ember['default'].$('select#profile-basics-widget-select-gender'),
+					homeSelectElem = _ember['default'].$('select#profile-basics-widget-select-homepage'),
 					self = this;
 
 				genderSelectElem.select2({
@@ -42,10 +43,61 @@ define(
 					self.get('model').set('gender', genderSelectElem.val());
 				});
 
+				homeSelectElem.select2({
+					'ajax': {
+						'url': window.apiServer + 'profiles/homepages',
+						'dataType': 'json',
+
+						'processResults': function (data) {
+							return  {
+								'results': window.Ember.$.map(data, function(item) {
+									return {
+										'text': _ember['default'].String.capitalize(item.display_name),
+										'slug': item.description,
+										'id': item.id
+									};
+								})
+							};
+						},
+
+						'cache': true
+					},
+
+					'minimumInputLength': 0,
+					'minimumResultsForSearch': 10,
+
+					'allowClear': true,
+					'closeOnSelect': true,
+
+					'placeholder': 'Home Page'
+				})
+				.on('change', function() {
+					self.get('model').set('homeModuleMenuId', homeSelectElem.val());
+				});
+
 				_ember['default'].$('div#profile-basics-widget-input-dob').datetimepicker({
 					'format': 'DD MMM YYYY',
 					'minDate': '01 Jan 1900',
 					'maxDate': window.moment()
+				});
+
+				if(!_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone) {
+					_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone = null;
+					delete _ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone;
+				}
+
+				_ember['default'].$('div#profile-basics-widget-image-dropzone').outerHeight(_ember['default'].$('div#profile-basics-widget-text-stuff').height());
+				_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone({
+					'url': window.apiServer + 'profiles/upload-image',
+					'clickable': true,
+					'acceptedFiles': 'image/*',
+
+					'init': function() {
+						var self = this;
+						self.on('complete', function(file) {
+							self.removeFile(file);
+						});
+					}
 				});
 
 				_ember['default'].$.ajax({
@@ -63,6 +115,23 @@ define(
 				})
 				.fail(function() {
 					console.error(window.apiServer + 'masterdata/genders error:\n', arguments);
+				});
+
+				_ember['default'].$.ajax({
+					'url': window.apiServer + 'profiles/homepages',
+					'dataType': 'json',
+					'cache': true
+				})
+				.done(function(data) {
+					_ember['default'].$.each(data, function(index, item) {
+						var thisOption = new Option(_ember['default'].String.capitalize(item.text), item.id, false, false);
+						homeSelectElem.append(thisOption);
+					});
+
+					homeSelectElem.val(self.get('model').get('homeModuleMenuId')).trigger('change');
+				})
+				.fail(function() {
+					console.error(window.apiServer + 'profiles/homepages error:\n', arguments);
 				});
 			},
 

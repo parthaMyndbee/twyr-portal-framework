@@ -107,7 +107,8 @@ var profilesComponent = prime({
 			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/components/profile-widget.js'), 'utf8'),
 			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/components/change-password-widget.js'), 'utf8'),
 			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/components/profile-basics-widget.js'), 'utf8'),
-			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/components/profile-contacts-widget.js'), 'utf8')
+			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/components/profile-contacts-widget.js'), 'utf8'),
+			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/components/profile-emergency-contacts-widget.js'), 'utf8')
 		])
 		.then(function(profileWidgetsJS) {
 			if(callback) callback(null, profileWidgetsJS);
@@ -132,7 +133,8 @@ var profilesComponent = prime({
 			renderer(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-widget.ejs'), { 'fullname': user.first_name + ' ' + user.last_name }),
 			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/componentHTMLs/change-password-widget.ejs'), 'utf8'),
 			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-basics-widget.ejs'), 'utf8'),
-			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-contacts-widget.ejs'), 'utf8')
+			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-contacts-widget.ejs'), 'utf8'),
+			filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/componentHTMLs/profile-emergency-contacts-widget.ejs'), 'utf8')
 		])
 		.then(function(profileWidgetHTMLs) {
 			if(callback) callback(null, profileWidgetHTMLs);

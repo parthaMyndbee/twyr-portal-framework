@@ -219,7 +219,7 @@ define(
 
 			'doSocialLogin': function(socialNetwork) {
 				var currentLocation = window.location.href;
-				window.location.href = window.apiServer + 'login/' + socialNetwork + '?currentLocation=' + currentLocation;
+				window.location.href = window.apiServer + 'session/' + socialNetwork + '?currentLocation=' + currentLocation;
 			},
 
 			'resetPassword': function() {
