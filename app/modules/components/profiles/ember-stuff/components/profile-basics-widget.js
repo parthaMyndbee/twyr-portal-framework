@@ -81,21 +81,30 @@ define(
 					'maxDate': window.moment()
 				});
 
-				if(!_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone) {
+				if(_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone) {
 					_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone = null;
 					delete _ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone;
 				}
 
 				_ember['default'].$('div#profile-basics-widget-image-dropzone').outerHeight(_ember['default'].$('div#profile-basics-widget-text-stuff').height());
+				_ember['default'].$('div#profile-basics-widget-image-dropzone img').attr('src', window.apiServer + 'profiles/get-image');
 				_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone({
 					'url': window.apiServer + 'profiles/upload-image',
+					'acceptedFiles': 'image/jpeg',
+
 					'clickable': true,
-					'acceptedFiles': 'image/*',
+					'withCredentials': true,
 
 					'init': function() {
 						var self = this;
+
 						self.on('complete', function(file) {
 							self.removeFile(file);
+						});
+
+						self.on('success', function() {
+							var d = new Date();
+							_ember['default'].$('div#profile-basics-widget-image-dropzone img').attr('src', window.apiServer + 'profiles/get-image?' + d.getTime());
 						});
 					}
 				});

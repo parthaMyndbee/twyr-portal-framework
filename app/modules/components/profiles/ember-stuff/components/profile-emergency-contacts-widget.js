@@ -155,7 +155,8 @@ define(
 			},
 
 			'delete': function(emergencyContact) {
-				var self = this;
+				var self = this,
+					contactName = emergencyContact.get('contact').get('fullName') || 'Emergency Contact';
 
 				emergencyContact.destroyRecord()
 				.then(function() {
@@ -164,7 +165,7 @@ define(
 
 					self.sendAction('controller-action', 'display-status-message', {
 						'type': 'success',
-						'message': emergencyContact.get('contact').get('fullName') + ' deleted succesfully'
+						'message': contactName + ' deleted succesfully'
 					});
 				})
 				.catch(function(reason) {
