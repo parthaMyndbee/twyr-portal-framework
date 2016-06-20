@@ -29,9 +29,8 @@
 	<link href="https://fonts.googleapis.com/css?family=Keania+One" rel="stylesheet" type="text/css">
 	<link href="https://fonts.googleapis.com/css?family=Cantarell:400,400italic,700,700italic" rel="stylesheet" type="text/css">
 
-	<!-- Dropzone for easier image uploads -->
-	<link href="/bhairavi/bower_components/dropzone/dist/basic.css" rel="stylesheet" type="text/css" />
-	<link href="/bhairavi/bower_components/dropzone/dist/dropzone.css" rel="stylesheet" type="text/css" />
+	<!-- Croppie for image uploads -->
+	<link href="/bhairavi/bower_components/croppie/croppie.css" rel="stylesheet" type="text/css" />
 
 	<!-- jQuery plugins -->
 	<link href="/bhairavi/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" type="text/css" />
@@ -281,16 +280,12 @@
 	});
 	</script>
 
-	<!-- Dropzone for easier image uploads -->
+	<!-- Croppied for image uploads -->
 	<% if(developmentMode) { %>
-	<script type="application/javascript" src="/bhairavi/bower_components/dropzone/dist/dropzone.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/croppie/croppie.js"></script>
 	<% } else { %>
-	<script type="application/javascript" src="/bhairavi/bower_components/dropzone/dist/min/dropzone.min.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/croppie/croppie.min.js"></script>
 	<% } %>
-
-	<script type="application/javascript">
-	window.Dropzone.autoDiscover = false;
-	</script>
 
 	<!-- jQuery plugins - for added functionality -->
 	<% if(developmentMode) { %>

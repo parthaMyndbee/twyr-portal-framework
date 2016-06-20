@@ -72,7 +72,7 @@ define(
 					'placeholder': 'Home Page'
 				})
 				.on('change', function() {
-					self.get('model').set('homeModuleMenuId', homeSelectElem.val());
+					self.get('model').set('homeModuleMenu', homeSelectElem.val());
 				});
 
 				_ember['default'].$('div#profile-basics-widget-input-dob').datetimepicker({
@@ -81,33 +81,8 @@ define(
 					'maxDate': window.moment()
 				});
 
-				if(_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone) {
-					_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone = null;
-					delete _ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone;
-				}
-
-				_ember['default'].$('div#profile-basics-widget-image-dropzone').outerHeight(_ember['default'].$('div#profile-basics-widget-text-stuff').height());
-				_ember['default'].$('div#profile-basics-widget-image-dropzone img').attr('src', window.apiServer + 'profiles/get-image');
-				_ember['default'].$('div#profile-basics-widget-image-dropzone').dropzone({
-					'url': window.apiServer + 'profiles/upload-image',
-					'acceptedFiles': 'image/jpeg',
-
-					'clickable': true,
-					'withCredentials': true,
-
-					'init': function() {
-						var self = this;
-
-						self.on('complete', function(file) {
-							self.removeFile(file);
-						});
-
-						self.on('success', function() {
-							var d = new Date();
-							_ember['default'].$('div#profile-basics-widget-image-dropzone img').attr('src', window.apiServer + 'profiles/get-image?' + d.getTime());
-						});
-					}
-				});
+				_ember['default'].$('div#profile-basics-widget-image').outerHeight(_ember['default'].$('div#profile-basics-widget-text-stuff').height());
+				_ember['default'].$('div#profile-basics-widget-image img').attr('src', window.apiServer + 'profiles/get-image');
 
 				_ember['default'].$.ajax({
 					'url': window.apiServer + 'masterdata/genders',
@@ -133,11 +108,11 @@ define(
 				})
 				.done(function(data) {
 					_ember['default'].$.each(data, function(index, item) {
-						var thisOption = new Option(_ember['default'].String.capitalize(item.text), item.id, false, false);
+						var thisOption = new Option(_ember['default'].String.capitalize(item.display_name), item.id, false, false);
 						homeSelectElem.append(thisOption);
 					});
 
-					homeSelectElem.val(self.get('model').get('homeModuleMenuId')).trigger('change');
+					homeSelectElem.val(self.get('model').get('homeModuleMenu')).trigger('change');
 				})
 				.fail(function() {
 					console.error(window.apiServer + 'profiles/homepages error:\n', arguments);

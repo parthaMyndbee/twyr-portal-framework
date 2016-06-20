@@ -31,7 +31,7 @@
   ],
   "dependencies": {
     "bootstrap": "*",
-	"dropzone": "*",
+	"croppie": "*",
     "ember": "*",
     "ember-cli-shims": "*",
     "ember-data": "*",
