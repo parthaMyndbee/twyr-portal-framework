@@ -46,7 +46,7 @@ var profilesComponent = prime({
 		}
 
 		if(callback) callback(null, [{
-			'name': 'profile',
+			'name': 'profiles-default',
 			'path': '/profile',
 
 			'parentRoute': null,

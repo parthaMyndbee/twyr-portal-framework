@@ -33,7 +33,7 @@ var homepageComponent = prime({
 			dbSrvc = self.dependencies['database-service'].knex,
 			loggerSrvc = self.dependencies['logger-service'],
 			homeRoute = {
-				'name': 'home',
+				'name': 'homepage-home',
 				'path': '/',
 
 				'parentRoute': null,

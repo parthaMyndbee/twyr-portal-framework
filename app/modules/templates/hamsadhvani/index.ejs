@@ -180,7 +180,7 @@
 		<div class="row" style="margin:0px; padding:0px;">
 			<!-- Position: left-sidebar -->
 			<% if(positions['left-sidebar'] && positions['left-sidebar'].length) { %>
-			<div class="col-sm-2" style="padding:0px;">
+			<div class="col-sm-2" style="padding:0px; padding-right:1px;">
 				<% positions['left-sidebar'].forEach(function(sidebarWidget) { %>
 					{{<%= sidebarWidget %>}}
 				<% }) %>
@@ -188,13 +188,13 @@
 			<% } %>
 
 			<!-- Main component area -->
-			<div class="col-sm-<%= mainContentWidth %>" style="padding:0px;">
+			<div class="col-sm-<%= mainContentWidth %>" style="padding:0px 1px;">
 			{{outlet}}
 			</div>
 
 			<!-- Position: right-sidebar -->
 			<% if(positions['right-sidebar'] && positions['right-sidebar'].length) { %>
-			<div class="col-sm-2" style="padding:0px;">
+			<div class="col-sm-2" style="padding:0px; padding-left:1px;">
 				<% positions['right-sidebar'].forEach(function(sidebarWidget) { %>
 					{{<%= sidebarWidget %>}}
 				<% }) %>
