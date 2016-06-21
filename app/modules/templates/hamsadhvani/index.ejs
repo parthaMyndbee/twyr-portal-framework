@@ -34,6 +34,7 @@
 
 	<!-- jQuery plugins -->
 	<link href="/bhairavi/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" type="text/css" />
+	<link href="/bhairavi/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
 
 	<!-- Bootstrap CSS Styles -->
 	<link href="/bhairavi/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -290,8 +291,12 @@
 	<!-- jQuery plugins - for added functionality -->
 	<% if(developmentMode) { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/select2/dist/js/select2.full.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/datatables.net/js/jquery.dataTables.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/datatables.net-bs/js/dataTables.bootstrap.js"></script>
 	<% } else { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/select2/dist/js/select2.full.min.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 	<% } %>
 
 	<script type="application/javascript" src="/bhairavi/bower_components/js-cookie/src/js.cookie.js"></script>

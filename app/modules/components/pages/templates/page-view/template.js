@@ -1,10 +1,10 @@
 /*
- * Name			: app/modules/components/homepage/templates/default/template.js
+ * Name			: app/modules/components/pages/templates/page-view/template.js
  * Author		: Vish Desai (vishwakarma_d@hotmail.com)
  * Version		: 0.7.1
  * Copyright	: Copyright (c) 2014 - 2016 Vish Desai (https://www.linkedin.com/in/vishdesai).
  * License		: The MITNFA License (https://spdx.org/licenses/MITNFA.html).
- * Description	: The Homepage Component Default Template
+ * Description	: The Pages Component Default View Template
  *
  */
 
@@ -22,16 +22,16 @@ var base = require('./../../../../templates/template-base').baseTemplate,
  */
 var path = require('path');
 
-var homeTemplate = prime({
+var pageViewTemplate = prime({
 	'inherits': base,
 
 	'constructor': function(module) {
 		base.call(this, module);
 	},
 
-	'name': 'home',
+	'name': 'page-view',
 	'basePath': __dirname,
 	'dependencies': []
 });
 
-exports.template = homeTemplate;
+exports.template = pageViewTemplate;

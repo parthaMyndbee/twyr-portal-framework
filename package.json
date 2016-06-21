@@ -19,7 +19,7 @@
 	},
 	"main": "index.js",
 	"scripts": {
-		"start": "BLUEBIRD_DEBUG=0 node index.js",
+		"start": "BLUEBIRD_DEBUG=1 node index.js",
 		"test": "echo \"Error: no test specified! Configure in package.json\" && exit 1"
 	},
 	"engines": {

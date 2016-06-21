@@ -20,6 +20,8 @@ var base = require('./../component-base').baseComponent,
 /**
  * Module dependencies, required for this module
  */
+var filesystem = promises.promisifyAll(require('fs-extra')),
+	path = require('path');
 
 var pagesComponent = prime({
 	'inherits': base,
@@ -28,14 +30,155 @@ var pagesComponent = prime({
 		base.call(this, module);
 	},
 
-	'_getEmberRoutes': function(user, renderer, callback) {
-		if(callback) callback(null, [{
-			'name': 'pages-default',
-			'path': '/pages',
+	'start': function(dependencies, callback) {
+		var self = this,
+			configSrvc = dependencies['configuration-service'],
+			dbSrvc = (dependencies['database-service']).knex,
+			loggerSrvc = dependencies['logger-service'];
 
-			'parentRoute': null,
-			'subRoutes': []
-		}]);
+		pagesComponent.parent.start.call(self, dependencies, function(err, status) {
+			if(err) {
+				if(callback) callback(err);
+				return;
+			}
+
+			configSrvc.getModuleIdAsync(self)
+			.then(function(id) {
+				return dbSrvc.raw('SELECT id FROM module_permissions WHERE module = ? AND name = ?', [id, 'page-author']);
+			})
+			.then(function(pageAuthorPermissionId) {
+				self['$pageAuthorPermissionId'] = pageAuthorPermissionId.rows[0].id;
+				return null;
+			})
+			.catch(function(startErr) {
+				loggerSrvc.error(self.name + '::start Error: ', startErr);
+				if(callback) callback(startErr);
+			});
+
+			if(callback) callback(null, status);
+		});
+	},
+
+	'_selectTemplates': function(user, mediaType, possibleTemplates, callback) {
+		var self = this,
+			selectedTemplates = possibleTemplates.filter(function(possibleTemplate) {
+				return (possibleTemplate.name == 'page-view');
+			});
+
+		if(!user) {
+			if(callback) callback(null, selectedTemplates);
+			return;
+		}
+
+		self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
+		.then(function(hasPermission) {
+			if(hasPermission) {
+				if(callback) callback(null, possibleTemplates);
+				return null;
+			}
+
+			if(callback) callback(null, selectedTemplates);
+			return null;
+		})
+		.catch(function(err) {
+			self.dependencies['logger-service'].error(self.name + '::_selectTemplates Error: ', err);
+			if(callback) callback(err);
+		});
+	},
+
+	'_getEmberRoutes': function(user, renderer, callback) {
+		var self = this,
+			emberRoutes = [{
+				'name': 'page-view',
+				'path': '/page/:page_id',
+
+				'parentRoute': null,
+				'subRoutes': []
+			}];
+
+		if(user) {
+			self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
+			.then(function(hasPermission) {
+				if(hasPermission) {
+					emberRoutes.push({
+						'name': 'pages-default',
+						'path': '/pages',
+
+						'parentRoute': null,
+						'subRoutes': []
+					});
+				}
+
+				if(callback) callback(null, emberRoutes);
+				return null;
+			})
+			.catch(function(err) {
+				self.dependencies['logger-service'].error(self.name + '::_getEmberRoutes Error: ', err);
+				if(callback) callback(err);
+			});
+
+			return;
+		}
+
+		if(callback) callback(null, emberRoutes);
+	},
+
+	'_getEmberComponents': function(user, renderer, callback) {
+		var loggerSrvc = this.dependencies['logger-service'],
+			self = this;
+
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
+		.then(function(hasPermission) {
+			if(hasPermission) {
+				return promises.all([
+					filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/page-manager-widget.js'), 'utf8')
+				]);
+			}
+
+			return [];
+		})
+		.then(function(widgetHTMLs) {
+			if(callback) callback(null, widgetHTMLs);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error(self.name + '::_getEmberComponentHTMLs Error: ', err);
+			if(callback) callback(err);
+		});
+	},
+
+	'_getEmberComponentHTMLs': function(user, renderer, callback) {
+		var loggerSrvc = this.dependencies['logger-service'],
+			self = this;
+
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
+		.then(function(hasPermission) {
+			if(hasPermission) {
+				return promises.all([
+					filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/page-manager-widget.ejs'), 'utf8')
+				]);
+			}
+
+			return [];
+		})
+		.then(function(widgetHTMLs) {
+			if(callback) callback(null, widgetHTMLs);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error(self.name + '::_getEmberComponentHTMLs Error: ', err);
+			if(callback) callback(err);
+		});
 	},
 
 	'name': 'pages',
