@@ -143,6 +143,7 @@ var app = prime({
 			});
 
 			selectedTemplate.configuration.apiServer = self.$config.apiServer;
+			selectedTemplate.configuration.twyrUserId = user.id || null;
 
 			selectedTemplate.configuration.routes = 'var Router = require(\'twyr-portal/router\')[\'default\'];\nRouter.map(function() {\n' + self._generateEmberRouteMap(returnedRoutes) + '\n});';
 			selectedTemplate.configuration.routeHandlers = _.map(emberStuff, 'routeHandler').join('\n').trim();

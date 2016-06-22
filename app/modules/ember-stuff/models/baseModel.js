@@ -7,25 +7,15 @@ define(
 			'createdAt': _attr['default']('date'),
 			'updatedAt': _attr['default']('date'),
 
-			'formattedDOB': _ember['default'].computed('dob', {
+			'formattedCreatedAt': _ember['default'].computed('createdAt', {
 				'get': function(key) {
-					return window.moment(this.get('dob')).format('DD MMM YYYY');
-				},
-
-				'set': function(key, newValue) {
-					this.set('dob', (new Date(newValue)));
-				}
-			}),
-
-			'formattedCreatedOn': _ember['default'].computed('createdOn', {
-				'get': function(key) {
-					return window.moment(this.get('createdOn')).format('Do MMM YYYY');
+					return window.moment(this.get('createdAt')).format('DD/MMM/YYYY hh:mm A');
 				}
 			}).readOnly(),
 
-			'formattedUpdatedOn': _ember['default'].computed('updatedOn', {
+			'formattedUpdatedAt': _ember['default'].computed('updatedAt', {
 				'get': function(key) {
-					return window.moment(this.get('updatedOn')).format('Do MMM YYYY');
+					return window.moment(this.get('updatedAt')).format('DD/MMM/YYYY hh:mm A');
 				}
 			}).readOnly()
 		});

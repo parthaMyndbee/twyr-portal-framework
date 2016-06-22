@@ -123,6 +123,46 @@ var pagesComponent = prime({
 		if(callback) callback(null, emberRoutes);
 	},
 
+	'_getEmberRouteHandlers': function(user, renderer, callback) {
+		var loggerSrvc = this.dependencies['logger-service'],
+			self = this;
+
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		renderer(path.join(this.basePath, 'ember-stuff/routeHandlers/default.ejs'), { 'userId': user.id })
+		.then(function(profileComponentJS) {
+			if(callback) callback(null, [profileComponentJS]);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error(self.name + '::_getEmberComponents:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
+	},
+
+	'_getEmberModels': function(user, renderer, callback) {
+		var loggerSrvc = this.dependencies['logger-service'],
+			self = this;
+
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/models/default.js'), 'utf8')
+		.then(function(profileModel) {
+			if(callback) callback(null, [profileModel]);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error(self.name + '::_getEmberModels:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
+	},
+
 	'_getEmberComponents': function(user, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;

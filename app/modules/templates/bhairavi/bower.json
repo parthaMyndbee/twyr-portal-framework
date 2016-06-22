@@ -42,6 +42,7 @@
     "fontawesome": "*",
     "ionicons": "*",
     "jquery": "< 3.0.0",
+	"craftpip/jquery-confirm": "*",
     "js-cookie": "*",
     "loader.js": "ember-cli/loader.js",
 	"moment": "*",
