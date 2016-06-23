@@ -2,10 +2,10 @@ define(
 	'twyr-portal/routes/pages-default',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: eronkanPortal/routes/pages-default');
+		if(window.developmentMode) console.log('DEFINE: twyr-portal/routes/pages-default');
 		var ManagePageRoute = _ember['default'].Route.extend({
 			'model': function() {
-				return this.store.findAll('page');
+				return this.store.peekAll('pages-default');
 			},
 
 			'setupController': function(controller, model) {

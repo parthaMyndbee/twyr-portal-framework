@@ -1,11 +1,14 @@
 <script type="text/x-handlebars" data-template-name="page-view">
 <div class="box box-default" style="text-align:left; box-shadow:none; margin-bottom:0px;">
 	<div class="box-header with-border">
-		<h3 class="box-title">Default Page View Template</h3>
+		<h3 class="box-title">{{model.title}}</h3>
+		<div class="box-tools pull-right">
+			<p style="margin:0px; line-height:250%;"><strong>{{model.author}}</strong> updated this at <strong>{{model.formattedUpdatedAt}}</strong></p>
+		</div>
 	</div>
 
-	<div class="box-body" style="padding:85px 0px 85px 0px; text-align:center;">
-		<p style="font-size:28px;">This is the default view template for the Pages Component</p>
+	<div class="box-body no-padding">
+		{{model.content}}
 	</div>
 </div>
 </script>

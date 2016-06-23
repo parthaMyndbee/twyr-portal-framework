@@ -1,0 +1,18 @@
+define(
+	'twyr-portal/routes/page-view',
+	['exports', 'ember'],
+	function(exports, _ember) {
+		if(window.developmentMode) console.log('DEFINE: twyr-portal/routes/page-view');
+		var PageViewRoute = _ember['default'].Route.extend({
+			'model': function(params) {
+				return this.store.findRecord('page-view', params.page_id);
+			},
+
+			'setupController': function(controller, model) {
+				controller.set('model', model);
+			}
+		});
+
+		exports['default'] = PageViewRoute;
+	}
+);

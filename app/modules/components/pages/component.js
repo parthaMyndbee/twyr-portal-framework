@@ -128,19 +128,42 @@ var pagesComponent = prime({
 			self = this;
 
 		if(!user) {
-			if(callback) callback(null, []);
+			filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/page-view.ejs'), 'utf8')
+			.then(function(pgeViewRouteHandler) {
+				if(callback) callback(null, [pgeViewRouteHandler]);
+				return null;
+			})
+			.catch(function(err) {
+				loggerSrvc.error(self.name + '::_getEmberRouteHandlers:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+				if(callback) callback(err);
+			});
+
 			return null;
 		}
 
-		renderer(path.join(this.basePath, 'ember-stuff/routeHandlers/default.ejs'), { 'userId': user.id })
-		.then(function(profileComponentJS) {
-			if(callback) callback(null, [profileComponentJS]);
-			return null;
-		})
-		.catch(function(err) {
-			loggerSrvc.error(self.name + '::_getEmberComponents:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
-			if(callback) callback(err);
-		});
+		if(user) {
+			self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
+			.then(function(hasPermission) {
+				var promiseResolutions = [];
+				promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/page-view.ejs'), 'utf8'));
+
+				if(hasPermission) {
+					promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/pages-default.ejs'), 'utf8'));
+				}
+
+				return promises.all(promiseResolutions);
+			})
+			.then(function(routeHandlers) {
+				if(callback) callback(null, routeHandlers);
+				return null;
+			})
+			.catch(function(err) {
+				self.dependencies['logger-service'].error(self.name + '::_getEmberRouteHandlers Error: ', err);
+				if(callback) callback(err);
+			});
+
+			return;
+		}
 	},
 
 	'_getEmberModels': function(user, renderer, callback) {
@@ -148,19 +171,42 @@ var pagesComponent = prime({
 			self = this;
 
 		if(!user) {
-			if(callback) callback(null, []);
+			filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/page-view.js'), 'utf8')
+			.then(function(pageViewModel) {
+				if(callback) callback(null, [pageViewModel]);
+				return null;
+			})
+			.catch(function(err) {
+				loggerSrvc.error(self.name + '::_getEmberModels:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+				if(callback) callback(err);
+			});
+
 			return null;
 		}
 
-		filesystem.readFileAsync(path.join(this.basePath, 'ember-stuff/models/default.js'), 'utf8')
-		.then(function(profileModel) {
-			if(callback) callback(null, [profileModel]);
-			return null;
-		})
-		.catch(function(err) {
-			loggerSrvc.error(self.name + '::_getEmberModels:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
-			if(callback) callback(err);
-		});
+		if(user) {
+			self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
+			.then(function(hasPermission) {
+				var promiseResolutions = [];
+				promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/page-view.js'), 'utf8'));
+
+				if(hasPermission) {
+					promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/pages-default.js'), 'utf8'));
+				}
+
+				return promises.all(promiseResolutions);
+			})
+			.then(function(pageModels) {
+				if(callback) callback(null, pageModels);
+				return null;
+			})
+			.catch(function(err) {
+				self.dependencies['logger-service'].error(self.name + '::_getEmberModels Error: ', err);
+				if(callback) callback(err);
+			});
+
+			return;
+		}
 	},
 
 	'_getEmberComponents': function(user, renderer, callback) {
@@ -182,12 +228,12 @@ var pagesComponent = prime({
 
 			return [];
 		})
-		.then(function(widgetHTMLs) {
-			if(callback) callback(null, widgetHTMLs);
+		.then(function(widgets) {
+			if(callback) callback(null, widgets);
 			return null;
 		})
 		.catch(function(err) {
-			loggerSrvc.error(self.name + '::_getEmberComponentHTMLs Error: ', err);
+			loggerSrvc.error(self.name + '::_getEmberComponents Error: ', err);
 			if(callback) callback(err);
 		});
 	},

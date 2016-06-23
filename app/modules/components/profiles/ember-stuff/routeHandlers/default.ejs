@@ -2,7 +2,7 @@ define(
 	'twyr-portal/routes/profiles-default',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: eronkanPortal/routes/profiles-default');
+		if(window.developmentMode) console.log('DEFINE: twyr-portal/routes/profiles-default');
 		var ManageProfileRoute = _ember['default'].Route.extend({
 			'model': function() {
 				return this.store.findRecord('profile', '<%= userId %>');

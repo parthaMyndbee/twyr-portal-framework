@@ -11,4 +11,82 @@
 	</tr>
 </thead>
 </table>
+
+{{#if anyPagesEditing}}
+	<div class="nav-tabs-custom" style="margin:0px; margin-top:10px; border-top:1px solid #d2d6de; padding-top:10px;">
+		<ul class="nav nav-tabs" role="tablist">
+			{{#each model as |page|}}
+			{{#if page.isEditing}}
+				<li class="page-manager-widget-list-tab" role="presentation" id="page-manager-widget-list-{{page.id}}-link">
+					<a href="#page-manager-widget-list-{{page.id}}-div" role="tab" data-toggle="tab">
+						{{page.title}}
+						<i class="fa fa-close" style="margin-left:10px; color:#dd4b39; cursor:pointer;" {{action "controller-action" "stopEditPage" page bubbles=false}} />
+					</a>
+				</li>
+			{{/if}}
+			{{/each}}
+		</ul>
+
+		<div class="tab-content" style="padding:0px;">
+			{{#each model as |page|}}
+			{{#if page.isEditing}}
+			<div class="page-manager-widget-list-div tab-pane fade" role="tabpanel" id="page-manager-widget-list-{{page.id}}-div">
+				{{page-edit-widget model=page controller-action="controller-action"}}
+			</div>
+			{{/if}}
+			{{/each}}
+		</div>
+	</div>
+{{/if}}
+</script>
+
+
+<script type="text/x-handlebars" data-template-name="components/page-edit-widget">
+<div class="row" style="margin:0px; padding:10px 0px;">
+	<div class="col-sm-12" style="text-align:right;">
+	{{#if model.hasDirtyAttributes}}
+		<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "savePage" model bubbles=false}}>
+			<i class="fa fa-save" />
+			<span style="font-size:12px;">Save</span>
+		</button>
+
+		<button type="button" id="button-cancel" class="btn btn-flat btn-warning btn-sm" {{action "controller-action" "stopEditPage" model bubbles=false}}>
+			<i class="fa fa-undo" />
+			<span style="font-size:12px;">Cancel</span>
+		</button>
+	{{else}}
+		<button type="button" id="button-cancel" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "stopEditPage" model bubbles=false}}>
+			<i class="fa fa-close-o" />
+			<span style="font-size:12px;">Finished</span>
+		</button>
+	{{/if}}
+
+	<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "deletePage" model.id bubbles=false}}>
+		<i class="fa fa-trash-o" />
+		<span style="font-size:12px;">Delete</span>
+	</button>
+	</div>
+</div>
+
+<div class="row" style="margin:0px;">
+	<div class="form-group col-sm-6">
+		<label>Title</label>
+		{{input type="text" value=model.title class="form-control"}}
+	</div>
+
+	<div class="form-group col-sm-2">
+		<label>Author</label>
+		{{input type="text" value=model.author.fullName class="form-control" readonly="readonly"}}
+	</div>
+
+	<div class="form-group col-sm-2">
+		<label>Status</label>
+		<select id="page-edit-widget-select-status-{{model.id}}" class="form-control" style="width:100%;" />
+	</div>
+
+	<div class="form-group col-sm-2">
+		<label>Permission</label>
+		<select id="page-edit-widget-select-permission-{{model.id}}" class="form-control" style="width:100%;" />
+	</div>
+</div>
 </script>

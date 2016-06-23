@@ -20,34 +20,66 @@ var base = require('./../component-base').baseComponent,
 /**
  * Module dependencies, required for this module
  */
+var filesystem = promises.promisifyAll(require('fs-extra')),
+	path = require('path');
 
 var homepageComponent = prime({
 	'inherits': base,
 
 	'constructor': function(module) {
 		base.call(this, module);
+
+		this._getUserHomeRouteNameAsync = promises.promisify(this._getUserHomeRouteName.bind(this));
 	},
 
 	'_getEmberRoutes': function(user, renderer, callback) {
-		var self = this,
-			dbSrvc = self.dependencies['database-service'].knex,
-			loggerSrvc = self.dependencies['logger-service'],
-			homeRoute = {
-				'name': 'homepage-home',
-				'path': '/',
+		if(callback) callback(null, [{
+			'name': 'homepage-home',
+			'path': '/',
 
-				'parentRoute': null,
-				'subRoutes': []
-			};
+			'parentRoute': null,
+			'subRoutes': []
+		}]);
+	},
+
+	'_getEmberRouteHandlers': function(user, renderer, callback) {
+		var self = this;
+
+		self._getUserHomeRouteNameAsync(user)
+		.then(function(homeRouteName) {
+			if(homeRouteName == 'homepage-home') {
+				return '';
+			}
+
+			if(homeRouteName[0] !== '"') {
+				homeRouteName = '"' + homeRouteName + '"';
+			}
+
+			return renderer(path.join(self.basePath, 'ember-stuff/routeHandlers/default.ejs'), { 'homeRouteName': homeRouteName })
+		})
+		.then(function(routeHandler) {
+			if(callback) callback(null, [routeHandler]);
+			return null;
+		})
+		.catch(function(err) {
+			if(callback) callback(err);
+		});
+	},
+
+	'_getUserHomeRouteName': function(user, callback) {
+		var self = this,
+			homeRouteName = 'homepage-home',
+			dbSrvc = self.dependencies['database-service'].knex,
+			loggerSrvc = self.dependencies['logger-service'];
 
 		if(!user) {
 			dbSrvc.raw('SELECT ember_route FROM module_menus WHERE permission = (SELECT id FROM module_permissions WHERE module = (SELECT id FROM modules WHERE name = ?) AND name = \'public\') AND is_default_home = true', [this.$module.name])
 			.then(function(defaultPublicRoute) {
 				if(defaultPublicRoute.rows.length) {
-					homeRoute.name = defaultPublicRoute.rows[0].ember_route;
+					homeRouteName = defaultPublicRoute.rows[0].ember_route;
 				}
 
-				if(callback) callback(null, [homeRoute]);
+				if(callback) callback(null, homeRouteName);
 				return null;
 			})
 			.catch(function(err) {
@@ -61,19 +93,19 @@ var homepageComponent = prime({
 		dbSrvc.raw('SELECT ember_route FROM module_menus WHERE id = (SELECT home_module_menu FROM users WHERE id = ?)', [user.id])
 		.then(function(userHomeRoute) {
 			if(!userHomeRoute.rows.length)
-				return dbSrvc.raw('SELECT ember_route FROM module_menus WHERE permission IN (SELECT id FROM module_permissions WHERE module = (SELECT id FROM modules WHERE name = ?) AND name IN (\'all\', \'public\', \'registered\')) AND is_default_home = true', [self.$module.name]);
+				return dbSrvc.raw('SELECT ember_route FROM module_menus WHERE permission IN (SELECT id FROM module_permissions WHERE module = (SELECT id FROM modules WHERE name = ?) AND name IN (\'public\', \'registered\')) AND is_default_home = true', [self.$module.name]);
 
 			if(!userHomeRoute.rows[0].ember_route)
-				return dbSrvc.raw('SELECT ember_route FROM module_menus WHERE permission IN (SELECT id FROM module_permissions WHERE module = (SELECT id FROM modules WHERE name = ?) AND name IN (\'all\', \'public\', \'registered\')) AND is_default_home = true', [self.$module.name]);
+				return dbSrvc.raw('SELECT ember_route FROM module_menus WHERE permission IN (SELECT id FROM module_permissions WHERE module = (SELECT id FROM modules WHERE name = ?) AND name IN (\'public\', \'registered\')) AND is_default_home = true', [self.$module.name]);
 
 			return userHomeRoute;
 		})
 		.then(function(userHomeRoute) {
 			if(userHomeRoute.rows.length) {
-				homeRoute.name = userHomeRoute.rows[0].ember_route;
+				homeRouteName = userHomeRoute.rows[0].ember_route;
 			}
 
-			if(callback) callback(null, [homeRoute]);
+			if(callback) callback(null, homeRouteName);
 			return null;
 		})
 		.catch(function(err) {

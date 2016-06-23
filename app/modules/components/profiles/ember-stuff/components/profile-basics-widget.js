@@ -12,25 +12,6 @@ define(
 					self = this;
 
 				genderSelectElem.select2({
-					'ajax': {
-						'url': window.apiServer + 'masterdata/genders',
-						'dataType': 'json',
-
-						'processResults': function (data) {
-							return  {
-								'results': window.Ember.$.map(data, function(item) {
-									return {
-										'text': _ember['default'].String.capitalize(item),
-										'slug': _ember['default'].String.capitalize(item),
-										'id': item
-									};
-								})
-							};
-						},
-
-						'cache': true
-					},
-
 					'minimumInputLength': 0,
 					'minimumResultsForSearch': 10,
 
@@ -44,25 +25,6 @@ define(
 				});
 
 				homeSelectElem.select2({
-					'ajax': {
-						'url': window.apiServer + 'profiles/homepages',
-						'dataType': 'json',
-
-						'processResults': function (data) {
-							return  {
-								'results': window.Ember.$.map(data, function(item) {
-									return {
-										'text': _ember['default'].String.capitalize(item.display_name),
-										'slug': item.description,
-										'id': item.id
-									};
-								})
-							};
-						},
-
-						'cache': true
-					},
-
 					'minimumInputLength': 0,
 					'minimumResultsForSearch': 10,
 
@@ -90,6 +52,7 @@ define(
 					'cache': true
 				})
 				.done(function(data) {
+					genderSelectElem.html('');
 					_ember['default'].$.each(data, function(index, item) {
 						var thisOption = new Option(_ember['default'].String.capitalize(item), item, false, false);
 						genderSelectElem.append(thisOption);
@@ -107,6 +70,7 @@ define(
 					'cache': true
 				})
 				.done(function(data) {
+					homeSelectElem.html('');
 					_ember['default'].$.each(data, function(index, item) {
 						var thisOption = new Option(_ember['default'].String.capitalize(item.display_name), item.id, false, false);
 						homeSelectElem.append(thisOption);

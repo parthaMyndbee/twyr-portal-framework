@@ -269,6 +269,13 @@
 	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<% } %>
 
+	<!-- Moment.js - for easier date/time manipulation -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/moment/moment.js"></script>
+	<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/moment/min/moment.min.js"></script>
+	<% } %>
+
 	<!-- jQuery Plugins -->
 	<script type="application/javascript" src="/bhairavi/bower_components/js-cookie/src/js.cookie.js"></script>
 
