@@ -60,10 +60,6 @@ define(
 				}
 			},
 
-			'anyPagesEditing': _ember['default'].computed('model.@each.isEditing', function() {
-				return !!(this.get('model').filterBy('isEditing', true).get('length'));
-			}),
-
 			'_setupRowOperations': function() {
 				var self = this;
 				window.$.each(self.$('div.page-row-operations'), function(index, divElem) {
@@ -82,6 +78,10 @@ define(
 					divElem.append(deletePageButton);
 				});
 			},
+
+			'anyPagesEditing': _ember['default'].computed('model.@each.isEditing', function() {
+				return !!(this.get('model').filterBy('isEditing', true).get('length'));
+			}),
 
 			'addPage': function(event) {
 				event.stopPropagation();
@@ -248,9 +248,12 @@ define(
 	function(exports, _ember, _app) {
 		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/page-edit-widget');
 		var PageEditWidget = _ember['default'].Component.extend({
+			'_ckEditor': null,
+
 			'didRender': function() {
 				var statusSelectElem = _ember['default'].$('select#page-edit-widget-select-status-' + this.get('model').get('id')),
 					permissionSelectElem = _ember['default'].$('select#page-edit-widget-select-permission-' + this.get('model').get('id')),
+					contentEditElem = _ember['default'].$('textarea#page-edit-widget-textarea-content-' + this.get('model').get('id')),
 					self = this;
 
 				self._super(...arguments);
@@ -320,6 +323,26 @@ define(
 				.fail(function() {
 					console.error(window.apiServer + 'masterdata/server-permissions error:\n', arguments);
 				});
+
+				if(!self.get('_ckEditor')) {
+					self.set('_ckEditor', contentEditElem.ckeditor({
+						'uploadUrl': window.apiServer + '/pages/upload/?page=' + self.get('model').get('id')
+					}).editor);
+
+					self.get('_ckEditor').on('change', function(event) {
+						self.get('model').set('content', self.get('_ckEditor').getData());
+					});
+				}
+			},
+
+			'willDestroyElement': function() {
+				var self = this;
+				self._super(...arguments);
+
+				if(self.get('_ckEditor')) {
+					self.get('_ckEditor').destroy();
+					self.set('_ckEditor', null);
+				}
 			},
 
 			'actions': {
