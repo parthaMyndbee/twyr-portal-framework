@@ -21,7 +21,8 @@ define(
 						{ 'data': 'title' },
 						{ 'data': 'author' },
 						{ 'data': 'status' },
-						{ 'data': 'created' }
+						{ 'data': 'created' },
+						{ 'data': 'updated' }
 					],
 
 					'columnDefs': [{
@@ -29,7 +30,7 @@ define(
 						'visible': false,
 						'searchable': false
 					}, {
-						'targets': [5],
+						'targets': [6],
 						'searchable': false,
 
 						'render': function(whatever, type, row) {
@@ -326,11 +327,19 @@ define(
 
 				if(!self.get('_ckEditor')) {
 					self.set('_ckEditor', contentEditElem.ckeditor({
-						'uploadUrl': window.apiServer + '/pages/upload/?page=' + self.get('model').get('id')
-					}).editor);
+						'filebrowserBrowseUrl': window.apiServer + 'pages/listFiles/?page=' + self.get('model').get('id'),
+						'filebrowserImageBrowseUrl': window.apiServer + 'pages/listImages/?page=' + self.get('model').get('id'),
+						'filebrowserUploadUrl': window.apiServer + 'pages/uploadFile/?page=' + self.get('model').get('id'),
+						'filebrowserImageUploadUrl': window.apiServer + 'pages/uploadImage/?page=' + self.get('model').get('id'),
 
-					self.get('_ckEditor').on('change', function(event) {
-						self.get('model').set('content', self.get('_ckEditor').getData());
+						'mathJaxLib': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-AMS_HTML',
+
+						'uploadUrl': window.apiServer + 'pages/uploadDroppedFile/?page=' + self.get('model').get('id'),
+						'imageUploadUrl': window.apiServer + 'pages/uploadDroppedImage/?page=' + self.get('model').get('id')
+					}));
+
+					self.get('_ckEditor').editor.on('change', function(event) {
+						self.get('model').set('content', self.get('_ckEditor').editor.getData());
 					});
 				}
 			},
@@ -340,9 +349,11 @@ define(
 				self._super(...arguments);
 
 				if(self.get('_ckEditor')) {
-					self.get('_ckEditor').destroy();
+					self.get('_ckEditor').editor.destroy();
 					self.set('_ckEditor', null);
 				}
+
+				self.get('model').set('isEditing', false);
 			},
 
 			'actions': {

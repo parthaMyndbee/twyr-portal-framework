@@ -7,19 +7,23 @@
 		<th>Author</th>
 		<th>Status</th>
 		<th>Created</th>
+		<th>Updated</th>
 		<th style="min-width:100px;">&nbsp;</th>
 	</tr>
 </thead>
 </table>
 
 {{#if anyPagesEditing}}
-	<div class="nav-tabs-custom" style="margin:0px; margin-top:10px; border-top:1px solid #d2d6de; padding-top:10px;">
-		<ul class="nav nav-tabs" role="tablist">
+	<div class="nav-tabs-custom" style="margin-top:20px;">
+		<ul class="nav nav-tabs" role="tablist" style="background-color:#f4f4f4;">
 			{{#each model as |page|}}
 			{{#if page.isEditing}}
 				<li class="page-manager-widget-list-tab" role="presentation" id="page-manager-widget-list-{{page.id}}-link">
 					<a href="#page-manager-widget-list-{{page.id}}-div" role="tab" data-toggle="tab">
 						{{page.title}}
+						{{#if page.hasDirtyAttributes}}
+						*
+						{{/if}}
 						<i class="fa fa-close" style="margin-left:10px; color:#dd4b39; cursor:pointer;" {{action "controller-action" "stopEditPage" page bubbles=false}} />
 					</a>
 				</li>
@@ -27,7 +31,7 @@
 			{{/each}}
 		</ul>
 
-		<div class="tab-content" style="padding:0px;">
+		<div class="tab-content" style="padding:0px; padding-bottom:10px;">
 			{{#each model as |page|}}
 			{{#if page.isEditing}}
 			<div class="page-manager-widget-list-div tab-pane fade" role="tabpanel" id="page-manager-widget-list-{{page.id}}-div">

@@ -40,7 +40,7 @@ define(
 				_ember['default'].$('div#profile-basics-widget-input-dob').datetimepicker({
 					'format': 'DD MMM YYYY',
 					'minDate': '01 Jan 1900',
-					'maxDate': window.moment()
+					'maxDate': window.moment().format('DD MMM YYYY')
 				});
 
 				_ember['default'].$('div#profile-basics-widget-image').outerHeight(_ember['default'].$('div#profile-basics-widget-text-stuff').height());

@@ -156,7 +156,6 @@ else {
 	var serverDomain = domain.create(),
 		TwyrPortal = require(config['main']).twyrPortal,
 		twyrPortal = promises.promisifyAll(new TwyrPortal(null, clusterId, cluster.worker.id));
-
 	var startupFn = function () {
 		var allStatuses = [];
 		if(!twyrPortal) return;
@@ -242,12 +241,12 @@ else {
 	});
 
 	serverDomain.on('error', function(err) {
-		console.error('Twyr Portal #' + cluster.worker.id + '::Domain Error:\n', JSON.stringify(err, null, '\t'));
+		console.error('Twyr Portal #' + cluster.worker.id + '::Domain Error:\n', err);
 		shutdownFn();
 	});
 
 	process.on('uncaughtException', function(err) {
-		console.error('Twyr Portal #' + cluster.worker.id + '::Process Error: ', JSON.stringify(err, null, '\t'));
+		console.error('Twyr Portal #' + cluster.worker.id + '::Process Error: ', err);
 		shutdownFn();
 	});
 
