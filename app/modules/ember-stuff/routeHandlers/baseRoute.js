@@ -1,9 +1,9 @@
 
 define(
-	'twyr-portal/routes/application',
+	'twyr-webapp/routes/application',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/routes/application');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/routes/application');
 		var ApplicationRoute = _ember['default'].Route.extend({
 			'actions': {
 				'controller-action': function(action, data) {
@@ -17,10 +17,10 @@ define(
 );
 
 define(
-	'twyr-portal/controllers/application',
+	'twyr-webapp/controllers/application',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/controllers/application');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/controllers/application');
 		var ApplicationController = _ember['default'].Controller.extend({
 			'resetStatusMessages': function(timeout) {
 				window.Ember.$('div#template-status-message').slideUp(timeout || 600);

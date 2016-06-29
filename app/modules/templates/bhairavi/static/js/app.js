@@ -1,5 +1,5 @@
 define(
-	'twyr-portal/resolver',
+	'twyr-webapp/resolver',
 	['exports', 'ember-resolver'],
 	function (exports, _emberResolver) {
 		exports['default'] = _emberResolver['default'];
@@ -7,10 +7,10 @@ define(
 );
 
 define(
-	'twyr-portal/router',
+	'twyr-webapp/router',
 	['exports', 'ember'],
 	function (exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/application/router');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/application/router');
 		var Router = _ember['default'].Router.extend({
 			location: 'history'
 		});
@@ -20,7 +20,7 @@ define(
 );
 
 define(
-	'twyr-portal/initializers/container-debug-adapter',
+	'twyr-webapp/initializers/container-debug-adapter',
 	['exports', 'ember-resolver/container-debug-adapter'],
 	function (exports, _emberResolverContainerDebugAdapter) {
 		exports['default'] = {
@@ -36,10 +36,10 @@ define(
 );
 
 define(
-	'twyr-portal/adapters/application',
+	'twyr-webapp/adapters/application',
 	['exports', 'ember-data/adapters/json-api'],
 	function (exports, _jsonAPIAdapter) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/adapters/application');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/application');
 		var Adapter = _jsonAPIAdapter['default'].extend({
 			'host': window.apiServer.substring(0, window.apiServer.length - 1)
 		});
@@ -49,10 +49,10 @@ define(
 );
 
 define(
-	'twyr-portal/serializers/application',
+	'twyr-webapp/serializers/application',
 	['exports', 'ember', 'ember-data/serializers/json-api'],
 	function (exports, _ember, _jsonAPISerializer) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/serializers/application');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/serializers/application');
 		exports['default'] = _jsonAPISerializer['default'].extend({
 			'keyForAttribute': function(attr) {
 				return _ember['default'].String.underscore(attr);
@@ -66,20 +66,20 @@ define(
 );
 
 define(
-	'twyr-portal/application',
-	['exports', 'ember', 'twyr-portal/resolver', 'ember-load-initializers', 'ember-data/adapters/json-api'],
+	'twyr-webapp/application',
+	['exports', 'ember', 'twyr-webapp/resolver', 'ember-load-initializers', 'ember-data/adapters/json-api'],
 	function(exports, _ember, _twyrPortalResolver, _emberLoadInitializers, _jsonAPIAdapter) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/application');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/application');
 		var twyrApplication = _ember['default'].Application.extend({
-			'modulePrefix': 'twyr-portal',
+			'modulePrefix': 'twyr-webapp',
 		    'Resolver': _twyrPortalResolver['default']
 		});
 
-		(0, _emberLoadInitializers['default'])(twyrApplication, 'twyr-portal');
+		(0, _emberLoadInitializers['default'])(twyrApplication, 'twyr-webapp');
 
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/application/create');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/application/create');
 		var App = twyrApplication.create({
-			'name': 'twyr-portal',
+			'name': 'twyr-webapp',
 			'version': '0.7.1',
 			'LOG_RESOLVER': window.developmentMode,
 			'LOG_ACTIVE_GENERATION': window.developmentMode,
@@ -95,7 +95,7 @@ define(
 			});
 		};
 
-		if(window.developmentMode) console.log('EXPORT: twyr-portal/application');
+		if(window.developmentMode) console.log('EXPORT: twyr-webapp/application');
 		exports['default'] = App;
 	}
 );

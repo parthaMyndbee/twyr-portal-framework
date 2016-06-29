@@ -1,10 +1,10 @@
 exports.config = ({
 	"File": {
 		"json": true,
-		"level": "debug",
+		"level": "info",
 		"maxsize": 10485760,
 		"colorize": true,
-		"filename": "logs/twyr-portal.log",
+		"filename": "logs/twyr-webapp.log",
 		"maxFiles": 15,
 		"tailable": true,
 		"timestamp": true,

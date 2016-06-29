@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/adapters/page-view',
-	['exports', 'twyr-portal/adapters/application'],
+	'twyr-webapp/adapters/page-view',
+	['exports', 'twyr-webapp/adapters/application'],
 	function(exports, _appAdapter) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/adapters/page-view');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/page-view');
 
 		var PageViewAdapter = _appAdapter['default'].extend({
 			'namespace': 'pages'
@@ -13,10 +13,10 @@ define(
 );
 
 define(
-	'twyr-portal/models/page-view',
-	['exports', 'twyr-portal/models/base', 'ember', 'ember-data/attr'],
+	'twyr-webapp/models/page-view',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr'],
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/models/page-view');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/page-view');
 		var PageViewModel = _twyrBaseModel['default'].extend({
 			'author': _attr['default']('string', { 'defaultValue': 'Anomymous' }),
 

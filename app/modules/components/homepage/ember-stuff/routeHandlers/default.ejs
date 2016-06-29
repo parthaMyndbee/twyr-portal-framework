@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/routes/homepage-home',
+	'twyr-webapp/routes/homepage-home',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/routes/homepage-home');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/routes/homepage-home');
 		var HomePageHomeRoute = _ember['default'].Route.extend({
 			'beforeModel': function() {
 				this.transitionTo(<%- homeRouteName %>);

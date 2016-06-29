@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/components/profile-basics-widget',
+	'twyr-webapp/components/profile-basics-widget',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/profile-basics-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/profile-basics-widget');
 		var ProfileBasicsWidget = _ember['default'].Component.extend({
 			'didRender': function() {
 				this._super(...arguments);

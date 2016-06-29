@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/components/login-widget',
+	'twyr-webapp/components/login-widget',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/login-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/login-widget');
 		var LoginWidgetComponent = _ember['default'].Component.extend({
 			'username': '',
 			'password': '',

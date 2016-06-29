@@ -3,29 +3,29 @@ exports.seed = function(knex, Promise) {
 	var rootTenantId = null,
 		rootUserId = null;
 
-	return knex.raw('SELECT id FROM modules WHERE name = ? AND parent IS NULL', ['twyr-portal'])
-	.then(function(portalId) {
-		if(portalId.rows.length)
+	return knex.raw('SELECT id FROM modules WHERE name = ? AND parent IS NULL', ['twyr-webapp'])
+	.then(function(webappId) {
+		if(webappId.rows.length)
 			return null;
 
-		return knex("modules").insert({ 'name': 'twyr-portal', 'display_name': 'Twyr Portal', 'description': 'The Twy\'r Portal Module - the "Application Class" for the Portal' }).returning('id')
+		return knex("modules").insert({ 'name': 'twyr-webapp', 'display_name': 'Twyr Web Application', 'description': 'The Twy\'r Web Application Module - the "Application Class" for the Web Application', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }).returning('id')
 		.then(function(parentId) {
 			parentId = parentId[0];
 			return Promise.all([
 				parentId,
-				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'logger-service', 'display_name': 'Logger Service', 'description': 'The Twy\'r Portal Logger Service' }),
-				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'cache-service', 'display_name': 'Cache Service', 'description': 'The Twy\'r Portal Cache Service - based on Redis' }),
-				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'pubsub-service', 'display_name': 'Publish/Subscribe Service', 'description': 'The Twy\'r Portal Publish/Subscribe Service - based on Ascoltatori' }),
-				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'api-service', 'display_name': 'API Service', 'description': 'The Twy\'r Portal API Service - allows modules to expose interfaces for use by other modules without direct references to each other' }),
-				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'database-service', 'display_name': 'Database Service', 'description': 'The Twy\'r Portal Database Service - built on top of Knex / Booksshelf and so supports MySQL, PostgreSQL, and a few others' }),
-				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'auth-service', 'display_name': 'Authentication Service', 'description': 'The Twy\'r Portal Authentication Service - based on Passport and its infinite strategies' }),
-				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'express-service', 'display_name': 'Express Service', 'description': 'The Twy\'r Portal Webserver Service - based on Express and node.js HTTP/HTTPS modules' }),
-				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'configuration-service', 'display_name': 'Configuration Service', 'description': 'The Twy\'r Portal Configuration Service' }).returning('id')
+				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'logger-service', 'display_name': 'Logger Service', 'description': 'The Twy\'r Web Application Logger Service', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }),
+				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'cache-service', 'display_name': 'Cache Service', 'description': 'The Twy\'r Web Application Cache Service - based on Redis', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }),
+				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'pubsub-service', 'display_name': 'Publish/Subscribe Service', 'description': 'The Twy\'r Web Application Publish/Subscribe Service - based on Ascoltatori', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }),
+				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'api-service', 'display_name': 'API Service', 'description': 'The Twy\'r Web Application API Service - allows modules to expose interfaces for use by other modules without direct references to each other', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }),
+				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'database-service', 'display_name': 'Database Service', 'description': 'The Twy\'r Web Application Database Service - built on top of Knex / Booksshelf and so supports MySQL, PostgreSQL, and a few others', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }),
+				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'auth-service', 'display_name': 'Authentication Service', 'description': 'The Twy\'r Web Application Authentication Service - based on Passport and its infinite strategies', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }),
+				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'express-service', 'display_name': 'Express Service', 'description': 'The Twy\'r Web Application Webserver Service - based on Express and node.js HTTP/HTTPS modules', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }),
+				knex("modules").insert({ 'parent': parentId, 'type': 'service', 'name': 'configuration-service', 'display_name': 'Configuration Service', 'description': 'The Twy\'r Web Application Configuration Service', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }).returning('id')
 				.then(function(configSrvcId) {
 					configSrvcId = configSrvcId[0];
 					return Promise.all([
-						knex("modules").insert({ 'parent': configSrvcId, 'type': 'service', 'name': 'file-configuration-service', 'display_name': 'File Configuration Service', 'description': 'The Twy\'r Portal Filesystem-based Configuration Service' }),
-						knex("modules").insert({ 'parent': configSrvcId, 'type': 'service', 'name': 'database-configuration-service', 'display_name': 'Database Configuration Service', 'description': 'The Twy\'r Portal Database-based Configuration Service' })
+						knex("modules").insert({ 'parent': configSrvcId, 'type': 'service', 'name': 'file-configuration-service', 'display_name': 'File Configuration Service', 'description': 'The Twy\'r Web Application Filesystem-based Configuration Service', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }),
+						knex("modules").insert({ 'parent': configSrvcId, 'type': 'service', 'name': 'database-configuration-service', 'display_name': 'Database Configuration Service', 'description': 'The Twy\'r Web Application Database-based Configuration Service', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } })
 					]);
 				})
 			]);
@@ -35,10 +35,10 @@ exports.seed = function(knex, Promise) {
 
 			return Promise.all([
 				parentId,
-				knex("module_permissions").insert({ 'module': parentId, 'name': 'public', 'display_name': 'Public User Permissions', 'description': 'The Twy\'r Portal Permissions for non-logged-in Users' }),
-				knex("module_permissions").insert({ 'module': parentId, 'name': 'registered', 'display_name': 'Registered User Permissions', 'description': 'The Twy\'r Portal Permissions for logged-in Users' }),
-				knex("module_permissions").insert({ 'module': parentId, 'name': 'administrator', 'display_name': 'Administrator Permissions', 'description': 'The Twy\'r Portal Permissions for Administrators' }),
-				knex("module_permissions").insert({ 'module': parentId, 'name': 'super-administrator', 'display_name': 'Super Administrator Permissions', 'description': 'The Twy\'r Portal Permissions for Super Administrators' })
+				knex("module_permissions").insert({ 'module': parentId, 'name': 'public', 'display_name': 'Public User Permissions', 'description': 'The Twy\'r Web Application Permissions for non-logged-in Users' }),
+				knex("module_permissions").insert({ 'module': parentId, 'name': 'registered', 'display_name': 'Registered User Permissions', 'description': 'The Twy\'r Web Application Permissions for logged-in Users' }),
+				knex("module_permissions").insert({ 'module': parentId, 'name': 'administrator', 'display_name': 'Administrator Permissions', 'description': 'The Twy\'r Web Application Permissions for Administrators' }),
+				knex("module_permissions").insert({ 'module': parentId, 'name': 'super-administrator', 'display_name': 'Super Administrator Permissions', 'description': 'The Twy\'r Web Application Permissions for Super Administrators' })
 			]);
 		})
 		.then(function(parentId) {
@@ -46,7 +46,7 @@ exports.seed = function(knex, Promise) {
 
 			return Promise.all([
 				parentId,
-				knex("module_templates").insert({ 'module': parentId, 'name': 'bhairavi', 'description': 'The Twy\'r Portal default public template', 'media_type': 'all', 'user_type': 'public', 'is_default': true, 'configuration': { 'title': 'Twy\'r Portal: Bhairavi Template' } }).returning('id')
+				knex("module_templates").insert({ 'module': parentId, 'name': 'bhairavi', 'description': 'The Twy\'r Web Application default public template', 'media_type': 'all', 'user_type': 'public', 'is_default': true, 'configuration': { 'title': 'Twy\'r Web Application: Bhairavi Template' }, 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }).returning('id')
 				.then(function(templateId) {
 					templateId = templateId[0];
 					return Promise.all([
@@ -66,7 +66,7 @@ exports.seed = function(knex, Promise) {
 						knex("module_template_positions").insert({ 'template': templateId, 'name': 'footer' })
 					]);
 				}),
-				knex("module_templates").insert({ 'module': parentId, 'name': 'hamsadhvani', 'description': 'The Twy\'r Portal default registered template', 'media_type': 'all', 'user_type': 'registered', 'is_default': true, 'configuration': { 'title': 'Twy\'r Portal: Hamsadhvani Template' } }).returning('id')
+				knex("module_templates").insert({ 'module': parentId, 'name': 'hamsadhvani', 'description': 'The Twy\'r Web Application default registered template', 'media_type': 'all', 'user_type': 'registered', 'is_default': true, 'configuration': { 'title': 'Twy\'r Web Application: Hamsadhvani Template' }, 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }).returning('id')
 				.then(function(templateId) {
 					templateId = templateId[0];
 					return Promise.all([

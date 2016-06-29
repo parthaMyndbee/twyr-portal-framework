@@ -27,8 +27,9 @@ var filesystem = promises.promisifyAll(require('fs')),
 var app = prime({
 	'inherits': base,
 
-	'constructor': function (module, clusterId, workedId) {
-		base.call(this, module);
+	'constructor': function (application, clusterId, workedId) {
+		base.call(this);
+		this['$application'] = application;
 		this['$uuid'] = clusterId + '-' + workedId;
 
 		this._loadConfig();
@@ -145,7 +146,7 @@ var app = prime({
 			selectedTemplate.configuration.apiServer = self.$config.apiServer;
 			selectedTemplate.configuration.twyrUserId = user ? user.id : null;
 
-			selectedTemplate.configuration.routes = 'var Router = require(\'twyr-portal/router\')[\'default\'];\nRouter.map(function() {\n' + self._generateEmberRouteMap(returnedRoutes) + '\n});';
+			selectedTemplate.configuration.routes = 'var Router = require(\'twyr-webapp/router\')[\'default\'];\nRouter.map(function() {\n' + self._generateEmberRouteMap(returnedRoutes) + '\n});';
 			selectedTemplate.configuration.routeHandlers = _.map(emberStuff, 'routeHandler').join('\n').trim();
 			selectedTemplate.configuration.models = _.map(emberStuff, 'model').join('\n').trim();
 			selectedTemplate.configuration.components = _.map(emberStuff, 'component').join('\n').trim();

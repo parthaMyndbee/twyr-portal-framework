@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/adapters/pages-default',
-	['exports', 'twyr-portal/adapters/application'],
+	'twyr-webapp/adapters/pages-default',
+	['exports', 'twyr-webapp/adapters/application'],
 	function(exports, _appAdapter) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/adapters/pages-default');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/pages-default');
 
 		var PagesDefaultAdapter = _appAdapter['default'].extend({
 			'namespace': 'pages'
@@ -13,10 +13,10 @@ define(
 );
 
 define(
-	'twyr-portal/models/pages-default',
-	['exports', 'twyr-portal/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
+	'twyr-webapp/models/pages-default',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/models/pages-default');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/pages-default');
 		var PageModel = _twyrBaseModel['default'].extend({
 			'author': _relationships.belongsTo('profile'),
 

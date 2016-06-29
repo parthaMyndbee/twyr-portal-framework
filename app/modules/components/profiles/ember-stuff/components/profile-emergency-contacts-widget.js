@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/components/profile-emergency-contacts-widget',
-	['exports', 'ember', 'twyr-portal/application'],
+	'twyr-webapp/components/profile-emergency-contacts-widget',
+	['exports', 'ember', 'twyr-webapp/application'],
 	function(exports, _ember, _app) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/profile-emergency-contacts-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/profile-emergency-contacts-widget');
 		var ProfileEmergencyContactsWidget = _ember['default'].Component.extend({
 			'didRender': function() {
 				var self = this;

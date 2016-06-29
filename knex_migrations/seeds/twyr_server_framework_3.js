@@ -1,41 +1,41 @@
 
 exports.seed = function(knex, Promise) {
-	var portalId = null,
+	var webappId = null,
 		componentId = null,
 		registeredPermId = null,
 		widgetId = null;
 
-	return knex.raw('SELECT id FROM modules WHERE name = ? AND parent IS NULL', ['twyr-portal'])
+	return knex.raw('SELECT id FROM modules WHERE name = ? AND parent IS NULL', ['twyr-webapp'])
 	.then(function(parentId) {
 		if(!parentId.rows.length)
 			return null;
 
-		portalId = parentId.rows[0].id;
-		return knex.raw('SELECT id FROM modules WHERE name = ? AND parent = ?', ['profiles', portalId]);
+		webappId = parentId.rows[0].id;
+		return knex.raw('SELECT id FROM modules WHERE name = ? AND parent = ?', ['profiles', webappId]);
 	})
 	.then(function(existingComponentId) {
 		if(existingComponentId.rows.length)
 			return null;
 
-		return knex("modules").insert({ 'parent': portalId, 'type': 'component', 'name': 'profiles', 'display_name': 'Profile Manager', 'description': 'The Twy\'r Portal User Profile Management Component' }).returning('id')
+		return knex("modules").insert({ 'parent': webappId, 'type': 'component', 'name': 'profiles', 'display_name': 'Profile Manager', 'description': 'The Twy\'r Web Application User Profile Management Component', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }).returning('id')
 		.then(function(sessionComponentId) {
 			componentId = sessionComponentId[0];
-			return knex("module_templates").insert({ 'module': componentId, 'name': 'profiles-default', 'description': 'The default Profile Management Template', 'media_type': 'all', 'user_type': 'registered', 'is_default': true }).returning('id');
+			return knex("module_templates").insert({ 'module': componentId, 'name': 'profiles-default', 'description': 'The default Profile Management Template', 'media_type': 'all', 'user_type': 'registered', 'is_default': true, 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }).returning('id');
 		})
 		.then(function(templateId) {
 			templateId = templateId[0];
 			return knex("module_template_positions").insert({ 'template': templateId, 'name': 'module' });
 		})
 		.then(function() {
-			return knex.raw('SELECT id FROM module_permissions WHERE module = ? AND name = ?', [portalId, 'registered']);
+			return knex.raw('SELECT id FROM module_permissions WHERE module = ? AND name = ?', [webappId, 'registered']);
 		})
 		.then(function(permId) {
 			registeredPermId = permId.rows[0].id;
-			return knex("module_widgets").insert({ 'module': componentId, 'permission': registeredPermId, 'ember_component': 'profile-widget', 'display_name': 'Profile', 'description': 'The Twy\'r Portal Profile Management Widget' }).returning('id');
+			return knex("module_widgets").insert({ 'module': componentId, 'permission': registeredPermId, 'ember_component': 'profile-widget', 'display_name': 'Profile', 'description': 'The Twy\'r Web Application Profile Management Widget', 'metadata': { 'author': 'Twy\'r', 'version': '0.7.1', 'website': 'https://twyr.github.io', 'demo': 'https://twyr.github.io', 'documentation': 'https://twyr.github.io' } }).returning('id');
 		})
 		.then(function(profileWidgetId) {
 			widgetId = profileWidgetId[0];
-			return knex.raw('SELECT id FROM module_template_positions WHERE template = (SELECT id FROM module_templates WHERE module = ? AND user_type = \'registered\') AND name = \'settings\'', [portalId]);
+			return knex.raw('SELECT id FROM module_template_positions WHERE template = (SELECT id FROM module_templates WHERE module = ? AND user_type = \'registered\') AND name = \'settings\'', [webappId]);
 		})
 		.then(function(tmplPositionId) {
 			tmplPositionId = tmplPositionId.rows[0].id;

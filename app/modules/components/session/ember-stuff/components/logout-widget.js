@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/components/logout-widget',
+	'twyr-webapp/components/logout-widget',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/logout-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/logout-widget');
 		var LogoutWidgetComponent = _ember['default'].Component.extend({
 			'doLogout': function() {
 				_ember['default'].$.ajax({
@@ -11,12 +11,12 @@ define(
 					'dataType': 'json',
 
 					'success': function(data) {
-						window.Cookies.remove('twyr-portal', { 'path': '/', 'domain': '.twyrframework.com' });
+						window.Cookies.remove('twyr-webapp', { 'path': '/', 'domain': '.twyrframework.com' });
 						window.location.href = '/';
 					},
 
 					'error': function(err) {
-						window.Cookies.remove('twyr-portal', { 'path': '/', 'domain': '.twyrframework.com' });
+						window.Cookies.remove('twyr-webapp', { 'path': '/', 'domain': '.twyrframework.com' });
 						window.location.href = '/';
 					}
 				});

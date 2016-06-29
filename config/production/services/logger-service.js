@@ -14,7 +14,7 @@ exports.config = ({
 		"timestamp": true,
 		"json": true,
 		"prettyPrint": true,
-		"filename": "logs/twyr-portal.log",
+		"filename": "logs/twyr-webapp.log",
 		"maxsize": 10485760,
 		"maxFiles": 15,
 		"tailable": true,

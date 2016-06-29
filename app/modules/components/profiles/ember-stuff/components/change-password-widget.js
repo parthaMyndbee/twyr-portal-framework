@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/components/change-password-widget',
+	'twyr-webapp/components/change-password-widget',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/change-password-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/change-password-widget');
 		var ChangePasswordWidget = _ember['default'].Component.extend({
 			'currentPassword': '',
 			'newPassword1': '',

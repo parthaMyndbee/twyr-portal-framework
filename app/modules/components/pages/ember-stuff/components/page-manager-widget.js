@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/components/page-manager-widget',
-	['exports', 'ember', 'twyr-portal/application'],
+	'twyr-webapp/components/page-manager-widget',
+	['exports', 'ember', 'twyr-webapp/application'],
 	function(exports, _ember, _app) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/page-manager-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/page-manager-widget');
 		var PageManagerWidget = _ember['default'].Component.extend({
 			'_pageListDataTable': null,
 
@@ -244,10 +244,10 @@ define(
 );
 
 define(
-	'twyr-portal/components/page-edit-widget',
-	['exports', 'ember', 'twyr-portal/application'],
+	'twyr-webapp/components/page-edit-widget',
+	['exports', 'ember', 'twyr-webapp/application'],
 	function(exports, _ember, _app) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/page-edit-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/page-edit-widget');
 		var PageEditWidget = _ember['default'].Component.extend({
 			'_ckEditor': null,
 

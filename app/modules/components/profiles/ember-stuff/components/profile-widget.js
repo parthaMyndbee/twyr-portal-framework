@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/components/profile-widget',
+	'twyr-webapp/components/profile-widget',
 	['exports', 'ember'],
 	function(exports, _ember) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/profile-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/profile-widget');
 		var ProfileWidget = _ember['default'].Component.extend({
 			'actions': {
 				'controller-action': function(action, data) {

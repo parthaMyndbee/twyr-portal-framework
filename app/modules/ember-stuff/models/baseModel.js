@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/models/base',
+	'twyr-webapp/models/base',
 	['exports', 'ember', 'ember-data/model', 'ember-data/attr'],
 	function(exports, _ember, _model, _attr) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/models/base');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/base');
 		var TwyrBaseModel = _model['default'].extend({
 			'createdAt': _attr['default']('date', { 'defaultValue': new Date() }),
 			'updatedAt': _attr['default']('date', { 'defaultValue': new Date() }),

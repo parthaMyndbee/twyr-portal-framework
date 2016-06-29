@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/components/profile-contacts-widget',
-	['exports', 'ember', 'twyr-portal/application'],
+	'twyr-webapp/components/profile-contacts-widget',
+	['exports', 'ember', 'twyr-webapp/application'],
 	function(exports, _ember, _app) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/components/profile-contacts-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/profile-contacts-widget');
 		var ProfileContactsWidget = _ember['default'].Component.extend({
 			'didRender': function() {
 				var self = this;

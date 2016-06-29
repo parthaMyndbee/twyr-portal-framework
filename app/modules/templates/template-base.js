@@ -65,8 +65,6 @@ var twyrTemplateBase = prime({
 		var self = this,
 			tmplPath = path.join(self.basePath, 'index.ejs');
 
-		if(self.$module.name == 'pages') console.log(self.name + '::render: ' + tmplPath);
-
 		renderer(tmplPath, configuration)
 		.then(function(renderedHTML) {
 			if(callback) callback(null, renderedHTML);

@@ -1,8 +1,8 @@
 define(
-	'twyr-portal/models/profile',
-	['exports', 'twyr-portal/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
+	'twyr-webapp/models/profile',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/models/profile');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/profile');
 		var ProfileModel = _twyrBaseModel['default'].extend({
 			'firstName': _attr['default']('string'),
 			'middleNames': _attr['default']('string'),
@@ -41,10 +41,10 @@ define(
 );
 
 define(
-	'twyr-portal/adapters/profile-contact',
-	['exports', 'twyr-portal/adapters/application'],
+	'twyr-webapp/adapters/profile-contact',
+	['exports', 'twyr-webapp/adapters/application'],
 	function(exports, _appAdapter) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/adapters/profile-contact');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/profile-contact');
 
 		var ProfileContactsAdapter = _appAdapter['default'].extend({
 			'namespace': 'profiles'
@@ -55,10 +55,10 @@ define(
 );
 
 define(
-	'twyr-portal/models/profile-contact',
-	['exports', 'twyr-portal/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
+	'twyr-webapp/models/profile-contact',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/models/profile-contact');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/profile-contact');
 		var ProfileContactsModel = _twyrBaseModel['default'].extend({
 			'contact': _attr['default']('string'),
 			'type': _attr['default']('string', { 'defaultValue': 'other' }),
@@ -77,10 +77,10 @@ define(
 );
 
 define(
-	'twyr-portal/adapters/profile-emergency-contact',
-	['exports', 'twyr-portal/adapters/application'],
+	'twyr-webapp/adapters/profile-emergency-contact',
+	['exports', 'twyr-webapp/adapters/application'],
 	function(exports, _appAdapter) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/adapters/profile-emergency-contact');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/profile-emergency-contact');
 
 		var ProfileEmergencyContactsAdapter = _appAdapter['default'].extend({
 			'namespace': 'profiles'
@@ -91,10 +91,10 @@ define(
 );
 
 define(
-	'twyr-portal/models/profile-emergency-contact',
-	['exports', 'twyr-portal/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
+	'twyr-webapp/models/profile-emergency-contact',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/models/profile-emergency-contact');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/profile-emergency-contact');
 		var ProfileEmergencyContactsModel = _twyrBaseModel['default'].extend({
 			'login': _relationships.belongsTo('profile', { 'inverse': 'profileEmergencyContacts' }),
 			'contact': _relationships.belongsTo('profile', { 'inverse': null }),
@@ -112,10 +112,10 @@ define(
 );
 
 define(
-	'twyr-portal/adapters/profile-others-emergency-contact',
-	['exports', 'twyr-portal/adapters/application'],
+	'twyr-webapp/adapters/profile-others-emergency-contact',
+	['exports', 'twyr-webapp/adapters/application'],
 	function(exports, _appAdapter) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/adapters/profile-others-emergency-contact');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/profile-others-emergency-contact');
 
 		var ProfileOthersEmergencyContactsAdapter = _appAdapter['default'].extend({
 			'namespace': 'profiles'
@@ -126,10 +126,10 @@ define(
 );
 
 define(
-	'twyr-portal/models/profile-others-emergency-contact',
-	['exports', 'twyr-portal/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
+	'twyr-webapp/models/profile-others-emergency-contact',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/models/profile-others-emergency-contact');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/profile-others-emergency-contact');
 		var ProfileOthersEmergencyContactsModel = _twyrBaseModel['default'].extend({
 			'login': _relationships.belongsTo('profile', { 'inverse': null }),
 			'contact': _relationships.belongsTo('profile', { 'inverse': 'profileOthersEmergencyContacts' }),
@@ -147,10 +147,10 @@ define(
 );
 
 define(
-	'twyr-portal/adapters/profile-social-login',
-	['exports', 'twyr-portal/adapters/application'],
+	'twyr-webapp/adapters/profile-social-login',
+	['exports', 'twyr-webapp/adapters/application'],
 	function(exports, _appAdapter) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/adapters/profile-social-login');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/profile-social-login');
 
 		var ProfileSocialLoginAdapter = _appAdapter['default'].extend({
 			'namespace': 'profiles'
@@ -161,10 +161,10 @@ define(
 );
 
 define(
-	'twyr-portal/models/profile-social-login',
-	['exports', 'twyr-portal/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
+	'twyr-webapp/models/profile-social-login',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
-		if(window.developmentMode) console.log('DEFINE: twyr-portal/models/profile-social-login');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/profile-social-login');
 		var ProfileSocialLoginModel = _twyrBaseModel['default'].extend({
 			'provider': _attr['default']('string'),
 			'providerUid': _attr['default']('string'),
