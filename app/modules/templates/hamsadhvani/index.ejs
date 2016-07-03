@@ -33,6 +33,9 @@
 	<!-- Croppie for image uploads -->
 	<link href="/bhairavi/bower_components/croppie/croppie.css" rel="stylesheet" type="text/css" />
 
+	<!-- Switchery for iOS style checkboxes -->
+	<link href="/bhairavi/bower_components/switchery/dist/switchery.css" rel="stylesheet" type="text/css" />
+
 	<!-- jQuery plugins -->
 	<link href="/bhairavi/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
 	<link href="/bhairavi/bower_components/select2/dist/css/select2.min.css" rel="stylesheet" type="text/css" />
@@ -43,6 +46,7 @@
 
 	<!-- Bootstrap plugins -->
 	<link href="/bhairavi/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+	<link href="/bhairavi/bower_components/jstree-bootstrap-theme/dist/themes/proton/style.min.css" rel="stylesheet" type="text/css" />
 
 	<!-- Font Awesome, for the Glyphs -->
 	<link href="/bhairavi/bower_components/fontawesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
@@ -94,11 +98,7 @@
 					<ul class="nav navbar-nav navbar-right">
 						<% if(positions.settings && positions.settings.length) { %>
 							<% positions.settings.forEach(function(settingsWidget, index) { %>
-								<% if (index == 0) { %>
-								<li class="active">{{<%= settingsWidget %>}}</li>
-								<% } else { %>
 								<li>{{<%= settingsWidget %>}}</li>
-								<% } %>
 							<% }) %>
 						<% } %>
 					</ul>
@@ -258,6 +258,13 @@
 	<!-- loader.js - ES6 Module definition -->
 	<script type="application/javascript" src="/bhairavi/bower_components/loader.js/lib/loader/loader.js"></script>
 
+	<!-- json-editor.js - easier configuration editing -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/json-editor/dist/jsoneditor.js"></script>
+	<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/json-editor/dist/jsoneditor.min.js"></script>
+	<% } %>
+
 	<!-- Validate.js - easier form value validations -->
 	<% if(developmentMode) { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/validate.js/validate.js"></script>
@@ -282,22 +289,31 @@
 	});
 	</script>
 
-	<!-- Croppied for image uploads -->
+	<!-- Croppie for image uploads -->
 	<% if(developmentMode) { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/croppie/croppie.js"></script>
 	<% } else { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/croppie/croppie.min.js"></script>
 	<% } %>
 
+	<!-- Switchery for iOS style checkboxes -->
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/switchery/dist/switchery.js"></script>
+	<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/switchery/dist/switchery.min.js"></script>
+	<% } %>
+
 	<!-- jQuery plugins - for added functionality -->
 	<% if(developmentMode) { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/datatables.net/js/jquery.dataTables.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/datatables.net-bs/js/dataTables.bootstrap.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/jstree/dist/jstree.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/jquery-confirm/jquery.confirm.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/select2/dist/js/select2.full.js"></script>
 	<% } else { %>
 	<script type="application/javascript" src="/bhairavi/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/jstree/dist/jstree.min.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/jquery-confirm/jquery.confirm.min.js"></script>
 	<script type="application/javascript" src="/bhairavi/bower_components/select2/dist/js/select2.full.min.js"></script>
 	<% } %>

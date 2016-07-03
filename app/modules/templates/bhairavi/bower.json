@@ -31,24 +31,31 @@
   ],
   "dependencies": {
     "bootstrap": "*",
-	"croppie": "*",
-	"datatables.net": "*",
-	"datatables.net-bs": "*",
+    "croppie": "*",
+    "datatables.net": "*",
+    "datatables.net-bs": "*",
     "ember": "*",
     "ember-cli-shims": "*",
     "ember-data": "*",
-	"eonasdan-bootstrap-datetimepicker": "latest",
+    "eonasdan-bootstrap-datetimepicker": "latest",
     "es5-shim": "*",
     "fontawesome": "*",
     "ionicons": "*",
     "jquery": "< 3.0.0",
-	"craftpip/jquery-confirm": "*",
+    "craftpip/jquery-confirm": "*",
     "js-cookie": "*",
+    "json-editor": "*",
+    "jstree": "> 3.3.0",
+    "jstree-bootstrap-theme": "*",
     "loader.js": "ember-cli/loader.js",
-	"moment": "*",
+    "moment": "*",
     "normalize-css": "*",
     "select2": "*",
+    "switchery": "*",
     "validate.js": "*"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "resolutions": {
+    "jstree": "> 3.3.0"
+  }
 }

@@ -30,7 +30,7 @@ define(
 				'get': function(key) {
 					return _ember['default'].String.capitalize(this.get('status'));
 				}
-			}).readOnly(),
+			}).readOnly()
 		});
 
 		exports['default'] = PageModel;

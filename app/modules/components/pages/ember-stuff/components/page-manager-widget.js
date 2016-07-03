@@ -329,6 +329,10 @@ define(
 					self.set('_ckEditor', contentEditElem.ckeditor({
 						'filebrowserBrowseUrl': window.apiServer + 'pages/listFiles/?page=' + self.get('model').get('id'),
 						'filebrowserImageBrowseUrl': window.apiServer + 'pages/listImages/?page=' + self.get('model').get('id'),
+
+						'filebrowserBrowseLinkUrl': window.apiServer + 'pages/listFiles/?page=' + self.get('model').get('id'),
+						'filebrowserImageBrowseLinkUrl': window.apiServer + 'pages/listImages/?page=' + self.get('model').get('id'),
+
 						'filebrowserUploadUrl': window.apiServer + 'pages/uploadFile/?page=' + self.get('model').get('id'),
 						'filebrowserImageUploadUrl': window.apiServer + 'pages/uploadImage/?page=' + self.get('model').get('id'),
 

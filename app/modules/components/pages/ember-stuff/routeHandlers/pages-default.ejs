@@ -10,6 +10,17 @@ define(
 
 			'setupController': function(controller, model) {
 				controller.set('model', model);
+			},
+
+			'actions': {
+				'willTransition': function() {
+					var dirtyPages = this.get('controller').get('model').filterBy('hasDirtyAttributes', true);
+
+					if(dirtyPages.get('length'))
+						return false;
+
+					return true;
+				}
 			}
 		});
 

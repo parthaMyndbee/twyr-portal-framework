@@ -1,0 +1,172 @@
+<script type="text/x-handlebars" data-template-name="components/module-details-widget">
+<div class="box box-solid" style="text-align:left; box-shadow:none; margin-bottom:0px;">
+	<div class="box-header with-border">
+		<h3 class="box-title">{{model.displayName}} V{{model.parsedMetadata.version}}</h3>
+		{{#if model.hasDirtyAttributes}}
+		<div class="box-tools pull-right">
+			<button id="button-cancel" class="btn btn-flat btn-warning btn-sm" {{action "controller-action" "cancel" bubbles=false}}>
+				<i class="fa fa-undo" />
+				<span style="font-size:12px;">Cancel</span>
+			</button>
+
+			<button class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "save" bubbles=false}}>
+				<i class="fa fa-save" />
+				<span style="font-size:12px;">Save</span>
+			</button>
+		</div>
+		{{/if}}
+	</div>
+
+	<div class="info-box" style="min-height:auto; border-radius:0px;">
+		<div class="info-box-content" style="margin-left:0px;">
+			<div class="row" style="margin:10px 0px;">
+				<div class="col-sm-10" style="padding-left:0px;">
+					<span class="info-box-text">{{model.description}}</span>
+				</div>
+				<div class="col-sm-2" style="text-align:right;">
+				{{#if model.adminOnly}}
+					<span class="info-box-text" style="text-overflow:inherit;">Admin Module</span>
+				{{else}}
+					<span class="info-box-text" style="text-overflow:inherit; display:inline; margin-right:10px;">Enabled:</span>
+					{{input type="checkbox" class="js-switch" name="module-details-widget-checkbox-enabled" checked=model.enabled}}
+				{{/if}}
+				</div>
+			</div>
+			<div class="row" style="margin:10px 0px;">
+				<div class="col-sm-4" style="padding-left:0px;">Author: <a href="{{model.parsedMetadata.website}}" target="_blank">{{model.parsedMetadata.author}}</a></div>
+				<div class="col-sm-4">Documentation: <a href="{{model.parsedMetadata.documentation}}" target="_blank">{{model.parsedMetadata.documentation}}</a></div>
+				<div class="col-sm-4" style="text-align:right; padding-right:0px;">Demo: <a href="{{model.parsedMetadata.demo}}" target="_blank">{{model.parsedMetadata.demo}}</a></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="info-box" style="min-height:auto; border-radius:0px;">
+		<div class="info-box-content" style="margin-left:0px;">
+			<div class="row" style="margin:10px 0px;">
+				<div class="col-sm-12">
+					<span class="info-box-text">Configuration Editor</span>
+				</div>
+			</div>
+			<div class="row" style="margin:10px 0px;">
+				<div class="col-sm-12">
+					<div id="module-details-widget-div-configuration-editor-{{model.id}}">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{{#if model.permissions.length}}
+	<div class="info-box" style="min-height:auto; border-radius:0px;">
+		<div class="info-box-content" style="margin-left:0px;">
+			<div class="row" style="margin:10px 0px;">
+				<span class="info-box-text">Permissions</span>
+			</div>
+			<div class="row" style="margin:10px 0px;">
+				<div class="col-sm-12 table-responsive" style="padding:0px;">
+					<table class="table table-hover">
+					<thead>
+					<tr>
+						<th>Permission Name</th>
+						<th>Internal Name</th>
+						<th>Description</th>
+						<th>Created At</th>
+						<th>Updated At</th>
+					</tr>
+					</thead>
+					<tbody>
+					{{#each model.permissions as |permission|}}
+					<tr>
+						<td>{{permission.displayName}}</td>
+						<td>{{permission.name}}</td>
+						<td>{{permission.description}}</td>
+						<td>{{permission.formattedCreatedAt}}</td>
+						<td>{{permission.formattedUpdatedAt}}</td>
+					</tr>
+					{{/each}}
+					</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{/if}}
+
+	{{#if model.widgets.length}}
+	<div class="info-box" style="min-height:auto; border-radius:0px;">
+		<div class="info-box-content" style="margin-left:0px;">
+			<div class="row" style="margin:10px 0px;">
+				<span class="info-box-text">Widgets</span>
+			</div>
+			<div class="row" style="margin:10px 0px;">
+				<div class="col-sm-12 table-responsive" style="padding:0px;">
+					<table class="table table-hover">
+					<thead>
+					<tr>
+						<th>Widget Name</th>
+						<th>Internal Name</th>
+						<th>Permission</th>
+						<th>Description</th>
+						<th>Created At</th>
+						<th>Updated At</th>
+					</tr>
+					</thead>
+					<tbody>
+					{{#each model.widgets as |widget|}}
+					<tr>
+						<td>{{widget.displayName}}</td>
+						<td>{{widget.emberComponent}}</td>
+						<td>{{widget.permission.displayName}}</td>
+						<td>{{widget.description}}</td>
+						<td>{{widget.formattedCreatedAt}}</td>
+						<td>{{widget.formattedUpdatedAt}}</td>
+					</tr>
+					{{/each}}
+					</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{/if}}
+
+	{{#if model.menus.length}}
+	<div class="info-box" style="min-height:auto; border-radius:0px;">
+		<div class="info-box-content" style="margin-left:0px;">
+			<div class="row" style="margin:10px 0px;">
+				<span class="info-box-text">Menus</span>
+			</div>
+			<div class="row" style="margin:10px 0px;">
+				<div class="col-sm-12 table-responsive" style="padding:0px;">
+					<table class="table table-hover">
+					<thead>
+					<tr>
+						<th>Menu Item Name</th>
+						<th>Internal Name</th>
+						<th>Permission</th>
+						<th>Description</th>
+						<th>Tooltip</th>
+						<th>Created At</th>
+						<th>Updated At</th>
+					</tr>
+					</thead>
+					<tbody>
+					{{#each model.menus as |menu|}}
+					<tr>
+						<td><span class="{{menu.iconClass}}" style="margin-right:10px;" />{{menu.displayName}}</td>
+						<td>{{menu.emberRoute}}</td>
+						<td>{{menu.permission.displayName}}</td>
+						<td>{{menu.description}}</td>
+						<td>{{menu.tooltip}}</td>
+						<td>{{menu.formattedCreatedAt}}</td>
+						<td>{{menu.formattedUpdatedAt}}</td>
+					</tr>
+					{{/each}}
+					</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{/if}}
+</div>
+</script>

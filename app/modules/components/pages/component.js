@@ -48,14 +48,14 @@ var pagesComponent = prime({
 			})
 			.then(function(pageAuthorPermissionId) {
 				self['$pageAuthorPermissionId'] = pageAuthorPermissionId.rows[0].id;
+
+				if(callback) callback(null, status);
 				return null;
 			})
 			.catch(function(startErr) {
 				loggerSrvc.error(self.name + '::start Error: ', startErr);
 				if(callback) callback(startErr);
 			});
-
-			if(callback) callback(null, status);
 		});
 	},
 

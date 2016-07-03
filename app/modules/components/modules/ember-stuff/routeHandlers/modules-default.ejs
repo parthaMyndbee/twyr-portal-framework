@@ -1,0 +1,18 @@
+define(
+	'twyr-webapp/routes/modules-default',
+	['exports', 'ember'],
+	function(exports, _ember) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/routes/modules-default');
+		var ModulesDefaultRoute = _ember['default'].Route.extend({
+			'model': function() {
+				return this.store.peekAll('module');
+			},
+
+			'setupController': function(controller, model) {
+				controller.set('model', model);
+			}
+		});
+
+		exports['default'] = ModulesDefaultRoute;
+	}
+);
