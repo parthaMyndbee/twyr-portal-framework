@@ -13,6 +13,13 @@ define(
 
 				self._initJSONEditor();
 				self._initSwitchery();
+
+				_ember['default'].run.scheduleOnce('afterRender', function() {
+					if(!self.$('li.module-details-widget-tab a').length)
+						return;
+
+					(self.$('li.module-details-widget-tab a')[0]).click();
+				});
 			},
 
 			'willDestroyElement': function() {
@@ -79,8 +86,8 @@ define(
 					'template': 'handlebars',
 
 					'refs': {},
-					'schema': {},
 
+					'schema': self.get('model').get('parsedConfigurationSchema'),
 					'startval': self.get('model').get('parsedConfiguration')
 				}));
 

@@ -11,8 +11,9 @@ define(
 			'displayName': _attr['default']('string'),
 			'description': _attr['default']('string'),
 
-			'configuration': _attr['default']('string'),
 			'metadata': _attr['default']('string'),
+			'configuration': _attr['default']('string'),
+			'configurationSchema': _attr['default']('string'),
 
 			'adminOnly': _attr['default']('boolean'),
 			'enabled': _attr['default']('boolean'),
@@ -20,6 +21,7 @@ define(
 			'permissions': _relationships.hasMany('module-permission', { 'inverse': 'module' }),
 			'widgets': _relationships.hasMany('module-widget', { 'inverse': 'module' }),
 			'menus': _relationships.hasMany('module-menu', { 'inverse': 'module' }),
+			'templates': _relationships.hasMany('module-template', { 'inverse': 'module' }),
 
 			'parsedConfiguration': _ember['default'].computed('configuration', {
 				'get': function(key) {
@@ -32,9 +34,33 @@ define(
 				}
 			}),
 
+			'parsedConfigurationSchema': _ember['default'].computed('configurationSchema', {
+				'get': function(key) {
+					return JSON.parse(this.get('configurationSchema'));
+				}
+			}).readOnly(),
+
 			'parsedMetadata': _ember['default'].computed('metadata', {
 				'get': function(key) {
 					return JSON.parse(this.get('metadata'));
+				}
+			}).readOnly(),
+
+			'staticDataExists': _ember['default'].computed('permissions', 'widgets', 'menus', {
+				'get': function(key) {
+					return !!(this.get('permissions').get('length') || this.get('menus').get('length') || this.get('widgets').get('length'));
+				}
+			}).readOnly(),
+
+			'templateExists': _ember['default'].computed('templates', {
+				'get': function(key) {
+					return !!(this.get('templates').get('length'));
+				}
+			}).readOnly(),
+
+			'tabbedInterfaceRequired': _ember['default'].computed('staticDataExists', 'templateExists', {
+				'get': function(key) {
+					return (this.get('staticDataExists') || this.get('templateExists'));
 				}
 			}).readOnly()
 		});
@@ -146,5 +172,79 @@ define(
 		});
 
 		exports['default'] = MenuModel;
+	}
+);
+
+define(
+	'twyr-webapp/adapters/module-template',
+	['exports', 'twyr-webapp/adapters/application'],
+	function(exports, _appAdapter) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/module-template');
+
+		var ModuleTemplateAdapter = _appAdapter['default'].extend({
+			'namespace': 'modules'
+		});
+
+		exports['default'] = ModuleTemplateAdapter;
+	}
+);
+
+define(
+	'twyr-webapp/models/module-template',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
+	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/module-template');
+		var TemplateModel = _twyrBaseModel['default'].extend({
+			'module': _relationships.belongsTo('module', { 'inverse': 'templates' }),
+
+			'name': _attr['default']('string'),
+			'description': _attr['default']('string'),
+
+			'media': _attr['default']('string', { 'defaultValue': 'all' }),
+			'role': _attr['default']('string', { 'defaultValue': 'all' }),
+
+			'isDefault': _attr['default']('boolean'),
+
+			'metadata': _attr['default']('string'),
+			'configuration': _attr['default']('string'),
+			'configurationSchema': _attr['default']('string'),
+
+			'displayMedia': _ember['default'].computed('media', {
+				'get': function(key) {
+					return _ember['default'].String.capitalize(this.get('media'));
+				}
+			}).readOnly(),
+
+			'displayRole': _ember['default'].computed('role', {
+				'get': function(key) {
+					return _ember['default'].String.capitalize(this.get('role'));
+				}
+			}).readOnly(),
+
+			'parsedConfiguration': _ember['default'].computed('configuration', {
+				'get': function(key) {
+					return JSON.parse(this.get('configuration'));
+				},
+
+				'set': function(key, newValue) {
+					this.set('configuration', JSON.stringify(newValue));
+					return newValue;
+				}
+			}),
+
+			'parsedConfigurationSchema': _ember['default'].computed('configurationSchema', {
+				'get': function(key) {
+					return JSON.parse(this.get('configurationSchema'));
+				}
+			}).readOnly(),
+
+			'parsedMetadata': _ember['default'].computed('metadata', {
+				'get': function(key) {
+					return JSON.parse(this.get('metadata'));
+				}
+			}).readOnly()
+		});
+
+		exports['default'] = TemplateModel;
 	}
 );

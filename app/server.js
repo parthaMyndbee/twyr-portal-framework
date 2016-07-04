@@ -177,7 +177,7 @@ var app = prime({
 
 		configSrvc.getModuleIdAsync(self)
 		.then(function(id) {
-			return dbSrvc.raw('SELECT id, module, name, media_type, user_type, configuration FROM module_templates WHERE module = ? AND is_default = true;', [id])
+			return dbSrvc.raw('SELECT id, module, name, media, role, configuration FROM module_templates WHERE module = ? AND is_default = true;', [id])
 		})
 		.then(function(moduleTemplates) {
 			if(!moduleTemplates.rows.length) {
@@ -201,7 +201,7 @@ var app = prime({
 
 		// Step 1: Check for exact match
 		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return ((modTmpl.media_type == mediaType) && (modTmpl.user_type == (user ? 'registered': 'public')));
+			return ((modTmpl.media == mediaType) && (modTmpl.role == (user ? 'registered': 'public')));
 		});
 
 		if(selectedTemplate.length) {
@@ -209,9 +209,9 @@ var app = prime({
 			return;
 		}
 
-		// Step 2: Check for user_type match
+		// Step 2: Check for role match
 		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return ((modTmpl.media_type == 'all') && (modTmpl.user_type == (user ? 'registered': 'public')));
+			return ((modTmpl.media == 'all') && (modTmpl.role == (user ? 'registered': 'public')));
 		});
 
 		if(selectedTemplate.length) {
@@ -219,9 +219,9 @@ var app = prime({
 			return;
 		}
 
-		// Step 3: Check for media_type match
+		// Step 3: Check for media type match
 		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return ((modTmpl.media_type == mediaType) && (modTmpl.user_type == 'all'));
+			return ((modTmpl.media == mediaType) && (modTmpl.role == 'all'));
 		});
 
 		if(selectedTemplate.length) {
@@ -231,7 +231,7 @@ var app = prime({
 
 		// Step 4: Check for generic match
 		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return ((modTmpl.media_type == 'all') && (modTmpl.user_type == 'all'));
+			return ((modTmpl.media == 'all') && (modTmpl.role == 'all'));
 		});
 
 		if(selectedTemplate.length) {

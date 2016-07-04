@@ -131,7 +131,7 @@ var twyrComponentBase = prime({
 
 		configSrvc.getModuleIdAsync(self)
 		.then(function(id) {
-			return dbSrvc.raw('SELECT id, module, name, media_type, user_type, configuration FROM module_templates WHERE module = ? AND is_default = true;', [id])
+			return dbSrvc.raw('SELECT id, module, name, media, role, configuration FROM module_templates WHERE module = ? AND is_default = true;', [id])
 		})
 		.then(function(moduleTemplates) {
 			if(callback) callback(null, moduleTemplates.rows);
