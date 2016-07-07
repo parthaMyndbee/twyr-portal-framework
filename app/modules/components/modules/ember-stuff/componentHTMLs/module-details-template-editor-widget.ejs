@@ -1,0 +1,53 @@
+<script type="text/x-handlebars" data-template-name="components/module-details-template-editor-module-widget">
+	<div class="info-box" style="max-height:90px; overflow:hidden; cursor:move;">
+		<span class="info-box-icon bg-blue">
+			<i class="fa fa-gears" />
+		</span>
+		<div class="info-box-content">
+			<span class="info-box-text">{{model.name}}</span>
+			{{model.description}}
+		</div>
+	</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/module-details-template-editor-widget">
+<div class="box box-solid" style="text-align:left; box-shadow:none; margin-bottom:0px;">
+	<div class="box-body no-padding">
+		<div class="nav-tabs-custom" style="margin-bottom:0px;">
+			<ul class="nav nav-tabs" role="tablist">
+				<li class="module-details-template-editor-widget-tab" role="presentation" id="module-details-template-editor-widget-configuration-editor-{{model.id}}-link">
+					<a href="#module-details-template-editor-widget-configuration-editor-{{model.id}}-div" role="tab" data-toggle="tab">
+						<span class="info-box-text">Configuration Editor</span>
+					</a>
+				</li>
+				<li class="module-details-template-editor-widget-tab" role="presentation" id="module-details-template-editor-widget-position-editor-{{model.id}}-link">
+					<a href="#module-details-template-editor-widget-position-editor-{{model.id}}-div" role="tab" data-toggle="tab">
+						<span class="info-box-text">Module Position Editor</span>
+					</a>
+				</li>
+			</ul>
+
+			<div class="tab-content">
+				<div class="tab-pane fade" role="tabpanel" id="module-details-template-editor-widget-configuration-editor-{{model.id}}-div">
+					<div class="row" style="margin:0px;">
+						<div class="col-sm-12">
+							<div id="module-details-template-editor-widget-div-configuration-editor-{{model.id}}">&nbsp;</div>
+						</div>
+					</div>
+				</div>
+				<div class="tab-pane fade" role="tabpanel" id="module-details-template-editor-widget-position-editor-{{model.id}}-div">
+					<div class="row" style="margin:0px;">
+						<div class="col-sm-2" id="module-details-template-editor-widget-position-editor-available-widgets-{{model.id}}">
+						{{#each availableWidgetList as |widget|}}
+							{{module-details-template-editor-module-widget model=widget controller-action="controller-action"}}
+						{{/each}}
+						</div>
+						<div class="col-sm-10" id="module-details-template-editor-widget-position-editor-template-preview-{{model.id}}" style="background-color:#f4f4f4; border:1px solid #f4f4f4; padding:15px;">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</script>

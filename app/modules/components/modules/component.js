@@ -188,6 +188,7 @@ var modulesComponent = prime({
 			return promises.all([
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/modules-default-widget.js'), 'utf8'),
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/module-details-widget.js'), 'utf8'),
+				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/module-details-template-editor-widget.js'), 'utf8'),
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/module-tree-widget.js'), 'utf8')
 			]);
 		})
@@ -221,6 +222,7 @@ var modulesComponent = prime({
 			return promises.all([
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/modules-default-widget.ejs'), 'utf8'),
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/module-details-widget.ejs'), 'utf8'),
+				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/module-details-template-editor-widget.ejs'), 'utf8'),
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/module-tree-widget.ejs'), 'utf8')
 			]);
 		})

@@ -56,12 +56,6 @@ define(
 				'get': function(key) {
 					return !!(this.get('templates').get('length'));
 				}
-			}).readOnly(),
-
-			'tabbedInterfaceRequired': _ember['default'].computed('staticDataExists', 'templateExists', {
-				'get': function(key) {
-					return (this.get('staticDataExists') || this.get('templateExists'));
-				}
 			}).readOnly()
 		});
 
@@ -130,7 +124,9 @@ define(
 			'displayName': _attr['default']('string'),
 			'description': _attr['default']('string'),
 
-			'metadata': _attr['default']('string')
+			'metadata': _attr['default']('string'),
+
+			'positions': _relationships.hasMany('template-position', { 'inverse': 'widgets' }),
 		});
 
 		exports['default'] = WidgetModel;
@@ -209,6 +205,8 @@ define(
 			'configuration': _attr['default']('string'),
 			'configurationSchema': _attr['default']('string'),
 
+			'positions': _relationships.hasMany('template-position', { 'inverse': 'template' }),
+
 			'displayMedia': _ember['default'].computed('media', {
 				'get': function(key) {
 					return _ember['default'].String.capitalize(this.get('media'));
@@ -243,6 +241,38 @@ define(
 					return JSON.parse(this.get('metadata'));
 				}
 			}).readOnly()
+		});
+
+		exports['default'] = TemplateModel;
+	}
+);
+
+
+define(
+	'twyr-webapp/adapters/template-position',
+	['exports', 'twyr-webapp/adapters/application'],
+	function(exports, _appAdapter) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/template-position');
+
+		var TemplatePositionAdapter = _appAdapter['default'].extend({
+			'namespace': 'modules'
+		});
+
+		exports['default'] = TemplatePositionAdapter;
+	}
+);
+
+
+define(
+	'twyr-webapp/models/template-position',
+	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
+	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/template-position');
+		var TemplateModel = _twyrBaseModel['default'].extend({
+			'name': _attr['default']('string'),
+			'template': _relationships.belongsTo('module-template', { 'inverse': 'positions' }),
+
+			'widgets': _relationships.hasMany('module-widget', { 'inverse': 'positions' })
 		});
 
 		exports['default'] = TemplateModel;
