@@ -65,13 +65,23 @@ define(
 					return;
 				}
 
-				_ember['default'].$.ajax({
-					'url': window.apiServer + 'modules/availableWidgets/' + self.get('model').get('id'),
-					'dataType': 'json',
-					'cache': true
-				})
-				.done(function(data) {
-					_ember['default'].$.each(data, function(index, item) {
+				_ember['default'].RSVP.allSettled([
+					_ember['default'].$.ajax({
+						'url': window.apiServer + 'modules/availableWidgets/' + self.get('model').get('id'),
+						'dataType': 'json',
+						'cache': false
+					}),
+
+					_ember['default'].$.ajax({
+						'url': 'modules/template-design/' + self.get('model').get('id'),
+						'dataType': 'html',
+						'cache': false
+					})
+				])
+				.then(function(data) {
+					console.log('RSVP Data: ', data);
+
+					_ember['default'].$.each((data[0]).value, function(index, item) {
 						self.get('availableWidgetList').addObject(item);
 					});
 
@@ -79,21 +89,45 @@ define(
 						availableWidgetContainer = self.$('div#module-details-template-editor-widget-position-editor-available-widgets-' + self.get('model').get('id'))[0],
 						widgetContainer = self.$('div#module-details-template-editor-widget-position-editor-template-preview-' + self.get('model').get('id'))[0];
 
+					window.$(widgetContainer).html((data[1]).value);
+
 					self.set('dragula', dragula([availableWidgetContainer, widgetContainer], {
 						'copy': function(element, source) {
 							return (source === availableWidgetContainer);
 						},
 
 						'accepts': function(element, target) {
-							return ((target !== availableWidgetContainer) && ($(target).children('#' + $(element).attr('id')).length <= 1));
+							if(target === availableWidgetContainer)
+								return false;
+
+							if($(target).children('#' + $(element).attr('id')).length > 1)
+								return false;
+
+							return true;
 						},
 
 						'mirrorContainer': mirrorContainer,
 						'revertOnSpill': true,
 						'removeOnSpill': true
 					}));
+
+					self.get('dragula').on('drop', function(element) {
+						element = window.$(element);
+						element.children('span').remove();
+
+						element.removeClass('info-box');
+						element.addClass('box box-solid box-primary');
+						element.css('overflow', 'initial');
+
+						var contentDiv = window.$(element.children('div.info-box-content'));
+						contentDiv.removeClass('info-box-content');
+						contentDiv.addClass('box-header no-border');
+						contentDiv.find('span.description').remove();
+
+						console.log('Modified Element: ', element);
+					});
 				})
-				.fail(function() {
+				.catch(function(err) {
 					console.error(window.apiServer + 'modules/availableWidgets error:\n', arguments);
 				});
 			},

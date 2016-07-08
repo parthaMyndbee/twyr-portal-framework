@@ -17,7 +17,8 @@ var base = require('./../../module-base').baseModule,
 /**
  * Module dependencies, required for this module
  */
-var path = require('path');
+var deepmerge = require('deepmerge'),
+	path = require('path');
 
 var twyrTemplateBase = prime({
 	'inherits': base,
@@ -62,8 +63,10 @@ var twyrTemplateBase = prime({
 	},
 
 	'render': function(renderer, configuration, callback) {
+		configuration = deepmerge(this.configuration, (configuration || {}));
+
 		var self = this,
-			tmplPath = path.join(self.basePath, 'index.ejs');
+			tmplPath = path.join(self.basePath, (configuration.file || 'index.ejs'));
 
 		renderer(tmplPath, configuration)
 		.then(function(renderedHTML) {
@@ -71,6 +74,7 @@ var twyrTemplateBase = prime({
 			return null;
 		})
 		.catch(function(err) {
+			console.error('Error rendering ' + tmplPath + ': ', err);
 			if(callback) callback(err);
 		});
 	},
@@ -136,7 +140,11 @@ var twyrTemplateBase = prime({
 
 	'name': 'twyr-template-base',
 	'basePath': __dirname,
-	'dependencies': ['express-service']
+	'dependencies': ['express-service', 'logger-service'],
+
+	'configuration': {
+		'positions': {}
+	}
 });
 
 exports.baseTemplate = twyrTemplateBase;

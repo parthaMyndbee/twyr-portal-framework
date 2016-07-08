@@ -20,19 +20,50 @@ var base = require('./../template-base').baseTemplate,
 /**
  * Module dependencies, required for this module
  */
-var path = require('path');
+var deepmerge = require('deepmerge'),
+	path = require('path');
 
 var hamsadhvaniTemplate = prime({
 	'inherits': base,
 
 	'constructor': function(module) {
+		this.configuration = deepmerge(this.configuration, {
+			'title': '',
+
+			'firstRowModules' : false,
+			'secondRowModules': false,
+			'bottomRowModules': false,
+
+			'apiServer': '',
+			'twyrUserId': '',
+
+			'mainContentWidth': 12,
+
+			'baseYear': '1900',
+			'currentYear': (new Date()).getUTCFullYear(),
+			'developmentMode': ((process.env.NODE_ENV || 'development').toLowerCase() == 'development'),
+
+			'positions': {
+				'module1': [],
+				'module2': [],
+				'module3': [],
+				'module4': [],
+				'module5': [],
+				'module6': [],
+				'module7': [],
+				'module8': [],
+				'module9': [],
+
+				'left-sidebar': [],
+				'right-sidebar': []
+			}
+		});
+
 		base.call(this, module);
 	},
 
 	'render': function(renderer, configuration, callback) {
-		configuration.firstRowModules = false;
-		configuration.secondRowModules = false;
-		configuration.bottomRowModules = false;
+		configuration = deepmerge(this.configuration, (configuration || {}));
 
 		var positions = configuration.positions;
 
@@ -99,6 +130,12 @@ var hamsadhvaniTemplate = prime({
 		configuration.baseYear = this.$module.$config.baseYear;
 		configuration.currentYear = (new Date()).getUTCFullYear();
 		configuration.developmentMode = ((process.env.NODE_ENV || 'development').toLowerCase() == 'development');
+
+		// Clean up before the rendering...
+		Object.keys(positions).forEach(function(position) {
+			if(!positions[position].length)
+				delete positions[position];
+		});
 
 		// Call parent for actual rendering
 		hamsadhvaniTemplate.parent.render.call(this, renderer, configuration, function(err, renderedTmpl) {

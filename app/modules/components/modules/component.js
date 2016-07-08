@@ -20,7 +20,8 @@ var base = require('./../component-base').baseComponent,
 /**
  * Module dependencies, required for this module
  */
-var filesystem = promises.promisifyAll(require('fs-extra')),
+var $ = require('cheerio'),
+	filesystem = promises.promisifyAll(require('fs-extra')),
 	path = require('path');
 
 var modulesComponent = prime({
@@ -57,6 +58,10 @@ var modulesComponent = prime({
 				if(callback) callback(startErr);
 			});
 		});
+	},
+
+	'_addRoutes': function() {
+		this.$router.get('/template-design/:id', this._getTemplateDesign.bind(this));
 	},
 
 	'_selectTemplates': function(user, mediaType, possibleTemplates, callback) {
@@ -236,6 +241,65 @@ var modulesComponent = prime({
 		});
 
 		return null;
+	},
+
+	'_getTemplateDesign': function(request, response, next) {
+		var self = this,
+			dbSrvc = self.dependencies['database-service'],
+			loggerSrvc = self.dependencies['logger-service'],
+			renderer = promises.promisify(response.render.bind(response)),
+			templateName = null;
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+
+		self._checkPermissionAsync(request.user, self['$moduleManagerPermissionId'])
+		.then(function(hasPermission) {
+			if(!hasPermission) {
+				throw new Error('Unauthorized Access');
+			}
+
+			return dbSrvc.knex.raw('SELECT name, module FROM module_templates WHERE id = ?', [request.params.id]);
+		})
+		.then(function(tmplModule) {
+			templateName = tmplModule.rows[0].name;
+			return dbSrvc.knex.raw('SELECT name FROM fn_get_module_ancestors(?) ORDER BY level DESC', [tmplModule.rows[0].module]);
+		})
+		.then(function(componentChain) {
+			componentChain.rows.shift();
+			componentChain = componentChain.rows;
+
+			console.log('Component Chain: ' + JSON.stringify(componentChain));
+
+			var templateModule = self,
+				template = null;
+
+			while(templateModule.$module)
+				templateModule = templateModule.$module;
+
+			componentChain.forEach(function(component) {
+				templateModule = templateModule['$components'][component.name];
+				if(!templateModule) throw new Error('Cannot find template module');
+			});
+
+			template = templateModule['$templates'][templateName];
+			return template.renderAsync(renderer, null);
+		})
+		.then(function(templateHTML) {
+			var dom = $(templateHTML);
+			if($(templateHTML).find('body').length) {
+				templateHTML = $(templateHTML).find('body').find('script[type="text/x-handlebars"]').html();
+			}
+			else {
+				templateHTML = $(templateHTML).html();
+			}
+
+			response.status(200).send(templateHTML);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body, '\nError: ', err);
+			response.sendStatus(500);
+		});
 	},
 
 	'name': 'modules',

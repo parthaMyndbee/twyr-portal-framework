@@ -90,6 +90,13 @@ var app = prime({
 			expressApp.use(path.join(mountPath, tmplName), subRouter);
 		});
 
+		Object.keys(self.$components).forEach(function(componentName) {
+			var subRouter = (self.$components[componentName]).getRouter(),
+				mountPath = self.$config ? (self.$config.componentMountPath || '/') : '/';
+
+			expressApp.use(path.join(mountPath, componentName), subRouter);
+		});
+
 		expressApp.all('*', function(request, response, next) {
 			var user = request.user,
 				mediaType = (response.locals.is_phone ? 'mobile' : (response.locals.is_tablet ? 'tablet': (response.locals.is_desktop ? 'desktop' : 'other'))),
