@@ -20,8 +20,8 @@ var base = require('./../component-base').baseComponent,
 /**
  * Module dependencies, required for this module
  */
-var $ = require('cheerio'),
-	_ = require('lodash'),
+var _ = require('lodash'),
+	cheerio = require('cheerio'),
 	filesystem = promises.promisifyAll(require('fs-extra')),
 	inflection = require('inflection'),
 	path = require('path');
@@ -296,12 +296,12 @@ var modulesComponent = prime({
 			return template.renderAsync(renderer, configuration);
 		})
 		.then(function(templateHTML) {
-			var dom = $(templateHTML);
-			if(dom.find('body').length) {
-				templateHTML = dom.find('body').find('script[type="text/x-handlebars"]').html();
+			var $ = cheerio.load(templateHTML);
+			if($('body').length) {
+				templateHTML = $('body').find('script[type="text/x-handlebars"]').html();
 			}
 			else {
-				templateHTML = dom.html();
+				templateHTML = $('script').html();
 			}
 
 			var componentSelectorRegExp =  /\{\{(.*?)\}\}/gm,
@@ -314,7 +314,7 @@ var modulesComponent = prime({
 				}
 
 				if(comp.indexOf('template-design-') == 2) {
-					replacers[comp] = '<div class="box box-primary" style="text-align:left; width:auto; margin:5px;"><div class="box-header with-border"><h3 class="box-title">' + inflection.titleize((comp.split(' ')[0]).replace('template-design-', '').replace('{{', '').replace('}}', '').replace(/-/g, ' ')) + '</h3></div><div id="' + (comp.split(' ')[0]).replace('template-design-', '').replace('{{', '').replace('}}', '').replace(/-/g, ' ') + '" class="box-body dragula-container" style="min-height:50px;"></div></div>';
+					replacers[comp] = '<div class="box box-primary" style="text-align:left; width:auto; margin:5px;"><div class="box-header with-border"><h3 class="box-title">' + inflection.titleize((comp.split(' ')[0]).replace('template-design-', '').replace('{{', '').replace('}}', '').replace(/-/g, ' ')) + '</h3></div><div id="' + (comp.split(' ')[0]).replace('template-design-', '').replace('{{', '').replace('}}', '') + '" class="box-body dragula-container" style="min-height:50px;"></div></div>';
 					return comp;
 				}
 
@@ -337,16 +337,26 @@ var modulesComponent = prime({
 		.then(function(results) {
 			var templateHTML = results[0],
 				widgetPositions = results[1].rows,
-				dom = $.load(templateHTML);
+				$ = cheerio.load(templateHTML);
 
 			widgetPositions.forEach(function(widgetPositionData) {
-				var widgetContainer = ($(templateHTML).find('div.dragula-container#' + widgetPositionData['position_name']))[0];
-				if(!widgetContainer) return;
-
-
+				var widgetContainer = ($('div.dragula-container#' + widgetPositionData['position_name']))[0];
+				$(widgetContainer).append('<div class="box box-solid box-primary" style="max-height:90px; overflow:initial; cursor:move; text-align:left;" id="' + widgetPositionData.widget_id + '"><div class="box-header no-border"><span class="info-box-text">' + widgetPositionData.widget_name + '</span></div></div>');
 			});
 
-			response.status(200).send(templateHTML);
+			return promises.all([$.html(), dbSrvc.knex.raw('SELECT id, name FROM module_template_positions WHERE template = ?', [request.params.id])]);
+		})
+		.then(function(results) {
+			var templateHTML = results[0],
+				widgetPositions = results[1].rows,
+				$ = cheerio.load(templateHTML);
+
+			widgetPositions.forEach(function(widgetPositionData) {
+				var widgetContainer = ($('div.dragula-container#' + widgetPositionData['name']))[0];
+				$(widgetContainer).attr('id', widgetPositionData.id);
+			});
+
+			response.status(200).send($.html());
 			return null;
 		})
 		.catch(function(err) {
