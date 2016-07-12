@@ -21,7 +21,9 @@ var base = require('./../component-base').baseComponent,
  * Module dependencies, required for this module
  */
 var $ = require('cheerio'),
+	_ = require('lodash'),
 	filesystem = promises.promisifyAll(require('fs-extra')),
+	inflection = require('inflection'),
 	path = require('path');
 
 var modulesComponent = prime({
@@ -268,8 +270,6 @@ var modulesComponent = prime({
 			componentChain.rows.shift();
 			componentChain = componentChain.rows;
 
-			console.log('Component Chain: ' + JSON.stringify(componentChain));
-
 			var templateModule = self,
 				template = null;
 
@@ -282,16 +282,69 @@ var modulesComponent = prime({
 			});
 
 			template = templateModule['$templates'][templateName];
-			return template.renderAsync(renderer, null);
+			return promises.all([template, dbSrvc.knex.raw('SELECT name FROM module_template_positions WHERE template = ?', [request.params.id])]);
+		})
+		.then(function(results) {
+			var template = results[0],
+				positions = _.map(results[1].rows, 'name'),
+				configuration = { 'positions': {} };
+
+			positions.forEach(function(positionName) {
+				configuration.positions[positionName] = ['template-design-' + positionName];
+			});
+
+			return template.renderAsync(renderer, configuration);
 		})
 		.then(function(templateHTML) {
 			var dom = $(templateHTML);
-			if($(templateHTML).find('body').length) {
-				templateHTML = $(templateHTML).find('body').find('script[type="text/x-handlebars"]').html();
+			if(dom.find('body').length) {
+				templateHTML = dom.find('body').find('script[type="text/x-handlebars"]').html();
 			}
 			else {
-				templateHTML = $(templateHTML).html();
+				templateHTML = dom.html();
 			}
+
+			var componentSelectorRegExp =  /\{\{(.*?)\}\}/gm,
+				replacers = {};
+
+			templateHTML.replace(componentSelectorRegExp, function(comp) {
+				if(comp == '{{outlet}}') {
+					replacers[comp] = '<div class="box box-solid box-primary" style="text-align:left; width:auto; margin:5px;"><div class="box-header with-border"><h3 class="box-title">Main Template Area</h3></div><div class="box-body" style="min-height:50px;"></div></div>';
+					return comp;
+				}
+
+				if(comp.indexOf('template-design-') == 2) {
+					replacers[comp] = '<div class="box box-primary" style="text-align:left; width:auto; margin:5px;"><div class="box-header with-border"><h3 class="box-title">' + inflection.titleize((comp.split(' ')[0]).replace('template-design-', '').replace('{{', '').replace('}}', '').replace(/-/g, ' ')) + '</h3></div><div id="' + (comp.split(' ')[0]).replace('template-design-', '').replace('{{', '').replace('}}', '').replace(/-/g, ' ') + '" class="box-body dragula-container" style="min-height:50px;"></div></div>';
+					return comp;
+				}
+
+				var subcomp = comp.split(' ');
+				if(subcomp[0].indexOf('-') > 0) {
+					replacers[comp] = '<div class="box box-solid box-info" style="text-align:left; width:auto; margin:5px;"><div class="box-header"><h3 class="box-title">' + inflection.titleize(subcomp[0].replace('{{', '').replace('}}', '').replace(/-/g, ' ')) + '</h3></div></div>';
+					return comp;
+				}
+
+				replacers[comp] = inflection.titleize(comp.replace('{{', '').replace('}}', '').replace(/-/g, ' '));
+				return comp;
+			});
+
+			Object.keys(replacers).forEach(function(comp) {
+				templateHTML = templateHTML.replace(comp, replacers[comp]);
+			});
+
+			return promises.all([templateHTML, dbSrvc.knex.raw('SELECT DISTINCT A.id AS position_id, A.name AS position_name, B.display_order, C.id AS widget_id, C.display_name AS widget_name FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (A.id = B.template_position) INNER JOIN module_widgets C ON (C.id = B.module_widget) WHERE A.template = ? ORDER BY B.display_order', [request.params.id])]);
+		})
+		.then(function(results) {
+			var templateHTML = results[0],
+				widgetPositions = results[1].rows,
+				dom = $.load(templateHTML);
+
+			widgetPositions.forEach(function(widgetPositionData) {
+				var widgetContainer = ($(templateHTML).find('div.dragula-container#' + widgetPositionData['position_name']))[0];
+				if(!widgetContainer) return;
+
+
+			});
 
 			response.status(200).send(templateHTML);
 			return null;

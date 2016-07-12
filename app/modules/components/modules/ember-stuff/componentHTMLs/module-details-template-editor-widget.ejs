@@ -25,9 +25,9 @@
 				</div>
 				<div class="tab-pane fade" role="tabpanel" id="module-details-template-editor-widget-position-editor-{{model.id}}-div">
 					<div class="row" style="margin:0px;">
-						<div class="col-sm-2" id="module-details-template-editor-widget-position-editor-available-widgets-{{model.id}}">
+						<div class="col-sm-2" id="module-details-template-editor-widget-position-editor-available-widgets-{{model.id}}" style="text-align:center;">
 						{{#each availableWidgetList as |widget|}}
-							<div id={{widget.id}} class="info-box" style="max-height:90px; overflow:hidden; cursor:move;">
+							<div id={{widget.id}} class="info-box" style="max-height:90px; overflow:hidden; cursor:move; text-align:left;">
 								<span class="info-box-icon bg-blue">
 									<i class="fa fa-gears" />
 								</span>
@@ -36,9 +36,11 @@
 									<span class="description">{{widget.description}}</span>
 								</div>
 							</div>
+						{{else}}
+							<span style="text-transform:uppercase;">No widgets available for this template</span>
 						{{/each}}
 						</div>
-						<div class="col-sm-10" id="module-details-template-editor-widget-position-editor-template-preview-{{model.id}}" style="border:1px solid #f4f4f4; padding:15px;">
+						<div class="col-sm-10" id="module-details-template-editor-widget-position-editor-template-preview-{{model.id}}" style="max-height:60vh; border:1px solid #f1f1f1; padding:15px; background-color:#f1f1f1; overflow-y:auto;">
 						</div>
 					</div>
 				</div>

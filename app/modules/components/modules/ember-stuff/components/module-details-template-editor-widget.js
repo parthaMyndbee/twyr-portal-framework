@@ -79,19 +79,24 @@ define(
 					})
 				])
 				.then(function(data) {
-					console.log('RSVP Data: ', data);
-
 					_ember['default'].$.each((data[0]).value, function(index, item) {
 						self.get('availableWidgetList').addObject(item);
 					});
 
 					var mirrorContainer = self.$('div#module-details-template-editor-widget-configuration-editor-' + self.get('model').get('id') + '-div')[0],
 						availableWidgetContainer = self.$('div#module-details-template-editor-widget-position-editor-available-widgets-' + self.get('model').get('id'))[0],
-						widgetContainer = self.$('div#module-details-template-editor-widget-position-editor-template-preview-' + self.get('model').get('id'))[0];
+						templateContainer = self.$('div#module-details-template-editor-widget-position-editor-template-preview-' + self.get('model').get('id'))[0];
 
-					window.$(widgetContainer).html((data[1]).value);
+					window.$(templateContainer).html((data[1]).value);
 
-					self.set('dragula', dragula([availableWidgetContainer, widgetContainer], {
+					var dragulaContainers = window.$(templateContainer).find('div.dragula-container'),
+						passedInContainers = [availableWidgetContainer];
+
+					for(var idx=0; idx < dragulaContainers.length; idx++) {
+						passedInContainers.push(dragulaContainers[idx]);
+					}
+
+					self.set('dragula', dragula(passedInContainers, {
 						'copy': function(element, source) {
 							return (source === availableWidgetContainer);
 						},
@@ -123,8 +128,6 @@ define(
 						contentDiv.removeClass('info-box-content');
 						contentDiv.addClass('box-header no-border');
 						contentDiv.find('span.description').remove();
-
-						console.log('Modified Element: ', element);
 					});
 				})
 				.catch(function(err) {

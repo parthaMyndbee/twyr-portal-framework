@@ -392,14 +392,14 @@
 
 <div class="modal fade" id="module-details-widget-dialog-template-editor" tabindex="-1" role="dialog">
 	<div class="modal-dialog" style="width:85%;">
-		<div class="modal-content" style="max-height:85vh; overflow-y:auto;">
+		<div class="modal-content">
 			<div class="modal-header">
 				<h4 class="modal-title">Template Editor: {{currentlyEditingTemplate.name}}</h4>
 			</div>
-			<div class="modal-body" style="padding:0px;">
+			<div class="modal-body">
 				{{module-details-template-editor-widget model=currentlyEditingTemplate controller-action="controller-action"}}
 			</div>
-			<div class="modal-footer" style="margin-top:0px;">
+			<div class="modal-footer">
 				{{#if currentlyEditingTemplate.hasDirtyAttributes}}
 				<button type="button" class="btn btn-primary" {{action "controller-action" "saveTemplate" currentlyEditingTemplate bubbles=false}}>Save</button>
 				{{/if}}

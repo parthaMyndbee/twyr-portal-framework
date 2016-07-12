@@ -27,7 +27,7 @@
 	<% if(positions.module && positions.module.length) { %>
 	<div class="box-body">
 		<% positions.module.forEach(function(moduleWidget) { %>
-			{{<%= moduleWidget %> model=model controller-action="controller-action"}}
+			{{<%- moduleWidget %> model=model controller-action="controller-action"}}
 		<% }) %>
 	</div>
 	<% } %>

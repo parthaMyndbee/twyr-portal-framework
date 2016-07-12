@@ -30,33 +30,12 @@ var bhairaviTemplate = prime({
 		this.configuration = deepmerge(this.configuration, {
 			'title': '',
 
-			'firstRowModules' : false,
+			'firstRowModules': false,
 			'secondRowModules': false,
 			'bottomRowModules': false,
 
 			'apiServer': '',
-			'twyrUserId': '',
-
-			'mainContentWidth': 12,
-
-			'baseYear': '1900',
-			'currentYear': (new Date()).getUTCFullYear(),
-			'developmentMode': ((process.env.NODE_ENV || 'development').toLowerCase() == 'development'),
-
-			'positions': {
-				'module1': [],
-				'module2': [],
-				'module3': [],
-				'module4': [],
-				'module5': [],
-				'module6': [],
-				'module7': [],
-				'module8': [],
-				'module9': [],
-
-				'left-sidebar': [],
-				'right-sidebar': []
-			}
+			'twyrUserId': ''
 		});
 
 		base.call(this, module);
