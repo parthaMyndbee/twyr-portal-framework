@@ -20,33 +20,31 @@ define(
 						'currentPassword': self.get('currentPassword'),
 						'newPassword1': self.get('newPassword1'),
 						'newPassword2': self.get('newPassword2')
-					},
-
-					'success': function(data) {
-						if(data.status) {
-							self.sendAction('controller-action', 'display-status-message', {
-								'type': 'success',
-								'message': 'Password changed'
-							});
-						}
-						else {
-							self.sendAction('controller-action', 'display-status-message', {
-								'type': 'error',
-								'message': data.responseText
-							});
-						}
-
-						self.cancel();
-					},
-
-					'error': function(err) {
-						self.sendAction('controller-action', 'display-status-message', {
-							'type': 'danger',
-							'message': err.responseJSON.message
-						});
-
-						self.cancel();
 					}
+				})
+				.done(function(data) {
+					if(data.status) {
+						self.sendAction('controller-action', 'display-status-message', {
+							'type': 'success',
+							'message': 'Password changed'
+						});
+					}
+					else {
+						self.sendAction('controller-action', 'display-status-message', {
+							'type': 'error',
+							'message': data.responseText
+						});
+					}
+
+					self.cancel();
+				})
+				.fail(function(err) {
+					self.sendAction('controller-action', 'display-status-message', {
+						'type': 'danger',
+						'message': err.responseJSON.message
+					});
+
+					self.cancel();
 				});
 			},
 

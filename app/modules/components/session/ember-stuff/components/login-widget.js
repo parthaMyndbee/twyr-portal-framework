@@ -187,33 +187,31 @@ define(
 					'data': {
 						'username': self.get('username'),
 						'password': self.get('password')
-					},
-
-					'success': function(data) {
-						if(data.status) {
-							self.showStatusMessage('success', data.responseText);
-							_ember['default'].run.later(self, function() {
-								window.location.href = '/';
-							}, 500);
-						}
-						else {
-							self.showStatusMessage('alert', data.responseText);
-							self.resetLoginForm();
-
-							_ember['default'].run.later(self, function() {
-								self.resetStatusMessages();
-							}, 5000);
-						}
-					},
-
-					'error': function(err) {
-						self.showStatusMessage('alert', (err.responseJSON ? err.responseJSON.responseText : (err.responseText || 'Unknown error' )));
+					}
+				})
+				.done(function(data) {
+					if(data.status) {
+						self.showStatusMessage('success', data.responseText);
+						_ember['default'].run.later(self, function() {
+							window.location.href = '/';
+						}, 500);
+					}
+					else {
+						self.showStatusMessage('alert', data.responseText);
 						self.resetLoginForm();
 
 						_ember['default'].run.later(self, function() {
 							self.resetStatusMessages();
 						}, 5000);
 					}
+				})
+				.fail(function(err) {
+					self.showStatusMessage('alert', (err.responseJSON ? err.responseJSON.responseText : (err.responseText || 'Unknown error' )));
+					self.resetLoginForm();
+
+					_ember['default'].run.later(self, function() {
+						self.resetStatusMessages();
+					}, 5000);
 				});
 			},
 
@@ -235,35 +233,33 @@ define(
 					'dataType': 'json',
 					'data': {
 						'username': this.get('resetUsername')
-					},
+					}
+				})
+				.done(function(data) {
+					if(data.status) {
+						self.showStatusMessage('success', data.responseText);
 
-					'success': function(data) {
-						if(data.status) {
-							self.showStatusMessage('success', data.responseText);
-
-							_ember['default'].run.later(self, function() {
-								self.resetForgotPasswordForm();
-								self.resetStatusMessages();
-							}, 5000);
-						}
-						else {
-							self.showStatusMessage('alert', data.responseText);
+						_ember['default'].run.later(self, function() {
 							self.resetForgotPasswordForm();
-
-							_ember['default'].run.later(self, function() {
-								self.resetStatusMessages();
-							}, 5000);
-						}
-					},
-
-					'error': function(err) {
-						self.showStatusMessage('alert', (err.responseJSON ? err.responseJSON.responseText : (err.responseText || 'Unknown error' )));
+							self.resetStatusMessages();
+						}, 5000);
+					}
+					else {
+						self.showStatusMessage('alert', data.responseText);
 						self.resetForgotPasswordForm();
 
 						_ember['default'].run.later(self, function() {
 							self.resetStatusMessages();
 						}, 5000);
 					}
+				})
+				.fail(function(err) {
+					self.showStatusMessage('alert', (err.responseJSON ? err.responseJSON.responseText : (err.responseText || 'Unknown error' )));
+					self.resetForgotPasswordForm();
+
+					_ember['default'].run.later(self, function() {
+						self.resetStatusMessages();
+					}, 5000);
 				});
 			},
 
@@ -282,35 +278,33 @@ define(
 						'username': self.get('registerUsername'),
 						'firstname': self.get('registerFirstname'),
 						'lastname': self.get('registerLastname')
-					},
+					}
+				})
+				.done(function(data) {
+					if(data.status) {
+						self.showStatusMessage('success', data.responseText);
 
-					'success': function(data) {
-						if(data.status) {
-							self.showStatusMessage('success', data.responseText);
-
-							_ember['default'].run.later(self, function() {
-								self.resetRegisterAccountForm();
-								self.resetStatusMessages();
-							}, 5000);
-						}
-						else {
-							self.showStatusMessage('alert', data.responseText);
+						_ember['default'].run.later(self, function() {
 							self.resetRegisterAccountForm();
-
-							_ember['default'].run.later(self, function() {
-								self.resetStatusMessages();
-							}, 5000);
-						}
-					},
-
-					'error': function(err) {
-						self.showStatusMessage('alert', (err.responseJSON ? err.responseJSON.responseText : (err.responseText || 'Unknown error' )));
+							self.resetStatusMessages();
+						}, 5000);
+					}
+					else {
+						self.showStatusMessage('alert', data.responseText);
 						self.resetRegisterAccountForm();
 
 						_ember['default'].run.later(self, function() {
 							self.resetStatusMessages();
 						}, 5000);
 					}
+				})
+				.fail(function(err) {
+					self.showStatusMessage('alert', (err.responseJSON ? err.responseJSON.responseText : (err.responseText || 'Unknown error' )));
+					self.resetRegisterAccountForm();
+
+					_ember['default'].run.later(self, function() {
+						self.resetStatusMessages();
+					}, 5000);
 				});
 			},
 

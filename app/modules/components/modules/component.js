@@ -309,7 +309,12 @@ var modulesComponent = prime({
 
 			templateHTML.replace(componentSelectorRegExp, function(comp) {
 				if(comp == '{{outlet}}') {
-					replacers[comp] = '<div class="box box-solid box-primary" style="text-align:left; width:auto; margin:5px;"><div class="box-header with-border"><h3 class="box-title">Main Template Area</h3></div><div class="box-body" style="min-height:50px;"></div></div>';
+					replacers[comp] = '<div class="box box-solid box-primary" style="text-align:left; width:auto; margin:5px;"><div class="box-header with-border"><h3 class="box-title">Main Template Area</h3></div><div class="box-body" style="min-height:50px; background-color:#f1f1f1;"></div></div>';
+					return comp;
+				}
+
+				if((comp[2] == '#') || (comp[2] == '/')) {
+					replacers[comp] = '';
 					return comp;
 				}
 
@@ -319,12 +324,12 @@ var modulesComponent = prime({
 				}
 
 				var subcomp = comp.split(' ');
-				if(subcomp[0].indexOf('-') > 0) {
+				if((comp.indexOf('controller-action') >= 0) && (subcomp[0].indexOf('-') > 0)) {
 					replacers[comp] = '<div class="box box-solid box-info" style="text-align:left; width:auto; margin:5px;"><div class="box-header"><h3 class="box-title">' + inflection.titleize(subcomp[0].replace('{{', '').replace('}}', '').replace(/-/g, ' ')) + '</h3></div></div>';
 					return comp;
 				}
 
-				replacers[comp] = inflection.titleize(comp.replace('{{', '').replace('}}', '').replace(/-/g, ' '));
+				replacers[comp] = comp;
 				return comp;
 			});
 

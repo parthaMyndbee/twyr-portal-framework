@@ -396,14 +396,14 @@
 			<div class="modal-header">
 				<h4 class="modal-title">Template Editor: {{currentlyEditingTemplate.name}}</h4>
 			</div>
-			<div class="modal-body">
+			<div class="modal-body" style="padding:10px 0px 0px;">
 				{{module-details-template-editor-widget model=currentlyEditingTemplate controller-action="controller-action"}}
 			</div>
-			<div class="modal-footer">
+			<div class="modal-footer" style="margin-top:0px;">
 				{{#if currentlyEditingTemplate.hasDirtyAttributes}}
 				<button type="button" class="btn btn-primary" {{action "controller-action" "saveTemplate" currentlyEditingTemplate bubbles=false}}>Save</button>
 				{{/if}}
-				<button type="button" class="btn btn-warning" {{action "controller-action" "stopEditTemplate" currentlyEditingTemplate bubbles=false}}>Cancel</button>
+				<button type="button" class="btn btn-default" {{action "controller-action" "stopEditTemplate" currentlyEditingTemplate bubbles=false}}>Close</button>
 			</div>
 		</div>
 	</div>

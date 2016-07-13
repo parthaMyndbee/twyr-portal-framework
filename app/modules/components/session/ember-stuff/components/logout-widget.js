@@ -8,17 +8,11 @@ define(
 				_ember['default'].$.ajax({
 					'type': 'GET',
 					'url': window.apiServer + 'session/logout',
-					'dataType': 'json',
-
-					'success': function(data) {
-						window.Cookies.remove('twyr-webapp', { 'path': '/', 'domain': '.twyrframework.com' });
-						window.location.href = '/';
-					},
-
-					'error': function(err) {
-						window.Cookies.remove('twyr-webapp', { 'path': '/', 'domain': '.twyrframework.com' });
-						window.location.href = '/';
-					}
+					'dataType': 'json'
+				})
+				.always(function(data) {
+					window.Cookies.remove('twyr-webapp', { 'path': '/', 'domain': '.twyrframework.com' });
+					window.location.href = '/';
 				});
 			},
 

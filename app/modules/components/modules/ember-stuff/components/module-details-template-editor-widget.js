@@ -6,6 +6,7 @@ define(
 		var ModuleDetailsTemplateEditorWidget = _ember['default'].Component.extend({
 			'availableWidgetList': _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }),
 
+			'_previousContainerState': _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }),
 			'_configurationEditor': null,
 			'_dragula': null,
 
@@ -116,7 +117,8 @@ define(
 						'removeOnSpill': true
 					}));
 
-					self.get('dragula').on('drop', function(element) {
+					self.get('dragula')
+					.on('drop', function(element, target) {
 						element = window.$(element);
 						element.children('span').remove();
 
@@ -128,6 +130,17 @@ define(
 						contentDiv.removeClass('info-box-content');
 						contentDiv.addClass('box-header no-border');
 						contentDiv.find('span.description').remove();
+
+						self._updateWidgetPositions(element, target);
+					})
+					.on('over', function(element, container) {
+						if(container === availableWidgetContainer)
+							return;
+
+						self.get('_previousContainerState').set(window.$(container).attr('id'), window.$(container).html());
+					})
+					.on('remove', function(element, container, source) {
+						self._updateWidgetPositions(element, source);
 					});
 				})
 				.catch(function(err) {
@@ -161,6 +174,36 @@ define(
 
 			'_updateModuleConfiguration': function() {
 				this.get('model').set('parsedConfiguration', this.get('_configurationEditor').getValue());
+			},
+
+			'_updateWidgetPositions': function(element, container) {
+				var self = this,
+					widgets = [];
+
+				window.$.each(window.$(container).children('div.box-primary'), function(index, widget) {
+					widgets.push(window.$(widget).attr('id'));
+				});
+
+				_ember['default'].$.ajax({
+					'type': 'PATCH',
+					'url': window.apiServer + 'modules/templatePositionModuleWidgets',
+
+					'dataType': 'json',
+					'data': {
+						'position': window.$(container).attr('id'),
+						'widgets': widgets
+					}
+				})
+				.fail(function(err) {
+					$(container).html(self.get('_previousContainerState').get(window.$(container).attr('id')));
+					self.sendAction('controller-action', 'display-status-message', {
+						'type': 'danger',
+						'message': err.message
+					});
+				})
+				.always(function() {
+					self.get('_previousContainerState').set(window.$(container).attr('id'), undefined);
+				});
 			},
 
 			'actions': {
