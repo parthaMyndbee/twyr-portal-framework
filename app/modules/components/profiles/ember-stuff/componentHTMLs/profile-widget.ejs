@@ -1,10 +1,10 @@
 <script type="text/x-handlebars" data-template-name="components/profile-widget">
-<div style="margin-top:15px;">
 {{#link-to "profiles-default" title="Profile"}}
+<div style="padding:12px 0px; cursor:pointer;">
 	<img src="/profiles/get-image" alt="<%= fullname %>" style="width:25px;">
-	<span style="color:#333; cursor:pointer; padding:5px;">
+	<span style="color:#333;">
 		<%= fullname %>
 	</span>
-{{/link-to}}
 </div>
+{{/link-to}}
 </script>

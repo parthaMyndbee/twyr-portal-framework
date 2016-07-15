@@ -273,7 +273,7 @@ define(
 				});
 
 				_ember['default'].$.ajax({
-					'url': window.apiServer + 'pages/publish-status-list',
+					'url': window.apiServer + 'masterdata/publish-status-list',
 					'dataType': 'json',
 					'cache': true
 				})
@@ -287,7 +287,7 @@ define(
 					statusSelectElem.val(self.get('model').get('status')).trigger('change');
 				})
 				.fail(function() {
-					console.error(window.apiServer + 'pages/publish-status-list error:\n', arguments);
+					console.error(window.apiServer + 'masterdata/publish-status-list error:\n', arguments);
 				});
 
 

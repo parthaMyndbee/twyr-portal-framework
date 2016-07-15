@@ -1,0 +1,29 @@
+define(
+	'twyr-webapp/routes/menus-default',
+	['exports', 'ember'],
+	function(exports, _ember) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/routes/menus-default');
+		var ManageMenuRoute = _ember['default'].Route.extend({
+			'model': function() {
+				return this.store.peekAll('menus-default');
+			},
+
+			'setupController': function(controller, model) {
+				controller.set('model', model);
+			},
+
+			'actions': {
+				'willTransition': function() {
+					var dirtyMenus = this.get('controller').get('model').filterBy('hasDirtyAttributes', true);
+
+					if(dirtyMenus.get('length'))
+						return false;
+
+					return true;
+				}
+			}
+		});
+
+		exports['default'] = ManageMenuRoute;
+	}
+);

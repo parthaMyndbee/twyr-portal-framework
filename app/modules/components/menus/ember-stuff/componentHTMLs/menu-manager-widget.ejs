@@ -1,0 +1,97 @@
+<script type="text/x-handlebars" data-template-name="components/menu-manager-widget">
+<table class="table table-bordered table-hover dataTable" id="menus-default-menu-list">
+<thead>
+	<tr>
+		<th>Id</th>
+		<th>Name</th>
+		<th>Component</th>
+		<th>Created</th>
+		<th>Updated</th>
+		<th style="min-width:100px;">&nbsp;</th>
+	</tr>
+</thead>
+</table>
+
+{{#if anyMenusEditing}}
+	<div class="nav-tabs-custom" style="margin-top:20px;">
+		<ul class="nav nav-tabs" role="tablist" style="background-color:#f4f4f4;">
+			{{#each model as |menu|}}
+			{{#if menu.isEditing}}
+				<li class="menu-manager-widget-list-tab" role="presentation" id="menu-manager-widget-list-{{menu.id}}-link">
+					<a href="#menu-manager-widget-list-{{menu.id}}-div" role="tab" data-toggle="tab">
+						{{menu.name}}
+						{{#if menu.hasDirtyAttributes}}
+						*
+						{{/if}}
+						<i class="fa fa-close" style="margin-left:10px; color:#dd4b39; cursor:pointer;" {{action "controller-action" "stopEditMenu" menu bubbles=false}} />
+					</a>
+				</li>
+			{{/if}}
+			{{/each}}
+		</ul>
+
+		<div class="tab-content" style="padding:0px; padding-bottom:10px;">
+			{{#each model as |menu|}}
+			{{#if menu.isEditing}}
+			<div class="menu-manager-widget-list-div tab-pane fade" role="tabpanel" id="menu-manager-widget-list-{{menu.id}}-div">
+				{{menu-edit-widget model=menu controller-action="controller-action"}}
+			</div>
+			{{/if}}
+			{{/each}}
+		</div>
+	</div>
+{{/if}}
+</script>
+
+
+<script type="text/x-handlebars" data-template-name="components/menu-edit-widget">
+<div class="row" style="margin:0px; padding:10px 0px;">
+	<div class="col-sm-12" style="text-align:right;">
+	{{#if model.hasDirtyAttributes}}
+		<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "saveMenu" model bubbles=false}}>
+			<i class="fa fa-save" />
+			<span style="font-size:12px;">Save</span>
+		</button>
+
+		<button type="button" id="button-cancel" class="btn btn-flat btn-warning btn-sm" {{action "controller-action" "stopEditMenu" model bubbles=false}}>
+			<i class="fa fa-undo" />
+			<span style="font-size:12px;">Cancel</span>
+		</button>
+	{{else}}
+		<button type="button" id="button-cancel" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "stopEditMenu" model bubbles=false}}>
+			<i class="fa fa-close-o" />
+			<span style="font-size:12px;">Finished</span>
+		</button>
+	{{/if}}
+
+	{{#unless model.isNew}}
+	<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "deleteMenu" model.id bubbles=false}}>
+		<i class="fa fa-trash-o" />
+		<span style="font-size:12px;">Delete</span>
+	</button>
+	{{/unless}}
+	</div>
+</div>
+
+<div class="row" style="margin:0px;">
+	<div class="form-group col-sm-6">
+		<label>Name</label>
+		{{input type="text" value=model.name class="form-control"}}
+	</div>
+
+	<div class="form-group col-sm-2">
+		<label>Type</label>
+		<select id="menu-edit-widget-select-type-{{model.id}}" class="form-control" style="width:100%;" />
+	</div>
+
+	<div class="form-group col-sm-2">
+		<label>Status</label>
+		<select id="menu-edit-widget-select-status-{{model.id}}" class="form-control" style="width:100%;" />
+	</div>
+
+	<div class="form-group col-sm-2">
+		<label>Permission</label>
+		<select id="menu-edit-widget-select-permission-{{model.id}}" class="form-control" style="width:100%;" />
+	</div>
+</div>
+</script>
