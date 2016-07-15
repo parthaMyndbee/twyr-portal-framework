@@ -7,8 +7,13 @@ define(
 			'firstName': _attr['default']('string'),
 			'middleNames': _attr['default']('string'),
 			'lastName': _attr['default']('string'),
+
+			'profileImage': _attr['default']('string'),
+			'profileImageMetadata': _attr['default']('string'),
+
 			'gender': _attr['default']('string'),
 			'dob': _attr['default']('date', { 'defaultValue': function() { return new Date(); } }),
+
 			'email': _attr['default']('string'),
 			'homeModuleMenu': _attr['default']('string'),
 

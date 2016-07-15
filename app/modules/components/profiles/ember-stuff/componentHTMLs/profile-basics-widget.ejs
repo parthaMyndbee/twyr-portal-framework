@@ -4,12 +4,12 @@
 		<h3 class="box-title">Basics</h3>
 		{{#if model.hasDirtyAttributes}}
 		<div class="box-tools pull-right">
-			<button id="button-cancel" class="btn btn-flat btn-warning btn-sm" style="border-radius:5px;" {{action "controller-action" "cancel" bubbles=false}}>
+			<button id="button-cancel" class="btn btn-flat btn-warning btn-sm" {{action "controller-action" "cancel" bubbles=false}}>
 				<i class="fa fa-undo" />
 				<span style="font-size:12px;">Cancel</span>
 			</button>
 
-			<button class="btn btn-flat btn-primary btn-sm" style="border-radius:5px;" {{action "controller-action" "save" bubbles=false}}>
+			<button class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "save" bubbles=false}}>
 				<i class="fa fa-save" />
 				<span style="font-size:12px;">Save</span>
 			</button>
@@ -18,8 +18,7 @@
 	</div>
 
 	<div class="box-body">
-	<div id="profile-basics-widget-image" class="col-sm-6" style="border:1px solid #efefef; text-align:center;">
-		<img src="" style="max-width:80%; max-height:80%;" />
+	<div id="profile-basics-widget-image" class="col-sm-6" style="padding:0px;" contenteditable="true">
 	</div>
 	<div id="profile-basics-widget-text-stuff" class="col-sm-6">
 		<div class="form-group">

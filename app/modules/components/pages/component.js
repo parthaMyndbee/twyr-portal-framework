@@ -21,7 +21,8 @@ var base = require('./../component-base').baseComponent,
  * Module dependencies, required for this module
  */
 var filesystem = promises.promisifyAll(require('fs-extra')),
-	path = require('path');
+	path = require('path'),
+	uuid = require('node-uuid');
 
 var pagesComponent = prime({
 	'inherits': base,
@@ -48,6 +49,7 @@ var pagesComponent = prime({
 			})
 			.then(function(pageAuthorPermissionId) {
 				self['$pageAuthorPermissionId'] = pageAuthorPermissionId.rows[0].id;
+				self['$mediaLibraryPath'] = path.isAbsolute(self.$config.mediaLibraryPath) ? self.$config.mediaLibraryPath : path.join(self.basePath, self.$config.mediaLibraryPath);
 
 				if(callback) callback(null, status);
 				return null;
@@ -57,6 +59,92 @@ var pagesComponent = prime({
 				if(callback) callback(startErr);
 			});
 		});
+	},
+
+	'_addRoutes': function() {
+		this.$router.get('/getImage/:id', this._getImage.bind(this));
+
+		this.$router.post('/uploadImage', this._uploadImage.bind(this));
+		this.$router.post('/uploadFile', this._uploadImage.bind(this));
+
+		this.$router.post('/uploadDroppedFile', this._uploadDroppedImage.bind(this));
+		this.$router.post('/uploadDroppedImage', this._uploadDroppedImage.bind(this));
+	},
+
+	'_getImage': function(request, response, next) {
+		var self = this,
+			loggerSrvc = self.dependencies['logger-service'];
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+
+		var imagePath = path.join(self.$mediaLibraryPath, request.params.id);
+		response.sendFile(imagePath);
+	},
+
+	'_uploadImage': function(request, response, next) {
+		var self = this,
+			Busboy = require('busboy'),
+			loggerSrvc = self.dependencies['logger-service'];
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+
+		var busboy = new Busboy({ 'headers': request.headers }),
+			fileName = null,
+			imageId = uuid.v4().toString(),
+			imageName = path.join(self.$mediaLibraryPath, imageId);
+
+		busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+			fileName = filename;
+			imageName += path.extname(filename);
+			file.pipe(filesystem.createWriteStream(imageName));
+		});
+
+		busboy.on('finish', function() {
+			var html = '';
+			html += '<script type="text/javascript">';
+			html += '    var funcNum = ' + request.query.CKEditorFuncNum + ';\n';
+			html += '    var url     = "' + request.protocol + '://' + request.hostname + ':' + request.app.get('port') + '/pages/getImage/' + imageId + path.extname(fileName) + '";\n';
+			html += '    var message = "' + fileName + ' was uploaded successfully";\n\n';
+
+			html += '    window.parent.CKEDITOR.tools.callFunction(funcNum, url, message);\n';
+			html += '</script>';
+
+			response.set('Access-Control-Allow-Origin', request.get('Origin'));
+			response.set('Access-Control-Allow-Credentials', true);
+			response.set('Connection', 'close');
+			response.status(200).send(html);
+		});
+
+		request.pipe(busboy);
+	},
+
+	'_uploadDroppedImage': function(request, response, next) {
+		var self = this,
+			Busboy = require('busboy'),
+			loggerSrvc = self.dependencies['logger-service'];
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+
+		var busboy = new Busboy({ 'headers': request.headers }),
+			fileName = null,
+			imageId = uuid.v4().toString(),
+			imageName = path.join(self.$mediaLibraryPath, imageId);
+
+		busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+			fileName = filename;
+			imageName += path.extname(filename);
+			file.pipe(filesystem.createWriteStream(imageName));
+		});
+
+		busboy.on('finish', function() {
+			response.status(200).send({
+				'uploaded': 1,
+				'fileName': fileName,
+				'url': request.protocol + '://' + request.hostname + ':' + request.app.get('port') + '/pages/getImage/' + imageId + path.extname(fileName)
+			});
+		});
+
+		request.pipe(busboy);
 	},
 
 	'_selectTemplates': function(user, mediaType, possibleTemplates, callback) {

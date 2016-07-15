@@ -11,7 +11,7 @@
 			<th style="width:40%;">Type</th>
 			<th>Contact</th>
 			<th style="text-align:right; vertical-align:middle;">
-				<button type="button" class="btn btn-flat btn-sm btn-success" style="padding:4px; line-height:1;" {{action "controller-action" "add"}}>
+				<button type="button" class="btn btn-flat btn-sm btn-success" style="padding:4px;" {{action "controller-action" "add"}}>
 					<i class="fa fa-plus" style="margin-right:2px;" /><span>Add</span>
 				</button>
 			</th>
@@ -33,10 +33,10 @@
 				{{input type="text" class="form-control" value=contact.contact}}
 			</td>
 			<td style="text-align:right; vertical-align:middle;">
-				<button type="button" title="Save" class="btn btn-flat btn-sm btn-primary" style="padding:4px; line-height:1;" {{action "controller-action" "save" contact}}>
+				<button type="button" title="Save" class="btn btn-flat btn-sm btn-primary" style="padding:4px;" {{action "controller-action" "save" contact}}>
 					<i class="fa fa-save" />
 				</button>
-				<button type="button" title="Delete" class="btn btn-flat btn-sm btn-danger" style="padding:4px; line-height:1;" {{action "controller-action" "delete" contact}}>
+				<button type="button" title="Delete" class="btn btn-flat btn-sm btn-danger" style="padding:4px;" {{action "controller-action" "delete" contact}}>
 					<i class="fa fa-remove" />
 				</button>
 			</td>
@@ -46,7 +46,7 @@
 			<td style="vertical-align:middle;">{{contact.displayType}}</td>
 			<td style="vertical-align:middle;">{{contact.contact}}</td>
 			<td style="text-align:right; vertical-align:middle;">
-				<button type="button" title="Delete" class="btn btn-flat btn-sm btn-danger" style="padding:4px; line-height:1;" {{action "controller-action" "delete" contact}}>
+				<button type="button" title="Delete" class="btn btn-flat btn-sm btn-danger" style="padding:4px;" {{action "controller-action" "delete" contact}}>
 					<i class="fa fa-remove" />
 				</button>
 			</td>

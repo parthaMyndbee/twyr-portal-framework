@@ -327,19 +327,19 @@ define(
 
 				if(!self.get('_ckEditor')) {
 					self.set('_ckEditor', contentEditElem.ckeditor({
-						'filebrowserBrowseUrl': window.apiServer + 'pages/listFiles/?page=' + self.get('model').get('id'),
-						'filebrowserImageBrowseUrl': window.apiServer + 'pages/listImages/?page=' + self.get('model').get('id'),
+						'filebrowserBrowseUrl': '/pages/listFiles/?page=' + self.get('model').get('id'),
+						'filebrowserImageBrowseUrl': '/pages/listImages/?page=' + self.get('model').get('id'),
 
-						'filebrowserBrowseLinkUrl': window.apiServer + 'pages/listFiles/?page=' + self.get('model').get('id'),
-						'filebrowserImageBrowseLinkUrl': window.apiServer + 'pages/listImages/?page=' + self.get('model').get('id'),
+						'filebrowserBrowseLinkUrl': '/pages/listFiles/?page=' + self.get('model').get('id'),
+						'filebrowserImageBrowseLinkUrl': '/pages/listImages/?page=' + self.get('model').get('id'),
 
-						'filebrowserUploadUrl': window.apiServer + 'pages/uploadFile/?page=' + self.get('model').get('id'),
-						'filebrowserImageUploadUrl': window.apiServer + 'pages/uploadImage/?page=' + self.get('model').get('id'),
+						'filebrowserUploadUrl': '/pages/uploadFile/?page=' + self.get('model').get('id'),
+						'filebrowserImageUploadUrl': '/pages/uploadImage/?page=' + self.get('model').get('id'),
 
 						'mathJaxLib': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-AMS_HTML',
 
-						'uploadUrl': window.apiServer + 'pages/uploadDroppedFile/?page=' + self.get('model').get('id'),
-						'imageUploadUrl': window.apiServer + 'pages/uploadDroppedImage/?page=' + self.get('model').get('id')
+						'uploadUrl': '/pages/uploadDroppedFile/?page=' + self.get('model').get('id'),
+						'imageUploadUrl': '/pages/uploadDroppedImage/?page=' + self.get('model').get('id')
 					}));
 
 					self.get('_ckEditor').editor.on('change', function(event) {

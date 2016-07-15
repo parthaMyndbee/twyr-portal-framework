@@ -32,6 +32,7 @@
 		"bookshelf": "*",
 		"bookshelf-jsonapi-params": "*",
 		"bluebird": "*",
+		"busboy": "*",
 		"cheerio": "*",
 		"chokidar": "*",
 		"consolidate": "*",

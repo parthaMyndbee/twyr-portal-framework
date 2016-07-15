@@ -1,7 +1,7 @@
 <script type="text/x-handlebars" data-template-name="components/profile-widget">
 {{#link-to "profiles-default" title="Profile"}}
-	<span class="fa fa-user" style="font-size:16px; color:#333; cursor:pointer; padding:15px; padding-right:0px;"/>
-	<span style="color:#333; cursor:pointer; padding:15px; padding-left:5px;">
+	<span style="color:#333; cursor:pointer; padding:5px;">
+		<img src="/profiles/get-image" alt="<%= fullname %>" style="width:25px;">
 		<%= fullname %>
 	</span>
 {{/link-to}}
