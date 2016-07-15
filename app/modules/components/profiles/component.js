@@ -73,8 +73,18 @@ var profilesComponent = prime({
 		new self.$UserModel({ 'id': request.user.id })
 		.fetch()
 		.then(function(user) {
-			var profileImageName = path.join(self['$profileImagePath'], (user.get('profile_image') || 'anonymous') + '.png');
-			response.sendFile(profileImageName);
+			var profileImageName = path.join(self['$profileImagePath'], user.get('profile_image') + '.png');
+			return promises.all([user, self._existsAsync(profileImageName)]);
+		})
+		.then(function(results) {
+			var user = results[0],
+				exists = results[1];
+
+			if(exists)
+				response.sendFile(path.join(self['$profileImagePath'], user.get('profile_image') + '.png'));
+			else
+				response.sendFile(path.join(self['$profileImagePath'], 'anonymous.png'));
+
 			return null;
 		})
 		.catch(function(err) {
@@ -102,20 +112,28 @@ var profilesComponent = prime({
 
 		var image = request.body.image.replace(/' '/g, '+').replace('data:image/png;base64,', ''),
 			imageId = uuid.v4().toString(),
-			imagePath = path.join(self['$profileImagePath'], imageId + '.png');
+			imagePath = path.join(self['$profileImagePath'], imageId + '.png'),
+			user = null;
 
 		filesystem.writeFileAsync(imagePath, Buffer.from(image, 'base64'))
 		.then(function(status) {
 			return new self.$UserModel({ 'id': request.user.id })
 			.fetch();
 		})
-		.then(function(user) {
+		.then(function(resultUser) {
+			user = resultUser;
 			if(!user.get('profile_image'))
+				return null;
+
+			return self._existsAsync(path.join(self['$profileImagePath'], user.get('profile_image') + '.png'));
+		})
+		.then(function(exists) {
+			if(!exists)
 				return null;
 
 			return filesystem.unlinkAsync(path.join(self['$profileImagePath'], user.get('profile_image') + '.png'));
 		})
-		.then(function(user) {
+		.then(function() {
 			return new self.$UserModel({ 'id': request.user.id })
 			.save({
 				'profile_image': imageId,

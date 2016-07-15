@@ -89,18 +89,24 @@ define(
 				// Initialize the Profile Image Container
 				profileImageElem.outerHeight(_ember['default'].$('div#profile-basics-widget-text-stuff').height());
 
+				if(self.get('_imageCroppie')) {
+					self.get('_imageCroppie').destroy();
+					self.set('_imageCroppie', null);
+				}
+
 				self.set('_imageCroppie', new Croppie(document.getElementById('profile-basics-widget-image'), {
 					'boundary': {
 						'width': profileImageElem.width(),
-						'height': (profileImageElem.height() - 50)
+						'height': profileImageElem.height()
 					},
 
 					'viewport': {
-						'width': 200,
-						'height': 200,
+						'width': (profileImageElem.width() < profileImageElem.height()) ? profileImageElem.width() : profileImageElem.height(),
+						'height': (profileImageElem.width() < profileImageElem.height()) ? profileImageElem.width() : profileImageElem.height(),
 						'type': 'circle'
 					},
 
+					'showZoomer': false,
 					'update': self._processCroppieUpdate.bind(self)
 				}));
 
@@ -109,11 +115,10 @@ define(
 				self.get('_imageCroppie')
 				.bind({
 					'url': '/profiles/get-image?_random=' + window.moment().valueOf(),
-					'points': imgMetadata.points
+					'points': (imgMetadata && imgMetadata.points) ? imgMetadata.points : [0, 0, 600, 600]
 				})
 				.then(function() {
-					console.log('Enabling Croppie Update Processing');
-					self.get('_imageCroppie').setZoom(imgMetadata.zoom);
+					if(imgMetadata && imgMetadata.zoom) self.get('_imageCroppie').setZoom(imgMetadata.zoom);
 
 					self.set('_enableCroppieUpdates', true);
 				})
