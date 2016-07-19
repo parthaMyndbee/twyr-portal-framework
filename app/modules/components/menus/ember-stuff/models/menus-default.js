@@ -24,6 +24,12 @@ define(
 			'status': _attr['default']('string', { 'defaultValue': 'draft' }),
 			'permission': _attr['default']('string'),
 
+			'menuEditorWidget': _ember['default'].computed('type', {
+				'get': function(key) {
+					return this.get('type') + '-menu-manager-widget';
+				}
+			}).readOnly(),
+
 			'displayType': _ember['default'].computed('status', {
 				'get': function(key) {
 					return _ember['default'].String.capitalize(this.get('type'));

@@ -36,7 +36,7 @@ exports.config = ({
 
 	'templateEngine': 'ejs',
 
-	'maxRequestSize': 1e6,
+	'maxRequestSize': 5242880,
 	'requestTimeout': 25,
 	'connectionTimeout': 30,
 	'favicon': './favicon.ico'

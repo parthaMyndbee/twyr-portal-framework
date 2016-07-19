@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/page-manager-widget',
-	['exports', 'ember', 'twyr-webapp/application'],
-	function(exports, _ember, _app) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/page-manager-widget');
-		var PageManagerWidget = _ember['default'].Component.extend({
+		var PageManagerWidget = _baseWidget['default'].extend({
 			'_pageListDataTable': null,
 
 			'didRender': function() {
@@ -227,15 +227,6 @@ define(
 					'cancel': function() {
 					}
 				});
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 
@@ -245,10 +236,10 @@ define(
 
 define(
 	'twyr-webapp/components/page-edit-widget',
-	['exports', 'ember', 'twyr-webapp/application'],
-	function(exports, _ember, _app) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/page-edit-widget');
-		var PageEditWidget = _ember['default'].Component.extend({
+		var PageEditWidget = _baseWidget['default'].extend({
 			'_ckEditor': null,
 
 			'didRender': function() {
@@ -358,15 +349,6 @@ define(
 				}
 
 				self.get('model').set('isEditing', false);
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 

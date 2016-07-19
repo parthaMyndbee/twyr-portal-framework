@@ -345,7 +345,18 @@ var app = prime({
 	},
 
 	'_getEmberComponents': function(user, renderer, callback){
-		if(callback) callback(null, []);
+		var self = this,
+			emberStuff = self.$config['ember-stuff'].path;
+
+		filesystem.readFileAsync(path.join(this.basePath, emberStuff, 'components/baseWidget.js'), 'utf8')
+		.then(function(baseWidget) {
+			if(callback) callback(null, [baseWidget]);
+			return null;
+		})
+		.catch(function(err) {
+			console.error(self.name + '::_getEmberComponents:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			if(callback) callback(err);
+		});
 	},
 
 	'_getEmberComponentHTMLs': function(user, renderer, callback){

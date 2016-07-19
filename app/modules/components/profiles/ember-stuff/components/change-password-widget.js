@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/change-password-widget',
-	['exports', 'ember'],
-	function(exports, _ember) {
+	['exports', 'ember', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/change-password-widget');
-		var ChangePasswordWidget = _ember['default'].Component.extend({
+		var ChangePasswordWidget = _baseWidget['default'].extend({
 			'currentPassword': '',
 			'newPassword1': '',
 			'newPassword2': '',
@@ -70,16 +70,7 @@ define(
 					else
 						self.$('button.btn-primary').attr('disabled', true);
 				}
-			}),
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
-			}
+			})
 		});
 
 		exports['default'] = ChangePasswordWidget;

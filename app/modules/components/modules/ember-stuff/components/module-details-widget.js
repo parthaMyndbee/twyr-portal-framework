@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/module-details-widget',
-	['exports', 'ember', 'twyr-webapp/application'],
-	function(exports, _ember, _app) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/module-details-widget');
-		var ModuleDetailsWidget = _ember['default'].Component.extend({
+		var ModuleDetailsWidget = _baseWidget['default'].extend({
 			'_configurationEditor': null,
 			'_switchery': null,
 
@@ -290,15 +290,6 @@ define(
 
 			'_updateModuleConfiguration': function() {
 				this.get('model').set('parsedConfiguration', this.get('_configurationEditor').getValue());
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 

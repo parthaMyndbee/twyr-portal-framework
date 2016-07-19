@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/login-widget',
-	['exports', 'ember'],
-	function(exports, _ember) {
+	['exports', 'ember', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/login-widget');
-		var LoginWidgetComponent = _ember['default'].Component.extend({
+		var LoginWidgetComponent = _baseWidget['default'].extend({
 			'username': '',
 			'password': '',
 
@@ -306,15 +306,6 @@ define(
 						self.resetStatusMessages();
 					}, 5000);
 				});
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.send('controller-action', action, data);
-				}
 			}
 		});
 

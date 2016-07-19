@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/profile-emergency-contacts-widget',
-	['exports', 'ember', 'twyr-webapp/application'],
-	function(exports, _ember, _app) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/profile-emergency-contacts-widget');
-		var ProfileEmergencyContactsWidget = _ember['default'].Component.extend({
+		var ProfileEmergencyContactsWidget = _baseWidget['default'].extend({
 			'didRender': function() {
 				var self = this;
 				self._super(...arguments);
@@ -174,15 +174,6 @@ define(
 						'errorModel': emergencyContact
 					});
 				});
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 

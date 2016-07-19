@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/module-details-template-editor-widget',
-	['exports', 'ember', 'twyr-webapp/application'],
-	function(exports, _ember, _app) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/module-details-template-editor-widget');
-		var ModuleDetailsTemplateEditorWidget = _ember['default'].Component.extend({
+		var ModuleDetailsTemplateEditorWidget = _baseWidget['default'].extend({
 			'availableWidgetList': _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }),
 
 			'_previousContainerState': _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }),
@@ -204,15 +204,6 @@ define(
 				.always(function() {
 					self.get('_previousContainerState').set(window.$(container).attr('id'), undefined);
 				});
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 

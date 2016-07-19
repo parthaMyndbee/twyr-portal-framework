@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/profile-basics-widget',
-	['exports', 'ember'],
-	function(exports, _ember) {
+	['exports', 'ember', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/profile-basics-widget');
-		var ProfileBasicsWidget = _ember['default'].Component.extend({
+		var ProfileBasicsWidget = _baseWidget['default'].extend({
 			'_imageCroppie': null,
 			'_enableCroppieUpdates': false,
 			'_profileImageUploadTimeout': null,
@@ -48,37 +48,34 @@ define(
 					console.error(window.apiServer + 'masterdata/genders error:\n', arguments);
 				});
 
-				// Initialize the Homepages Select
-				homeSelectElem.select2({
-					'minimumInputLength': 0,
-					'minimumResultsForSearch': 10,
-
-					'allowClear': true,
-					'closeOnSelect': true,
-
-					'placeholder': 'Home Page'
-				})
-				.on('change', function() {
-					self.get('model').set('homeModuleMenu', homeSelectElem.val());
-				});
-
 				_ember['default'].$('div#profile-basics-widget-input-dob').datetimepicker({
 					'format': 'DD MMM YYYY',
 					'minDate': '01 Jan 1900',
 					'maxDate': window.moment().format('DD MMM YYYY')
 				});
 
+				// Initialize the Homepages Select
 				_ember['default'].$.ajax({
 					'url': window.apiServer + 'profiles/homepages',
 					'dataType': 'json',
 					'cache': true
 				})
 				.done(function(data) {
-					homeSelectElem.html('');
-					_ember['default'].$.each(data, function(index, item) {
-						var thisOption = new Option(_ember['default'].String.capitalize(item.display_name), item.id, false, false);
-						homeSelectElem.append(thisOption);
+					homeSelectElem.select2({
+						'minimumInputLength': 0,
+						'minimumResultsForSearch': 10,
+
+						'allowClear': true,
+						'closeOnSelect': true,
+
+						'placeholder': 'Home Page',
+
+						'data': data
+					})
+					.on('change', function() {
+						self.get('model').set('homeModuleMenu', homeSelectElem.val());
 					});
+
 
 					homeSelectElem.val(self.get('model').get('homeModuleMenu')).trigger('change');
 				})
@@ -217,7 +214,6 @@ define(
 
 			'_uploadProfileImage': function(imageData, metadata) {
 				var self = this;
-				console.log('Upload Profile Metadata: ', metadata);
 
 				_ember['default'].RSVP.allSettled([
 					_ember['default'].$.ajax({
@@ -255,15 +251,6 @@ define(
 				.finally(function() {
 					self.set('_profileImageUploadTimeout', null);
 				});
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 

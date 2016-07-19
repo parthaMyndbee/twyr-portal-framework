@@ -28,7 +28,7 @@ exports.config = ({
 	},
 
 	'ember-stuff': {
-		'path': './modules/ember-stuff'
+		'path': './ember-stuff'
 	},
 
 	'apiServer': {

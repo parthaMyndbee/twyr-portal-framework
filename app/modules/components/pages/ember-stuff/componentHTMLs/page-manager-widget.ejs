@@ -65,7 +65,7 @@
 		</button>
 	{{/if}}
 
-	{{#unless page.isNew}}
+	{{#unless model.isNew}}
 	<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "deletePage" model.id bubbles=false}}>
 		<i class="fa fa-trash-o" />
 		<span style="font-size:12px;">Delete</span>

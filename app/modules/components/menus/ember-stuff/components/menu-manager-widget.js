@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/menu-manager-widget',
-	['exports', 'ember', 'twyr-webapp/application'],
-	function(exports, _ember, _app) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/menu-manager-widget');
-		var MenuManagerWidget = _ember['default'].Component.extend({
+		var MenuManagerWidget = _baseWidget['default'].extend({
 			'_menuListDataTable': null,
 
 			'didRender': function() {
@@ -193,6 +193,14 @@ define(
 					'confirm': function() {
 						self.get('model').store.findRecord('menus-default', menuId)
 						.then(function(menu) {
+							menu.set('isEditing', false);
+							_ember['default'].run.scheduleOnce('afterRender', function() {
+								if(!self.$('li.menu-manager-widget-list-tab a').length)
+									return;
+
+								(self.$('li.menu-manager-widget-list-tab a')[0]).click();
+							});
+
 							return menu.destroyRecord();
 						})
 						.then(function() {
@@ -212,18 +220,8 @@ define(
 						});
 					},
 
-					'cancel': function() {
-					}
+					'cancel': function() {}
 				});
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 
@@ -233,10 +231,10 @@ define(
 
 define(
 	'twyr-webapp/components/menu-edit-widget',
-	['exports', 'ember', 'twyr-webapp/application'],
-	function(exports, _ember, _app) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/menu-edit-widget');
-		var MenuEditWidget = _ember['default'].Component.extend({
+		var MenuEditWidget = _baseWidget['default'].extend({
 			'didRender': function() {
 				var typeSelectElem = _ember['default'].$('select#menu-edit-widget-select-type-' + this.get('model').get('id')),
 					statusSelectElem = _ember['default'].$('select#menu-edit-widget-select-status-' + this.get('model').get('id')),
@@ -349,15 +347,6 @@ define(
 				self._super(...arguments);
 
 				self.get('model').set('isEditing', false);
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 

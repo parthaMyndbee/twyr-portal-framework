@@ -1,9 +1,9 @@
 define(
 	'twyr-webapp/components/module-tree-widget',
-	['exports', 'ember', 'twyr-webapp/application'],
-	function(exports, _ember, _app) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/module-tree-widget');
-		var ModuleTreeWidget = _ember['default'].Component.extend({
+		var ModuleTreeWidget = _baseWidget['default'].extend({
 			'didRender': function() {
 				var self = this;
 				self._super(...arguments);
@@ -49,15 +49,6 @@ define(
 				self._super(...arguments);
 
 				self.$('div#module-tree-container').jstree(true).destroy();
-			},
-
-			'actions': {
-				'controller-action': function(action, data) {
-					if(this[action])
-						this[action](data);
-					else
-						this.sendAction('controller-action', action, data);
-				}
 			}
 		});
 
