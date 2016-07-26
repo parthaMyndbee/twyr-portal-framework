@@ -1,3 +1,71 @@
 <script type="text/x-handlebars" data-template-name="components/horizontal-menu-manager-widget">
-<div>Horizontal Menu Manager Widget</div>
+<div class="row" style="margin:0px; border-top:1px solid #f1f1f1;">
+	<div class="col-sm-3" id="horizontal-menu-manager-widget-available-component-menus-{{model.id}}" style="text-align:center; max-height:400px; overflow-y:auto;">
+		{{#each _availableMenus as |componentMenu|}}
+			<div id={{componentMenu.id}} class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="{{componentMenu.tooltip}}">
+				<span class="info-box-icon bg-blue">
+					<i class="{{componentMenu.iconClass}}" />
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text">{{componentMenu.displayName}}</span>
+					<span class="description">{{componentMenu.description}}</span>
+				</div>
+			</div>
+		{{/each}}
+			<div id="empty-menu-item" class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="Empty Menu Item">
+				<span class="info-box-icon bg-blue">
+					<i class="fa fa-bars" />
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text">Empty Menu Item</span>
+					<span class="description">Drag this to create Menu Items not linked to the ones created by the components</span>
+				</div>
+			</div>
+	</div>
+	<div class="col-sm-9" style="padding-top:20px;">
+		<ul class="nav navbar-nav dragula-container" id="horizontal-menu-manager-widget-{{model.id}}" style="min-height:50px; width:100%; background-color:#f8f8f8;">
+		{{#each sortedMenuItems as |menuItem index|}}
+		{{#unless menuItem.parent}}
+			{{horizontal-menu-item-widget model=menuItem controller-action="controller-action"}}
+		{{/unless}}
+		{{/each}}
+		</ul>
+	</div>
+</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/horizontal-menu-item-widget">
+<a id="{{model.id}}" href="#">
+	{{#if model.componentMenu}}
+		<span class="{{model.componentMenu.iconClass}}" style="margin-right:5px;" />
+		{{model.componentMenu.displayName}}
+
+		{{#if model.componentMenu.children.length}}
+			<span class="fa fa-caret-down" style="margin-left:5px;" />
+		{{/if}}
+	{{else}}
+		<span class="{{model.iconClass}}" style="margin-right:5px;" />
+		{{model.displayName}}
+		<span class="fa fa-caret-down" style="margin-left:5px;" />
+	{{/if}}
+</a>
+{{#if isExpanded}}
+	{{#if model.componentMenu}}
+		{{#if model.componentMenu.children.length}}
+		<ul class="dropdown-menu">
+			{{#each model.componentMenu.children as |menuItem|}}
+				{{horizontal-menu-item-widget model=menuItem controller-action="controller-action"}}
+				<li class="divider" />
+			{{/each}}
+		</ul>
+		{{/if}}
+	{{else}}
+	<ul class="dropdown-menu dragula-container" style="min-height:100px; width:100%;">
+		{{#each sortedMenuItems as |menuItem|}}
+			{{horizontal-menu-item-widget model=menuItem controller-action="controller-action"}}
+			<li class="divider" />
+		{{/each}}
+	</ul>
+	{{/if}}
+{{/if}}
 </script>

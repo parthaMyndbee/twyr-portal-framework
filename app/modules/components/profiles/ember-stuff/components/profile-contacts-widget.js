@@ -4,7 +4,7 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/profile-contacts-widget');
 		var ProfileContactsWidget = _baseWidget['default'].extend({
-			'didRender': function() {
+			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
 
@@ -74,7 +74,7 @@ define(
 
 			'add': function() {
 				var self = this,
-					newProfileContact = this.get('model').store.createRecord('profile-contact', {
+					newProfileContact = this.get('store').createRecord('profile-contact', {
 						'id': _app['default'].UUID(),
 						'profile': this.get('model'),
 

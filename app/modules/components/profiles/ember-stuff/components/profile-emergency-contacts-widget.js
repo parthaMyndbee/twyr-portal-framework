@@ -4,7 +4,7 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/profile-emergency-contacts-widget');
 		var ProfileEmergencyContactsWidget = _baseWidget['default'].extend({
-			'didRender': function() {
+			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
 
@@ -121,7 +121,7 @@ define(
 
 			'add': function() {
 				var self = this,
-					newProfileEmergencyContact = this.get('model').store.createRecord('profile-emergency-contact', {
+					newProfileEmergencyContact = this.get('store').createRecord('profile-emergency-contact', {
 						'id': _app['default'].UUID(),
 						'profile': this.get('model'),
 

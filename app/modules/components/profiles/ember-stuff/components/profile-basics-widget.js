@@ -8,7 +8,7 @@ define(
 			'_enableCroppieUpdates': false,
 			'_profileImageUploadTimeout': null,
 
-			'didRender': function() {
+			'didInsertElement': function() {
 				this._super(...arguments);
 
 				var genderSelectElem = _ember['default'].$('select#profile-basics-widget-select-gender'),

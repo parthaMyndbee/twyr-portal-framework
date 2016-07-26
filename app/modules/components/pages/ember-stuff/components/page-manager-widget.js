@@ -6,7 +6,7 @@ define(
 		var PageManagerWidget = _baseWidget['default'].extend({
 			'_pageListDataTable': null,
 
-			'didRender': function() {
+			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
 
@@ -91,9 +91,9 @@ define(
 				var self = this,
 					newPage = null;
 
-				self.get('model').store.findRecord('profile', window.twyrUserId)
+				self.get('store').findRecord('profile', window.twyrUserId)
 				.then(function(profile) {
-					newPage = self.get('model').store.createRecord('pages-default', {
+					newPage = self.get('store').createRecord('pages-default', {
 						'id': _app['default'].UUID(),
 						'author': profile
 					});
@@ -120,7 +120,7 @@ define(
 					event.preventDefault();
 				}
 
-				self.get('model').store.findRecord('pages-default', pageId)
+				self.get('store').findRecord('pages-default', pageId)
 				.then(function(page) {
 					page.set('isEditing', true);
 					_ember['default'].run.scheduleOnce('afterRender', function() {
@@ -203,7 +203,7 @@ define(
 					'cancelButtonClass': 'btn btn-flat btn-primary',
 
 					'confirm': function() {
-						self.get('model').store.findRecord('pages-default', pageId)
+						self.get('store').findRecord('pages-default', pageId)
 						.then(function(page) {
 							return page.destroyRecord();
 						})
@@ -242,7 +242,7 @@ define(
 		var PageEditWidget = _baseWidget['default'].extend({
 			'_ckEditor': null,
 
-			'didRender': function() {
+			'didInsertElement': function() {
 				var statusSelectElem = _ember['default'].$('select#page-edit-widget-select-status-' + this.get('model').get('id')),
 					permissionSelectElem = _ember['default'].$('select#page-edit-widget-select-permission-' + this.get('model').get('id')),
 					contentEditElem = _ember['default'].$('textarea#page-edit-widget-textarea-content-' + this.get('model').get('id')),

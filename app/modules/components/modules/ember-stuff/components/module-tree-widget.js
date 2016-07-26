@@ -4,7 +4,7 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/module-tree-widget');
 		var ModuleTreeWidget = _baseWidget['default'].extend({
-			'didRender': function() {
+			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
 

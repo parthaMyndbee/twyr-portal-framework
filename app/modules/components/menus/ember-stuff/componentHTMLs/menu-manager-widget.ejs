@@ -30,7 +30,7 @@
 			{{/each}}
 		</ul>
 
-		<div class="tab-content" style="padding:0px; padding-bottom:10px;">
+		<div class="tab-content" style="padding:0px;">
 			{{#each model as |menu|}}
 			{{#if menu.isEditing}}
 			<div class="menu-manager-widget-list-div tab-pane fade" role="tabpanel" id="menu-manager-widget-list-{{menu.id}}-div">
@@ -43,59 +43,3 @@
 {{/if}}
 </script>
 
-
-<script type="text/x-handlebars" data-template-name="components/menu-edit-widget">
-<div class="row" style="margin:0px; padding:10px 0px;">
-	<div class="col-sm-12" style="text-align:right;">
-	{{#if model.hasDirtyAttributes}}
-		<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "saveMenu" model bubbles=false}}>
-			<i class="fa fa-save" />
-			<span style="font-size:12px;">Save</span>
-		</button>
-
-		<button type="button" id="button-cancel" class="btn btn-flat btn-warning btn-sm" {{action "controller-action" "stopEditMenu" model bubbles=false}}>
-			<i class="fa fa-undo" />
-			<span style="font-size:12px;">Cancel</span>
-		</button>
-	{{else}}
-		<button type="button" id="button-cancel" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "stopEditMenu" model bubbles=false}}>
-			<i class="fa fa-close-o" />
-			<span style="font-size:12px;">Finished</span>
-		</button>
-	{{/if}}
-
-	{{#unless model.isNew}}
-	<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "deleteMenu" model.id bubbles=false}}>
-		<i class="fa fa-trash-o" />
-		<span style="font-size:12px;">Delete</span>
-	</button>
-	{{/unless}}
-	</div>
-</div>
-
-<div class="row" style="margin:0px;">
-	<div class="form-group col-sm-6">
-		<label>Name</label>
-		{{input type="text" value=model.name class="form-control"}}
-	</div>
-
-	<div class="form-group col-sm-2">
-		<label>Type</label>
-		<select id="menu-edit-widget-select-type-{{model.id}}" class="form-control" style="width:100%;" />
-	</div>
-
-	<div class="form-group col-sm-2">
-		<label>Status</label>
-		<select id="menu-edit-widget-select-status-{{model.id}}" class="form-control" style="width:100%;" />
-	</div>
-
-	<div class="form-group col-sm-2">
-		<label>Permission</label>
-		<select id="menu-edit-widget-select-permission-{{model.id}}" class="form-control" style="width:100%;" />
-	</div>
-</div>
-
-<div class="row" style="margin:0px;">
-{{component model.menuEditorWidget model=model controller-action="controller-action"}}
-</div>
-</script>

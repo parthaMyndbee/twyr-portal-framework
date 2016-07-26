@@ -11,7 +11,7 @@ define(
 				if(self.get('_selectedModule') && (self.get('_selectedModule').get('id') == moduleId))
 					return;
 
-				self.get('model').store
+				self.get('store')
 				.findRecord('module', moduleId)
 				.then(function(module) {
 					self.set('_selectedModule', module);
