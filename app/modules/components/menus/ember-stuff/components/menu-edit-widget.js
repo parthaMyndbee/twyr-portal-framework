@@ -109,6 +109,8 @@ define(
 				.fail(function() {
 					console.error(window.apiServer + 'masterdata/server-permissions error:\n', arguments);
 				});
+
+				self.get('model').get('hasDirtyAttributes');
 			},
 
 			'willDestroyElement': function() {
@@ -116,7 +118,26 @@ define(
 				self._super(...arguments);
 
 				self.get('model').set('isEditing', false);
-			}
+			},
+
+			'menuStateChanged': _ember['default'].observer('model.hasDirtyAttributes', 'model.menuItems.@each.hasDirtyAttributes', function() {
+				var self = this;
+
+				self.get('model').get('menuItems')
+				.then(function(menuItems) {
+					self.get('model').set('shouldEnableSave', (self.get('model').get('hasDirtyAttributes') || (!!menuItems.filterBy('hasDirtyAttributes', true).length)));
+					return null;
+				})
+				.catch(function(err) {
+					self.get('model').set('shouldEnableSave', false);
+
+					console.error(err);
+					self.sendAction('controller-action', 'display-status-message', {
+						'type': 'danger',
+						'message': err.message
+					});
+				});
+			})
 		});
 
 		exports['default'] = MenuEditWidget;

@@ -15,9 +15,9 @@ define(
 
 				self._pageListDataTable = self.$('table#pages-default-page-list').DataTable({
 					'ajax': window.apiServer + 'pages/list',
+					'rowId': 'id',
 
 					'columns': [
-						{ 'data': 'id' },
 						{ 'data': 'title' },
 						{ 'data': 'author' },
 						{ 'data': 'status' },
@@ -26,11 +26,7 @@ define(
 					],
 
 					'columnDefs': [{
-						'targets': [0],
-						'visible': false,
-						'searchable': false
-					}, {
-						'targets': [6],
+						'targets': [5],
 						'searchable': false,
 
 						'render': function(whatever, type, row) {

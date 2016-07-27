@@ -1,7 +1,7 @@
 <script type="text/x-handlebars" data-template-name="components/menu-edit-widget">
 <div class="row" style="margin:0px; padding:10px 0px;">
 	<div class="col-sm-12" style="text-align:right;">
-	{{#if model.hasDirtyAttributes}}
+	{{#if model.shouldEnableSave}}
 		<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "saveMenu" model bubbles=false}}>
 			<i class="fa fa-save" />
 			<span style="font-size:12px;">Save</span>

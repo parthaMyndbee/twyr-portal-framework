@@ -8,6 +8,7 @@ define(
 			'_dragula': null,
 
 			'sortedMenuItems': undefined,
+			'_currentlyExpandedChild': undefined,
 
 			'didInsertElement': function() {
 				var self = this;
@@ -44,16 +45,57 @@ define(
 				self._uninitDragula();
 			},
 
-			'onMenuItemsChanged': _ember['default'].observer('model.menuItems.length', 'model.menuItems.@each.displayOrder', function() {
+			'onMenuItemsChanged': _ember['default'].observer('model.menuItems.[]', 'model.menuItems.@each.displayOrder', function() {
 				var self = this;
 
-				this.get('model').get('menuItems')
+				self.get('model').get('menuItems')
 				.then(function(menuItems) {
-					self.set('sortedMenuItems', menuItems.sortBy('displayOrder'));
+					var children = _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(menuItems.filterBy('parent.id', undefined)) });
+					children = _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(children.sortBy('displayOrder')) });
+
+					if(!self.get('sortedMenuItems')) {
+						self.set('sortedMenuItems', _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(children.sortBy('displayOrder')) }));
+						return;
+					}
+
+					var refresh = false;
+					if(children.get('length') != self.get('sortedMenuItems').get('length')) {
+						refresh = true;
+					}
+					else {
+						children.forEach(function(child, index) {
+							if(child.get('id') != self.get('sortedMenuItems').objectAt(index).get('id'))
+								refresh = true;
+						});
+					}
+
+					if(!refresh) return;
+					self.set('sortedMenuItems', _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(children.sortBy('displayOrder')) }));
 				})
 				.catch(function(err) {
 					self.set('sortedMenuItems', undefined);
+					self.sendAction('controller-action', 'display-status-message', {
+						'type': 'danger',
+						'message': err.message
+					});
 				});
+			}),
+
+			'onChildExpandedChanged': _ember['default'].observer('sortedMenuItems.@each.isExpanded', function() {
+				var self = this;
+				if(self.get('_currentlyExpandedChild')) {
+					self.get('_currentlyExpandedChild').set('isExpanded', false);
+					self.set('_currentlyExpandedChild', undefined);
+				}
+
+				if(self.get('sortedMenuItems')) {
+					self.get('sortedMenuItems').forEach(function(child) {
+						if(!child.get('isExpanded'))
+							return;
+
+						self.set('_currentlyExpandedChild', child);
+					});
+				}
 			}),
 
 			'_initDragula': function() {
@@ -91,13 +133,21 @@ define(
 
 						element.remove();
 
-						self.set('sortedMenuItems', undefined);
-						_ember['default'].run.scheduleOnce('afterRender', function() {
+						if(!parentId) {
+							self.set('sortedMenuItems', undefined);
+							_ember['default'].run.scheduleOnce('afterRender', function() {
+								self['add-menu-item']({
+									'componentMenuId': componentMenuId,
+									'parentId': parentId
+								});
+							});
+						}
+						else {
 							self['add-menu-item']({
 								'componentMenuId': componentMenuId,
 								'parentId': parentId
 							});
-						});
+						}
 
 						return;
 					}
@@ -113,11 +163,30 @@ define(
 					var menuItemId = window.$(window.$(element).children('a')[0]).attr('id'),
 						menuItem = (self.get('store').peekAll('menu-item').filterBy('id', menuItemId))[0];
 
-					self.set('sortedMenuItems', undefined);
-					_ember['default'].run.scheduleOnce('afterRender', function() {
-						self['remove-menu-item']({
-							'menuItem': menuItem,
-							'source': source
+					menuItem.get('parent')
+					.then(function(parent) {
+						if(!parent) {
+							self.set('sortedMenuItems', undefined);
+							_ember['default'].run.scheduleOnce('afterRender', function() {
+								self['remove-menu-item']({
+									'menuItem': menuItem,
+									'source': source
+								});
+							});
+						}
+						else {
+							self['remove-menu-item']({
+								'menuItem': menuItem,
+								'source': source
+							});
+						}
+
+						return null;
+					})
+					.catch(function(err) {
+						self.sendAction('controller-action', 'display-status-message', {
+							'type': 'danger',
+							'message': err.message
 						});
 					});
 				});
@@ -145,13 +214,6 @@ define(
 				self.get('model').get('menuItems')
 				.then(function(menuItems) {
 					menuItems.addObject(menuItem);
-					if(!parentMenuItem) return null;
-
-					return parentMenuItem.get('children');
-				})
-				.then(function(children) {
-					if(!children) return null;
-					children.addObject(menuItem);
 				})
 				.catch(function(err) {
 					self.sendAction('controller-action', 'display-status-message', {
@@ -181,17 +243,6 @@ define(
 
 				self.get('model').get('menuItems')
 				.then(function(menuItems) {
-					menuItems.removeObject(data.menuItem);
-					return data.menuItem.get('parent');
-				})
-				.then(function(parent) {
-					if(!parent) return null;
-					return parent.get('children');
-				})
-				.then(function(children) {
-					if(!children) return null;
-
-					children.removeObject(data.menuItem);
 					data.menuItem.deleteRecord();
 					return null;
 				})
@@ -216,10 +267,14 @@ define(
 		var HorizontalMenuItemWidget = _baseWidget['default'].extend({
 			'tagName': 'li',
 			'classNames': ['dropdown'],
-			'classNameBindings': ['isExpanded:open'],
-			'isExpanded': false,
+			'classNameBindings': ['model.isExpanded:open'],
+
+			'isHorizontal': false,
+			'isVertical': false,
+			'caretClass': 'fa fa-caret-down',
 
 			'sortedMenuItems': undefined,
+			'_currentlyExpandedChild': undefined,
 
 			'didInsertElement': function() {
 				var self = this;
@@ -228,6 +283,16 @@ define(
 				self.get('model').get('children')
 				.then(function(menuItems) {
 					self.set('sortedMenuItems', menuItems.sortBy('displayOrder'));
+					self.set('isHorizontal', (self.get('orientation') == 'horizontal'));
+					self.set('isVertical', (self.get('orientation') == 'vertical'));
+
+					if(self.get('orientation') == 'vertical') {
+						self.set('caretClass', 'fa fa-caret-down');
+					}
+
+					if(self.get('orientation') == 'horizontal') {
+						self.set('caretClass', 'fa fa-caret-right');
+					}
 				})
 				.catch(function(err) {
 					self.set('sortedMenuItems', undefined);
@@ -244,7 +309,7 @@ define(
 
 				var self = this;
 				self.set('sortedMenuItems', undefined);
-				self.set('isExpanded', !this.get('isExpanded'));
+				self.get('model').set('isExpanded', !self.get('model').get('isExpanded'));
 
 				_ember['default'].run.scheduleOnce('afterRender', function() {
 					self.get('model').get('children')
@@ -261,24 +326,103 @@ define(
 				});
 			},
 
-			'onMenuItemsChanged': _ember['default'].observer('model.children.length', 'model.children.@each.displayOrder', function() {
-				var self = this;
-				self.set('sortedMenuItems', undefined);
+			'doubleClick': function(event) {
+				event.stopPropagation();
+				event.preventDefault();
 
-				_ember['default'].run.scheduleOnce('afterRender', function() {
-					self.get('model').get('children')
-					.then(function(menuItems) {
-						self.set('sortedMenuItems', menuItems.sortBy('displayOrder'));
-					})
-					.catch(function(err) {
-						self.set('sortedMenuItems', undefined);
-						self.sendAction('controller-action', 'display-status-message', {
-							'type': 'danger',
-							'message': err.message
+				var self = this;
+				self.get('model').get('componentMenu')
+				.then(function(componentMenu) {
+					if(componentMenu) {
+						return null;
+					}
+
+					self.sendAction('controller-action', 'editMenuItem', self.get('model'));
+				})
+				.catch(function(err) {
+					console.error(err);
+					self.sendAction('controller-action', 'display-status-message', {
+						'type': 'danger',
+						'message': err.message
+					});
+				});
+			},
+
+			'caretClassChanged': _ember['default'].observer('model.isExpanded', function() {
+				if(this.get('orientation') == 'vertical') {
+					if(this.get('model').get('isExpanded'))
+						this.set('caretClass', 'fa fa-caret-up');
+					else
+						this.set('caretClass', 'fa fa-caret-down');
+				}
+
+				if(this.get('orientation') == 'horizontal') {
+					if(this.get('model').get('isExpanded'))
+						this.set('caretClass', 'fa fa-caret-left');
+					else
+						this.set('caretClass', 'fa fa-caret-right');
+				}
+			}),
+
+			'onMenuItemsChanged': _ember['default'].observer('model.children.[]', 'model.children.@each.displayOrder', function() {
+				var self = this;
+
+				self.get('model').get('children')
+				.then(function(menuItems) {
+					if(!self.get('sortedMenuItems')) {
+						self.set('sortedMenuItems', _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(menuItems.sortBy('displayOrder')) }));
+						return;
+					}
+
+					var refresh = false;
+					if(menuItems.get('length') != self.get('sortedMenuItems').get('length')) {
+						refresh = true;
+					}
+					else {
+						menuItems.forEach(function(child, index) {
+							if(child.get('id') != self.get('sortedMenuItems').objectAt(index).get('id'))
+								refresh = true;
 						});
+					}
+
+					if(!refresh) return;
+					self.set('sortedMenuItems', _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(menuItems.sortBy('displayOrder')) }));
+				})
+				.catch(function(err) {
+					self.set('sortedMenuItems', undefined);
+
+					console.err(err);
+					self.sendAction('controller-action', 'display-status-message', {
+						'type': 'danger',
+						'message': err.message
 					});
 				});
 			}),
+
+			'onChildExpandedChanged': _ember['default'].observer('model.children.@each.isExpanded', function() {
+				var self = this;
+				if(self.get('_currentlyExpandedChild')) {
+					self.get('_currentlyExpandedChild').set('isExpanded', false);
+					self.set('_currentlyExpandedChild', undefined);
+				}
+
+				self.get('model').get('children')
+				.then(function(children) {
+					children.forEach(function(child) {
+						if(!child.get('isExpanded'))
+							return;
+
+						self.set('_currentlyExpandedChild', child);
+					});
+				})
+				.catch(function(err) {
+					self.set('_currentlyExpandedChild', undefined);
+					self.sendAction('controller-action', 'display-status-message', {
+						'type': 'danger',
+						'message': err.message
+					});
+				});
+			})
 		});
 
 		exports['default'] = HorizontalMenuItemWidget;

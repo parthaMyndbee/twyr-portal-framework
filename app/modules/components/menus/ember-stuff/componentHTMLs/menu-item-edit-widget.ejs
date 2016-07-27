@@ -1,0 +1,30 @@
+<script type="text/x-handlebars" data-template-name="components/menu-item-edit-widget">
+<div class="box box-solid" style="text-align:left; box-shadow:none; margin-bottom:0px;">
+<div class="box-body">
+	<div class="form-group">
+		<label>Icon Class (FontAwesome)</label>
+		<div class="input-group">
+			<div class="input-group-addon">
+				<i class="{{model.iconClass}}" />
+			</div>
+			{{input type="text" value=model.iconClass class="form-control"}}
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label>Display Name</label>
+		{{input type="text" value=model.displayName class="form-control"}}
+	</div>
+
+	<div class="form-group">
+		<label>Tooltip</label>
+		{{input type="text" value=model.tooltip class="form-control"}}
+	</div>
+
+	<div class="form-group">
+		<label>Description</label>
+		{{input type="text" value=model.description class="form-control"}}
+	</div>
+</div>
+</div>
+</script>

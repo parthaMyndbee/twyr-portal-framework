@@ -221,6 +221,7 @@ var menusComponent = prime({
 			if(hasPermission) {
 				return promises.all([
 					filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/menu-edit-widget.ejs'), 'utf8'),
+					filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/menu-item-edit-widget.ejs'), 'utf8'),
 					filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/menu-manager-widget.ejs'), 'utf8')
 				]);
 			}

@@ -2,7 +2,6 @@
 <table class="table table-bordered table-hover dataTable" id="menus-default-menu-list">
 <thead>
 	<tr>
-		<th>Id</th>
 		<th>Name</th>
 		<th>Component</th>
 		<th>Created</th>
@@ -20,7 +19,7 @@
 				<li class="menu-manager-widget-list-tab" role="presentation" id="menu-manager-widget-list-{{menu.id}}-link">
 					<a href="#menu-manager-widget-list-{{menu.id}}-div" role="tab" data-toggle="tab">
 						{{menu.name}}
-						{{#if menu.hasDirtyAttributes}}
+						{{#if menu.shouldEnableSave}}
 						*
 						{{/if}}
 						<i class="fa fa-close" style="margin-left:10px; color:#dd4b39; cursor:pointer;" {{action "controller-action" "stopEditMenu" menu bubbles=false}} />
@@ -41,5 +40,24 @@
 		</div>
 	</div>
 {{/if}}
+
+<div class="modal fade" id="menu-manager-widget-dialog-menu-item-editor" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<i class="{{currentlyEditingMenuItem.iconClass}}" />
+					{{currentlyEditingMenuItem.displayName}}
+				</h4>
+			</div>
+			<div class="modal-body">
+				{{menu-item-edit-widget model=currentlyEditingMenuItem controller-action="controller-action"}}
+			</div>
+			<div class="modal-footer" style="margin-top:0px;">
+				<button type="button" class="btn btn-default" {{action "controller-action" "stopEditMenuItem" currentlyEditingMenuItem bubbles=false}}>Close</button>
+			</div>
+		</div>
+	</div>
+</div>
 </script>
 

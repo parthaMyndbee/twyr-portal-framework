@@ -5,19 +5,22 @@ define(
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/menu-manager-widget');
 		var MenuManagerWidget = _baseWidget['default'].extend({
 			'_menuListDataTable': null,
+			'currentlyEditingMenuItem': undefined,
+
+			'_menuCache': _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }),
 
 			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
 
-				if(self._menuListDataTable)
+				if(self.get('_menuListDataTable'))
 					return;
 
-				self._menuListDataTable = self.$('table#menus-default-menu-list').DataTable({
+				self.set('_menuListDataTable', self.$('table#menus-default-menu-list').DataTable({
 					'ajax': window.apiServer + 'menus/list',
+					'rowId': 'id',
 
 					'columns': [
-						{ 'data': 'id' },
 						{ 'data': 'name' },
 						{ 'data': 'component' },
 						{ 'data': 'created' },
@@ -26,10 +29,42 @@ define(
 
 					'columnDefs': [{
 						'targets': [0],
-						'visible': false,
-						'searchable': false
+
+						'render': function(data, type, row) {
+							var menu = self.get('_menuCache').get(row.id);
+							if(!menu) {
+								self.get('store').findRecord('menus-default', row.id)
+								.then(function(menuRecord) {
+									menuRecord.addObserver('shouldEnableSave', function() {
+										var newName = menuRecord.get('name');
+										if(menuRecord.get('shouldEnableSave'))
+											newName += ' *';
+
+										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
+										self.get('_menuListDataTable').cell(tblRow.index(), 0).data(newName);
+									});
+
+									menuRecord.addObserver('name', function() {
+										var newName = menuRecord.get('name');
+										if(menuRecord.get('shouldEnableSave'))
+											newName += ' *';
+
+										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
+										self.get('_menuListDataTable').cell(tblRow.index(), 0).data(newName);
+									});
+
+									self.get('_menuCache').set(row.id, menuRecord);
+								})
+								.catch(function(err) {
+									console.error(err);
+								});
+							}
+
+							return data;
+						}
 					}, {
-						'targets': [5],
+						'targets': [4],
+						'sortable': false,
 						'searchable': false,
 
 						'render': function(whatever, type, row) {
@@ -40,23 +75,23 @@ define(
 					'order': [
 						[ 1, 'asc' ]
 					]
-				});
+				}));
 
 				var addMenuButton = self.$('<button type="button" class="btn btn-flat btn-sm btn-success" style="margin-left:5px;" />');
 				addMenuButton.html('<span class="fa fa-plus" style="margin-right:3px;" />New Menu');
 				addMenuButton.click(self.addMenu.bind(self));
 				self.$('div.dataTables_filter').append(addMenuButton);
 
-				self._menuListDataTable.on('draw.dt', self._setupRowOperations.bind(self));
+				self.get('_menuListDataTable').on('draw.dt', self._setupRowOperations.bind(self));
 			},
 
 			'willDestroyElement': function() {
 				var self = this;
 				self._super(...arguments);
 
-				if(self._menuListDataTable) {
-					self._menuListDataTable.destroy();
-					self._menuListDataTable = null;
+				if(self.get('_menuListDataTable')) {
+					self.get('_menuListDataTable').destroy();
+					self.set('_menuListDataTable', null);
 				}
 			},
 
@@ -127,18 +162,42 @@ define(
 			'stopEditMenu': function(menu) {
 				var self = this,
 					confirmFn = function() {
-						menu.set('isEditing', false);
-						menu.rollbackAttributes();
+						menu.get('menuItems')
+						.then(function(menuItems) {
+							var menuItemsIds = _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) });
+							menuItems.forEach(function(menuItem) {
+								menuItemsIds.addObject(menuItem.get('id'));
+							});
 
-						_ember['default'].run.scheduleOnce('afterRender', function() {
-							if(!self.$('li.menu-manager-widget-list-tab a').length)
-								return;
+							menu.rollbackAttributes();
+							menuItemsIds.forEach(function(menuItemId) {
+								var menuItem = self.get('store').peekRecord('menu-item', menuItemId);
+								menuItem.rollbackAttributes();
+							});
 
-							(self.$('li.menu-manager-widget-list-tab a')[0]).click();
+							return null;
+						})
+						.then(function() {
+							_ember['default'].run.scheduleOnce('afterRender', function() {
+								if(!self.$('li.menu-manager-widget-list-tab a').length)
+									return;
+
+								(self.$('li.menu-manager-widget-list-tab a')[0]).click();
+							});
+						})
+						.catch(function(err) {
+							console.error(err);
+							self.sendAction('controller-action', 'display-status-message', {
+								'type': 'danger',
+								'message': err.message
+							});
+						})
+						.finally(function() {
+							menu.set('isEditing', false);
 						});
 					};
 
-				if(!menu.get('hasDirtyAttributes')) {
+				if(!menu.get('shouldEnableSave')) {
 					confirmFn();
 					return;
 				}
@@ -159,7 +218,10 @@ define(
 				var self = this;
 				menu.save()
 				.then(function() {
-					return self._menuListDataTable.ajax.reload(null, false);
+					return menu.get('menuItems');
+				})
+				.then(function(menuItems) {
+					return menuItems.save();
 				})
 				.then(function() {
 					self.sendAction('controller-action', 'display-status-message', {
@@ -172,6 +234,10 @@ define(
 						'type': 'ember-error',
 						'errorModel': menu
 					});
+				})
+				.finally(function() {
+					self.set('_menuCache', _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }));
+					self.get('_menuListDataTable').ajax.reload(null, false);
 				});
 			},
 
@@ -204,7 +270,8 @@ define(
 							return menu.destroyRecord();
 						})
 						.then(function() {
-							return self._menuListDataTable.ajax.reload(null, false);
+							self.set('_menuCache', _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }));
+							return self.get('_menuListDataTable').ajax.reload(null, false);
 						})
 						.then(function() {
 							self.sendAction('controller-action', 'display-status-message', {
@@ -222,7 +289,48 @@ define(
 
 					'cancel': function() {}
 				});
-			}
+			},
+
+			'editMenuItem': function(menuItem) {
+				this.stopEditMenuItem();
+
+				this.set('currentlyEditingMenuItem', menuItem);
+				this.$('div#menu-manager-widget-dialog-menu-item-editor').modal({
+					'backdrop': 'static',
+					'keyboard': false
+				});
+			},
+
+			'stopEditMenuItem': function(menuItem) {
+				if(!menuItem) {
+					return;
+				}
+
+				if(menuItem.get('isNew') || !menuItem.get('hasDirtyAttributes')) {
+					this.$('div#menu-manager-widget-dialog-menu-item-editor').modal('hide');
+					this.set('currentlyEditingMenuItem', null);
+					return;
+				}
+
+				var self = this;
+				window.$.confirm({
+					'title': 'Cancel Menu Item changes?',
+					'text': 'Are you sure you want to stop editing this menu item? You will lose any changes you have already made',
+
+					'confirmButtonClass': 'btn btn-flat btn-danger',
+					'cancelButtonClass': 'btn btn-flat btn-primary',
+
+					'confirm': function() {
+						self.$('div#menu-manager-widget-dialog-menu-item-editor').modal('hide');
+
+						self.get('currentlyEditingMenuItem').rollbackAttributes();
+						self.set('currentlyEditingMenuItem', null);
+					},
+
+					'cancel': function() {
+					}
+				});
+			},
 		});
 
 		exports['default'] = MenuManagerWidget;
