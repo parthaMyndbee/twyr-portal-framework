@@ -5,15 +5,16 @@ define(
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/page-manager-widget');
 		var PageManagerWidget = _baseWidget['default'].extend({
 			'_pageListDataTable': null,
+			'_pageCache': _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }),
 
 			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
 
-				if(self._pageListDataTable)
+				if(self.get('_pageListDataTable'))
 					return;
 
-				self._pageListDataTable = self.$('table#pages-default-page-list').DataTable({
+				self.set('_pageListDataTable', self.$('table#pages-default-page-list').DataTable({
 					'ajax': window.apiServer + 'pages/list',
 					'rowId': 'id',
 
@@ -21,13 +22,79 @@ define(
 						{ 'data': 'title' },
 						{ 'data': 'author' },
 						{ 'data': 'status' },
+						{ 'data': 'permission' },
 						{ 'data': 'created' },
 						{ 'data': 'updated' }
 					],
 
 					'columnDefs': [{
-						'targets': [5],
+						'targets': [0],
+
+						'render': function(data, type, row) {
+							var page = self.get('_pageCache').get(row.id);
+							if(!page) {
+								self.get('store').findRecord('pages-default', row.id)
+								.then(function(pageRecord) {
+									pageRecord.addObserver('hasDirtyAttributes', function() {
+										var newTitle = pageRecord.get('title');
+										var newStatus = _ember['default'].String.capitalize(pageRecord.get('status'));
+
+										if(pageRecord.get('hasDirtyAttributes'))
+											newTitle += ' *';
+
+										var tblRow = self.get('_pageListDataTable').row(pageRecord.get('id'));
+										self.get('_pageListDataTable').cell(tblRow.index(), 0).data(newTitle);
+										self.get('_pageListDataTable').cell(tblRow.index(), 2).data(newStatus);
+
+										self.get('store').findRecord('module-permission', pageRecord.get('permission'))
+										.then(function(permission) {
+											self.get('_pageListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+										})
+										.catch(function(err) {
+											console.error(err);
+										});
+									});
+
+									pageRecord.addObserver('title', function() {
+										var newTitle = pageRecord.get('title');
+										if(pageRecord.get('hasDirtyAttributes'))
+											newTitle += ' *';
+
+										var tblRow = self.get('_pageListDataTable').row(pageRecord.get('id'));
+										self.get('_pageListDataTable').cell(tblRow.index(), 0).data(newTitle);
+									});
+
+									pageRecord.addObserver('status', function() {
+										var newStatus = _ember['default'].String.capitalize(pageRecord.get('status'));
+
+										var tblRow = self.get('_pageListDataTable').row(pageRecord.get('id'));
+										self.get('_pageListDataTable').cell(tblRow.index(), 2).data(newStatus);
+									});
+
+									pageRecord.addObserver('permission', function() {
+										self.get('store').findRecord('module-permission', pageRecord.get('permission'))
+										.then(function(permission) {
+											var tblRow = self.get('_pageListDataTable').row(pageRecord.get('id'));
+											self.get('_pageListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+										})
+										.catch(function(err) {
+											console.error(err);
+										});
+									});
+
+									self.get('_pageCache').set(row.id, pageRecord);
+								})
+								.catch(function(err) {
+									console.error(err);
+								});
+							}
+
+							return data;
+						}
+					}, {
+						'targets': [6],
 						'searchable': false,
+						'sortable': false,
 
 						'render': function(whatever, type, row) {
 							return '<div class="page-row-operations" id="' + row.id + '" style="width:100%; text-align:right;" />';
@@ -35,25 +102,25 @@ define(
 					}],
 
 					'order': [
-						[ 1, 'asc' ]
+						[ 0, 'asc' ]
 					]
-				});
+				}));
 
 				var addPageButton = self.$('<button type="button" class="btn btn-flat btn-sm btn-success" style="margin-left:5px;" />');
 				addPageButton.html('<span class="fa fa-plus" style="margin-right:3px;" />New Page');
 				addPageButton.click(self.addPage.bind(self));
 				self.$('div.dataTables_filter').append(addPageButton);
 
-				self._pageListDataTable.on('draw.dt', self._setupRowOperations.bind(self));
+				self.get('_pageListDataTable').on('draw.dt', self._setupRowOperations.bind(self));
 			},
 
 			'willDestroyElement': function() {
 				var self = this;
 				self._super(...arguments);
 
-				if(self._pageListDataTable) {
-					self._pageListDataTable.destroy();
-					self._pageListDataTable = null;
+				if(self.get('_pageListDataTable')) {
+					self.get('_pageListDataTable').destroy();
+					self.set('_pageListDataTable', null);
 				}
 			},
 
@@ -167,7 +234,8 @@ define(
 				var self = this;
 				page.save()
 				.then(function() {
-					return self._pageListDataTable.ajax.reload(null, false);
+					self.set('_pageCache', _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }));
+					return self.get('_pageListDataTable').ajax.reload(null, false);
 				})
 				.then(function() {
 					self.sendAction('controller-action', 'display-status-message', {
@@ -201,10 +269,12 @@ define(
 					'confirm': function() {
 						self.get('store').findRecord('pages-default', pageId)
 						.then(function(page) {
+							page.set('isEditing', false);
 							return page.destroyRecord();
 						})
 						.then(function() {
-							return self._pageListDataTable.ajax.reload(null, false);
+							self.set('_pageCache', _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }));
+							return self.get('_pageListDataTable').ajax.reload(null, false);
 						})
 						.then(function() {
 							self.sendAction('controller-action', 'display-status-message', {

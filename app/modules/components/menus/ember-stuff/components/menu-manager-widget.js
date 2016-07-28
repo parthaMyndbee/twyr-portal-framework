@@ -4,9 +4,9 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/menu-manager-widget');
 		var MenuManagerWidget = _baseWidget['default'].extend({
-			'_menuListDataTable': null,
 			'currentlyEditingMenuItem': undefined,
 
+			'_menuListDataTable': null,
 			'_menuCache': _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }),
 
 			'didInsertElement': function() {
@@ -22,7 +22,9 @@ define(
 
 					'columns': [
 						{ 'data': 'name' },
-						{ 'data': 'component' },
+						{ 'data': 'type' },
+						{ 'data': 'status' },
+						{ 'data': 'permission' },
 						{ 'data': 'created' },
 						{ 'data': 'updated' }
 					],
@@ -37,11 +39,24 @@ define(
 								.then(function(menuRecord) {
 									menuRecord.addObserver('shouldEnableSave', function() {
 										var newName = menuRecord.get('name');
+										var newType = _ember['default'].String.capitalize(menuRecord.get('type'));
+										var newStatus = _ember['default'].String.capitalize(menuRecord.get('status'));
+
 										if(menuRecord.get('shouldEnableSave'))
 											newName += ' *';
 
 										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
 										self.get('_menuListDataTable').cell(tblRow.index(), 0).data(newName);
+										self.get('_menuListDataTable').cell(tblRow.index(), 1).data(newType);
+										self.get('_menuListDataTable').cell(tblRow.index(), 2).data(newStatus);
+
+										self.get('store').findRecord('module-permission', menuRecord.get('permission'))
+										.then(function(permission) {
+											self.get('_menuListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+										})
+										.catch(function(err) {
+											console.error(err);
+										});
 									});
 
 									menuRecord.addObserver('name', function() {
@@ -51,6 +66,31 @@ define(
 
 										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
 										self.get('_menuListDataTable').cell(tblRow.index(), 0).data(newName);
+									});
+
+									menuRecord.addObserver('type', function() {
+										var newType = _ember['default'].String.capitalize(menuRecord.get('type'));
+
+										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
+										self.get('_menuListDataTable').cell(tblRow.index(), 1).data(newType);
+									});
+
+									menuRecord.addObserver('status', function() {
+										var newStatus = _ember['default'].String.capitalize(menuRecord.get('status'));
+
+										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
+										self.get('_menuListDataTable').cell(tblRow.index(), 2).data(newStatus);
+									});
+
+									menuRecord.addObserver('permission', function() {
+										self.get('store').findRecord('module-permission', menuRecord.get('permission'))
+										.then(function(permission) {
+											var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
+											self.get('_menuListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+										})
+										.catch(function(err) {
+											console.error(err);
+										});
 									});
 
 									self.get('_menuCache').set(row.id, menuRecord);
@@ -63,7 +103,7 @@ define(
 							return data;
 						}
 					}, {
-						'targets': [4],
+						'targets': [6],
 						'sortable': false,
 						'searchable': false,
 
@@ -73,7 +113,7 @@ define(
 					}],
 
 					'order': [
-						[ 1, 'asc' ]
+						[ 0, 'asc' ]
 					]
 				}));
 
@@ -306,30 +346,8 @@ define(
 					return;
 				}
 
-				if(menuItem.get('isNew') || !menuItem.get('hasDirtyAttributes')) {
-					this.$('div#menu-manager-widget-dialog-menu-item-editor').modal('hide');
-					this.set('currentlyEditingMenuItem', null);
-					return;
-				}
-
-				var self = this;
-				window.$.confirm({
-					'title': 'Cancel Menu Item changes?',
-					'text': 'Are you sure you want to stop editing this menu item? You will lose any changes you have already made',
-
-					'confirmButtonClass': 'btn btn-flat btn-danger',
-					'cancelButtonClass': 'btn btn-flat btn-primary',
-
-					'confirm': function() {
-						self.$('div#menu-manager-widget-dialog-menu-item-editor').modal('hide');
-
-						self.get('currentlyEditingMenuItem').rollbackAttributes();
-						self.set('currentlyEditingMenuItem', null);
-					},
-
-					'cancel': function() {
-					}
-				});
+				this.$('div#menu-manager-widget-dialog-menu-item-editor').modal('hide');
+				this.set('currentlyEditingMenuItem', null);
 			},
 		});
 

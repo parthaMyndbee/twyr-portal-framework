@@ -109,8 +109,6 @@ define(
 				.fail(function() {
 					console.error(window.apiServer + 'masterdata/server-permissions error:\n', arguments);
 				});
-
-				self.get('model').get('hasDirtyAttributes');
 			},
 
 			'willDestroyElement': function() {

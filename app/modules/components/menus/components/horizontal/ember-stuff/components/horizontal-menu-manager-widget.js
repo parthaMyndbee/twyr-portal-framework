@@ -214,6 +214,15 @@ define(
 				self.get('model').get('menuItems')
 				.then(function(menuItems) {
 					menuItems.addObject(menuItem);
+
+					_ember['default'].run.scheduleOnce('afterRender', function() {
+						var parentMenu = window.$(window.$('a#' + menuItem.get('id')).parents('ul')[0]);
+						return self['reorder-menu-item']({
+							'parent': parentMenu
+						});
+					});
+
+					return null;
 				})
 				.catch(function(err) {
 					self.sendAction('controller-action', 'display-status-message', {
@@ -229,9 +238,6 @@ define(
 
 				_ember['default'].run.begin();
 				window.$.each(menuItems, function(index, menuItem) {
-					if(window.$(menuItem).hasClass('divider'))
-						return;
-
 					var menuItemRecord = self.get('store').peekRecord('menu-item', window.$(window.$(menuItem).children('a')[0]).attr('id'));
 					menuItemRecord.set('displayOrder', index);
 				});
@@ -244,6 +250,14 @@ define(
 				self.get('model').get('menuItems')
 				.then(function(menuItems) {
 					data.menuItem.deleteRecord();
+
+					_ember['default'].run.scheduleOnce('afterRender', function() {
+						var parentMenu = window.$(window.$('a#' + data.menuItem.get('id')).parents('ul')[0]);
+						return self['reorder-menu-item']({
+							'parent': parentMenu
+						});
+					});
+
 					return null;
 				})
 				.catch(function(err) {
@@ -266,8 +280,12 @@ define(
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/horizontal-menu-item-widget');
 		var HorizontalMenuItemWidget = _baseWidget['default'].extend({
 			'tagName': 'li',
+
 			'classNames': ['dropdown'],
 			'classNameBindings': ['model.isExpanded:open'],
+
+			'attributeBindings': ['style'],
+			'style': 'border-bottom:1px solid #eee; padding:5px 0px;',
 
 			'isHorizontal': false,
 			'isVertical': false,
