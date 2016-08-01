@@ -58,6 +58,10 @@ define(
 				return _ember['default'].String.underscore(attr);
 			},
 
+			'keyForLink': function(attr) {
+				return _ember['default'].String.underscore(attr);
+			},
+
 			'keyForRelationship': function(attr) {
 				return _ember['default'].String.underscore(attr);
 			}

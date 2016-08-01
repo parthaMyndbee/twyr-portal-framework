@@ -68,7 +68,7 @@
 					<ul class="nav navbar-nav">
 						<% if(positions.settings && positions.settings.length) { %>
 							<% positions.settings.forEach(function(settingsWidget) { %>
-								<li class="user">{{<%- settingsWidget %>}}</li>
+								<li class="user">{{<%- settingsWidget %> controller-action="controller-action"}}</li>
 							<% }) %>
 						<% } %>
 					</ul>
@@ -92,10 +92,10 @@
 
 		<!-- Position: menubar -->
 		<% if(positions.menubar && positions.menubar.length) { %>
-		<div class="row" style="min-height:0px; margin:0px; border:0px; padding:0px;">
-			<div class = "col-sm-12" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+		<div class="row">
+			<div class="col-sm-12">
 				<% positions.menubar.forEach(function(menuWidget) { %>
-					{{<%- menuWidget %>}}
+					{{<%- menuWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 		</div>
@@ -107,7 +107,7 @@
 			<% if(positions.module1 && positions.module1.length) { %>
 			<div class="col-sm-<%= firstRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module1.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -115,7 +115,7 @@
 			<% if(positions.module2 && positions.module2.length) { %>
 			<div class="col-sm-<%= firstRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module2.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -123,7 +123,7 @@
 			<% if(positions.module3 && positions.module3.length) { %>
 			<div class="col-sm-<%= firstRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module3.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -136,7 +136,7 @@
 			<% if(positions.module4 && positions.module4.length) { %>
 			<div class="col-sm-<%= secondRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module4.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -144,7 +144,7 @@
 			<% if(positions.module5 && positions.module5.length) { %>
 			<div class="col-sm-<%= secondRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module5.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -152,7 +152,7 @@
 			<% if(positions.module6 && positions.module6.length) { %>
 			<div class="col-sm-<%= secondRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module6.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -164,7 +164,7 @@
 			<% if(positions['left-sidebar'] && positions['left-sidebar'].length) { %>
 			<div class="col-sm-2" style="padding:0px; padding-right:1px;">
 				<% positions['left-sidebar'].forEach(function(sidebarWidget) { %>
-					{{<%- sidebarWidget %>}}
+					{{<%- sidebarWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -178,7 +178,7 @@
 			<% if(positions['right-sidebar'] && positions['right-sidebar'].length) { %>
 			<div class="col-sm-2" style="padding:0px; padding-left:1px;">
 				<% positions['right-sidebar'].forEach(function(sidebarWidget) { %>
-					{{<%- sidebarWidget %>}}
+					{{<%- sidebarWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -190,7 +190,7 @@
 			<% if(positions.module7 && positions.module7.length) { %>
 			<div class="col-sm-<%= bottomRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module7.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -198,7 +198,7 @@
 			<% if(positions.module8 && positions.module8.length) { %>
 			<div class="col-sm-<%= bottomRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module8.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -206,7 +206,7 @@
 			<% if(positions.module9 && positions.module9.length) { %>
 			<div class="col-sm-<%= bottomRowModuleWidth %>" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
 				<% positions.module9.forEach(function(moduleWidget) { %>
-					{{<%- moduleWidget %>}}
+					{{<%- moduleWidget %> controller-action="controller-action"}}
 				<% }) %>
 			</div>
 			<% } %>
@@ -220,7 +220,7 @@
 			</div>
 			<% if(positions.footer && positions.footer.length) { %>
 				<% positions.footer.forEach(function(widget){ %>
-					{{<%- widget %>}}
+					{{<%- widget %> controller-action="controller-action"}}
 				<% }) %>
 			<% } else { %>
 				<p>&nbsp;</p>

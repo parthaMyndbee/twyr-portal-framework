@@ -28,70 +28,6 @@ define(
 					],
 
 					'columnDefs': [{
-						'targets': [0],
-
-						'render': function(data, type, row) {
-							var page = self.get('_pageCache').get(row.id);
-							if(!page) {
-								self.get('store').findRecord('pages-default', row.id)
-								.then(function(pageRecord) {
-									pageRecord.addObserver('hasDirtyAttributes', function() {
-										var newTitle = pageRecord.get('title');
-										var newStatus = _ember['default'].String.capitalize(pageRecord.get('status'));
-
-										if(pageRecord.get('hasDirtyAttributes'))
-											newTitle += ' *';
-
-										var tblRow = self.get('_pageListDataTable').row(pageRecord.get('id'));
-										self.get('_pageListDataTable').cell(tblRow.index(), 0).data(newTitle);
-										self.get('_pageListDataTable').cell(tblRow.index(), 2).data(newStatus);
-
-										self.get('store').findRecord('module-permission', pageRecord.get('permission'))
-										.then(function(permission) {
-											self.get('_pageListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
-										})
-										.catch(function(err) {
-											console.error(err);
-										});
-									});
-
-									pageRecord.addObserver('title', function() {
-										var newTitle = pageRecord.get('title');
-										if(pageRecord.get('hasDirtyAttributes'))
-											newTitle += ' *';
-
-										var tblRow = self.get('_pageListDataTable').row(pageRecord.get('id'));
-										self.get('_pageListDataTable').cell(tblRow.index(), 0).data(newTitle);
-									});
-
-									pageRecord.addObserver('status', function() {
-										var newStatus = _ember['default'].String.capitalize(pageRecord.get('status'));
-
-										var tblRow = self.get('_pageListDataTable').row(pageRecord.get('id'));
-										self.get('_pageListDataTable').cell(tblRow.index(), 2).data(newStatus);
-									});
-
-									pageRecord.addObserver('permission', function() {
-										self.get('store').findRecord('module-permission', pageRecord.get('permission'))
-										.then(function(permission) {
-											var tblRow = self.get('_pageListDataTable').row(pageRecord.get('id'));
-											self.get('_pageListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
-										})
-										.catch(function(err) {
-											console.error(err);
-										});
-									});
-
-									self.get('_pageCache').set(row.id, pageRecord);
-								})
-								.catch(function(err) {
-									console.error(err);
-								});
-							}
-
-							return data;
-						}
-					}, {
 						'targets': [6],
 						'searchable': false,
 						'sortable': false,
@@ -118,10 +54,103 @@ define(
 				var self = this;
 				self._super(...arguments);
 
+				var pages = self.get('store').peekAll('pages-default');
+				pages.forEach(function(page) {
+					page.set('isEditing', false);
+					self._removePageObservers(page);
+				});
+
 				if(self.get('_pageListDataTable')) {
 					self.get('_pageListDataTable').destroy();
 					self.set('_pageListDataTable', null);
 				}
+			},
+
+			'_addPageObservers': function(page) {
+				var self = this;
+
+				if(!self.get('hasDirtyAttributesObserver')) {
+					self.set('hasDirtyAttributesObserver', (function(pageRecord) {
+						var newTitle = pageRecord.get('title');
+						var newStatus = _ember['default'].String.capitalize(pageRecord.get('status'));
+
+						if(pageRecord.get('hasDirtyAttributes'))
+							newTitle += ' *';
+
+						var tblRow = self.get('_pageListDataTable').row('tr#' + pageRecord.get('id'));
+						self.get('_pageListDataTable').cell(tblRow.index(), 0).data(newTitle);
+						self.get('_pageListDataTable').cell(tblRow.index(), 2).data(newStatus);
+
+						var permission = self.get('store').peekRecord('module-permission', pageRecord.get('permission'));
+						if(permission) {
+							self.get('_pageListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+							return;
+						}
+
+						self.get('store').findRecord('module-permission', pageRecord.get('permission'))
+						.then(function(permission) {
+							self.get('_pageListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+						})
+						.catch(function(err) {
+							console.error(err);
+						});
+					}).bind(self));
+				}
+
+				if(!self.set('titleObserver')) {
+					self.set('titleObserver', (function(pageRecord) {
+						var newTitle = pageRecord.get('title');
+						if(pageRecord.get('hasDirtyAttributes'))
+							newTitle += ' *';
+
+						var tblRow = self.get('_pageListDataTable').row('tr#' + pageRecord.get('id'));
+						self.get('_pageListDataTable').cell(tblRow.index(), 0).data(newTitle);
+					}).bind(self));
+				}
+
+				if(!self.set('statusObserver')) {
+					self.set('statusObserver', (function(pageRecord) {
+						var newStatus = _ember['default'].String.capitalize(pageRecord.get('status'));
+
+						var tblRow = self.get('_pageListDataTable').row('tr#' + pageRecord.get('id'));
+						self.get('_pageListDataTable').cell(tblRow.index(), 2).data(newStatus);
+					}).bind(self));
+				}
+
+				if(!self.set('permissionObserver')) {
+					self.set('permissionObserver', (function(pageRecord) {
+						var permission = self.get('store').peekRecord('module-permission', pageRecord.get('permission'));
+						if(permission) {
+							var tblRow = self.get('_pageListDataTable').row('tr#' + pageRecord.get('id'));
+							self.get('_pageListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+
+							return;
+						}
+
+						self.get('store').findRecord('module-permission', pageRecord.get('permission'))
+						.then(function(permission) {
+							var tblRow = self.get('_pageListDataTable').row('tr#' + pageRecord.get('id'));
+							self.get('_pageListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+						})
+						.catch(function(err) {
+							console.error(err);
+						});
+					}).bind(self));
+				}
+
+				page.addObserver('hasDirtyAttributes', self.get('hasDirtyAttributesObserver'));
+				page.addObserver('title', self.get('titleObserver'));
+				page.addObserver('status', self.get('statusObserver'));
+				page.addObserver('permission', self.get('permissionObserver'));
+			},
+
+			'_removePageObservers': function(pageRecord) {
+				var self = this;
+
+				pageRecord.removeObserver('hasDirtyAttributes', self.get('hasDirtyAttributesObserver'));
+				pageRecord.removeObserver('title', self.get('titleObserver'));
+				pageRecord.removeObserver('status', self.get('statusObserver'));
+				pageRecord.removeObserver('permission', self.get('permissionObserver'));
 			},
 
 			'_setupRowOperations': function() {
@@ -161,7 +190,19 @@ define(
 						'author': profile
 					});
 
+					self.get('_pageListDataTable').row.add({
+						'id': newPage.get('id'),
+						'title': newPage.get('title'),
+						'author': profile.get('fullName'),
+						'status': _ember['default'].String.capitalize(newPage.get('status')),
+						'permission': '',
+						'created': newPage.get('formattedCreatedAt'),
+						'updated': newPage.get('formattedUpdatedAt')
+					}).draw();
+
 					newPage.set('isEditing', true);
+					self._addPageObservers(newPage);
+
 					_ember['default'].run.scheduleOnce('afterRender', function() {
 						self.$('li#page-manager-widget-list-' + newPage.get('id') + '-link a').click();
 					});
@@ -183,9 +224,23 @@ define(
 					event.preventDefault();
 				}
 
+				var page = self.get('store').peekRecord('pages-default', pageId);
+				if(page) {
+					page.set('isEditing', true);
+					self._addPageObservers(page);
+
+					_ember['default'].run.scheduleOnce('afterRender', function() {
+						self.$('li#page-manager-widget-list-' + page.get('id') + '-link a').click();
+					});
+
+					return;
+				}
+
 				self.get('store').findRecord('pages-default', pageId)
 				.then(function(page) {
 					page.set('isEditing', true);
+					self._addPageObservers(page);
+
 					_ember['default'].run.scheduleOnce('afterRender', function() {
 						self.$('li#page-manager-widget-list-' + page.get('id') + '-link a').click();
 					});
@@ -201,10 +256,17 @@ define(
 
 			'stopEditPage': function(page) {
 				var self = this,
+					isNew = page.get('isNew'),
+					pageId = page.get('id'),
 					confirmFn = function() {
+						self._removePageObservers(page);
 						page.set('isEditing', false);
-						page.rollbackAttributes();
 
+						if(isNew) {
+							self.get('_pageListDataTable').row('tr#' + pageId).remove().draw();
+						}
+
+						page.rollbackAttributes();
 						_ember['default'].run.scheduleOnce('afterRender', function() {
 							if(!self.$('li.page-manager-widget-list-tab a').length)
 								return;
@@ -233,10 +295,6 @@ define(
 			'savePage': function(page) {
 				var self = this;
 				page.save()
-				.then(function() {
-					self.set('_pageCache', _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }));
-					return self.get('_pageListDataTable').ajax.reload(null, false);
-				})
 				.then(function() {
 					self.sendAction('controller-action', 'display-status-message', {
 						'type': 'success',
@@ -267,16 +325,12 @@ define(
 					'cancelButtonClass': 'btn btn-flat btn-primary',
 
 					'confirm': function() {
-						self.get('store').findRecord('pages-default', pageId)
-						.then(function(page) {
-							page.set('isEditing', false);
-							return page.destroyRecord();
-						})
+						var page = self.get('store').peekRecord('pages-default', pageId);
+
+						page.destroyRecord()
 						.then(function() {
-							self.set('_pageCache', _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }));
-							return self.get('_pageListDataTable').ajax.reload(null, false);
-						})
-						.then(function() {
+							self._removePageObservers(page);
+
 							self.sendAction('controller-action', 'display-status-message', {
 								'type': 'success',
 								'message': 'Page deleted succesfully'
@@ -287,6 +341,9 @@ define(
 								'type': 'danger',
 								'message': err.message
 							});
+						})
+						.finally(function() {
+							self.get('_pageListDataTable').row('tr#' + pageId).remove().draw();
 						});
 					},
 

@@ -42,6 +42,12 @@ define(
 				'get': function(key) {
 					return _ember['default'].String.capitalize(this.get('status'));
 				}
+			}).readOnly(),
+
+			'shouldEnableSave': _ember['default'].computed('hasDirtyAttributes', 'menuItems.@each.hasDirtyAttributes', {
+				'get': function(key) {
+					return (this.get('hasDirtyAttributes') || this.get('menuItems').filterBy('shouldEnableSave', true).length);
+				}
 			}).readOnly()
 		});
 
@@ -81,7 +87,13 @@ define(
 			'description': _attr['default']('string', { 'defaultValue': '' }),
 			'tooltip': _attr['default']('string', { 'defaultValue': '' }),
 
-			'displayOrder': _attr['default']('number', { 'defaultValue': 0 })
+			'displayOrder': _attr['default']('number', { 'defaultValue': 0 }),
+
+			'shouldEnableSave': _ember['default'].computed('hasDirtyAttributes', 'menuItems.@each.hasDirtyAttributes', {
+				'get': function(key) {
+					return (this.get('hasDirtyAttributes') || this.get('children').filterBy('shouldEnableSave', true).length);
+				}
+			}).readOnly()
 		});
 
 		exports['default'] = MenuItemModel;

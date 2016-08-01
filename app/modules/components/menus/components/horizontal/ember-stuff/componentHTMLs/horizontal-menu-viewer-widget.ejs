@@ -1,0 +1,10 @@
+<script type="text/x-handlebars" data-template-name="components/menu-<%= menuId %>">
+<ul class="nav navbar-nav" id="horizontal-menu-viewer-widget-{{model.id}}" style="text-align:left;">
+{{#each sortedMenuItems as |menuItem index|}}
+{{#unless menuItem.parent}}
+	{{horizontal-menu-item-view-widget model=menuItem orientation="vertical" controller-action="controller-action"}}
+{{/unless}}
+{{/each}}
+</ul>
+</script>
+

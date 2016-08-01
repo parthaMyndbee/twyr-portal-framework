@@ -60,7 +60,8 @@ var horizontalComponent = prime({
 	},
 
 	'_getEmberComponents': function(user, renderer, callback) {
-		var loggerSrvc = this.dependencies['logger-service'],
+		var dbSrvc = this.dependencies['database-service'].knex,
+			loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
 		if(!user) {
@@ -68,15 +69,25 @@ var horizontalComponent = prime({
 			return null;
 		}
 
-		self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
-		.then(function(hasPermission) {
-			if(hasPermission) {
-				return promises.all([
-					filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/horizontal-menu-manager-widget.js'), 'utf8')
-				]);
+		dbSrvc.raw('SELECT A.ember_component FROM module_widgets A INNER JOIN menus B ON (A.id = B.module_widget) WHERE B.type = \'horizontal\' AND A.permission IN (SELECT permission FROM fn_get_user_permissions(?))', [user.id])
+		.then(function(userHorizontalMenus) {
+			var promiseResolutions = [];
+			userHorizontalMenus.rows.forEach(function(userHorizontalMenu) {
+				var menuId = userHorizontalMenu.ember_component.replace('menu-', '');
+				promiseResolutions.push(renderer(path.join(self.basePath, 'ember-stuff/components/horizontal-menu-viewer-widget.ejs'), { 'menuId': menuId }));
+			});
+
+			promiseResolutions.push(self._checkPermissionAsync(user, self['$menuAuthorPermissionId']));
+			return promises.all(promiseResolutions);
+		})
+		.then(function(userHorizontalMenus) {
+			var hasAuthorPermission = userHorizontalMenus.pop();
+			if(hasAuthorPermission) {
+				userHorizontalMenus.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/horizontal-menu-manager-widget.js'), 'utf8'));
 			}
 
-			return [];
+			userHorizontalMenus.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/horizontal-menu-item-view-widget.js'), 'utf8'));
+			return promises.all(userHorizontalMenus);
 		})
 		.then(function(widgets) {
 			if(callback) callback(null, widgets);
@@ -89,7 +100,8 @@ var horizontalComponent = prime({
 	},
 
 	'_getEmberComponentHTMLs': function(user, renderer, callback) {
-		var loggerSrvc = this.dependencies['logger-service'],
+		var dbSrvc = this.dependencies['database-service'].knex,
+			loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
 		if(!user) {
@@ -97,15 +109,25 @@ var horizontalComponent = prime({
 			return null;
 		}
 
-		self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
-		.then(function(hasPermission) {
-			if(hasPermission) {
-				return promises.all([
-					filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/horizontal-menu-manager-widget.ejs'), 'utf8')
-				]);
+		dbSrvc.raw('SELECT A.ember_component FROM module_widgets A INNER JOIN menus B ON (A.id = B.module_widget) WHERE B.type = \'horizontal\' AND A.permission IN (SELECT permission FROM fn_get_user_permissions(?))', [user.id])
+		.then(function(userHorizontalMenus) {
+			var promiseResolutions = [];
+			userHorizontalMenus.rows.forEach(function(userHorizontalMenu) {
+				var menuId = userHorizontalMenu.ember_component.replace('menu-', '');
+				promiseResolutions.push(renderer(path.join(self.basePath, 'ember-stuff/componentHTMLs/horizontal-menu-viewer-widget.ejs'), { 'menuId': menuId }));
+			});
+
+			promiseResolutions.push(self._checkPermissionAsync(user, self['$menuAuthorPermissionId']));
+			return promises.all(promiseResolutions);
+		})
+		.then(function(userHorizontalMenus) {
+			var hasAuthorPermission = userHorizontalMenus.pop();
+			if(hasAuthorPermission) {
+				userHorizontalMenus.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/horizontal-menu-manager-widget.ejs'), 'utf8'));
 			}
 
-			return [];
+			userHorizontalMenus.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/horizontal-menu-item-view-widget.ejs'), 'utf8'));
+			return promises.all(userHorizontalMenus);
 		})
 		.then(function(widgetHTMLs) {
 			if(callback) callback(null, widgetHTMLs);

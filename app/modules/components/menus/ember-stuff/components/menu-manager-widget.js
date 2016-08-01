@@ -7,7 +7,6 @@ define(
 			'currentlyEditingMenuItem': undefined,
 
 			'_menuListDataTable': null,
-			'_menuCache': _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }),
 
 			'didInsertElement': function() {
 				var self = this;
@@ -30,79 +29,6 @@ define(
 					],
 
 					'columnDefs': [{
-						'targets': [0],
-
-						'render': function(data, type, row) {
-							var menu = self.get('_menuCache').get(row.id);
-							if(!menu) {
-								self.get('store').findRecord('menus-default', row.id)
-								.then(function(menuRecord) {
-									menuRecord.addObserver('shouldEnableSave', function() {
-										var newName = menuRecord.get('name');
-										var newType = _ember['default'].String.capitalize(menuRecord.get('type'));
-										var newStatus = _ember['default'].String.capitalize(menuRecord.get('status'));
-
-										if(menuRecord.get('shouldEnableSave'))
-											newName += ' *';
-
-										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
-										self.get('_menuListDataTable').cell(tblRow.index(), 0).data(newName);
-										self.get('_menuListDataTable').cell(tblRow.index(), 1).data(newType);
-										self.get('_menuListDataTable').cell(tblRow.index(), 2).data(newStatus);
-
-										self.get('store').findRecord('module-permission', menuRecord.get('permission'))
-										.then(function(permission) {
-											self.get('_menuListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
-										})
-										.catch(function(err) {
-											console.error(err);
-										});
-									});
-
-									menuRecord.addObserver('name', function() {
-										var newName = menuRecord.get('name');
-										if(menuRecord.get('shouldEnableSave'))
-											newName += ' *';
-
-										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
-										self.get('_menuListDataTable').cell(tblRow.index(), 0).data(newName);
-									});
-
-									menuRecord.addObserver('type', function() {
-										var newType = _ember['default'].String.capitalize(menuRecord.get('type'));
-
-										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
-										self.get('_menuListDataTable').cell(tblRow.index(), 1).data(newType);
-									});
-
-									menuRecord.addObserver('status', function() {
-										var newStatus = _ember['default'].String.capitalize(menuRecord.get('status'));
-
-										var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
-										self.get('_menuListDataTable').cell(tblRow.index(), 2).data(newStatus);
-									});
-
-									menuRecord.addObserver('permission', function() {
-										self.get('store').findRecord('module-permission', menuRecord.get('permission'))
-										.then(function(permission) {
-											var tblRow = self.get('_menuListDataTable').row(menuRecord.get('id'));
-											self.get('_menuListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
-										})
-										.catch(function(err) {
-											console.error(err);
-										});
-									});
-
-									self.get('_menuCache').set(row.id, menuRecord);
-								})
-								.catch(function(err) {
-									console.error(err);
-								});
-							}
-
-							return data;
-						}
-					}, {
 						'targets': [6],
 						'sortable': false,
 						'searchable': false,
@@ -129,10 +55,115 @@ define(
 				var self = this;
 				self._super(...arguments);
 
+				var menus = self.get('store').peekAll('menus-default');
+				menus.forEach(function(menu) {
+					menu.set('isEditing', false);
+					self._removeMenuObservers(menu);
+				});
+
 				if(self.get('_menuListDataTable')) {
 					self.get('_menuListDataTable').destroy();
 					self.set('_menuListDataTable', null);
 				}
+			},
+
+			'_addMenuObservers': function(menu) {
+				var self = this;
+				if(!self.get('shouldEnableSaveObserver')) {
+					self.set('shouldEnableSaveObserver', (function(menuRecord) {
+						var newName = menuRecord.get('name');
+						var newType = _ember['default'].String.capitalize(menuRecord.get('type'));
+						var newStatus = _ember['default'].String.capitalize(menuRecord.get('status'));
+
+						if(menuRecord.get('shouldEnableSave'))
+							newName += ' *';
+
+						var tblRow = self.get('_menuListDataTable').row('tr#' + menuRecord.get('id'));
+						self.get('_menuListDataTable').cell(tblRow.index(), 0).data(newName);
+						self.get('_menuListDataTable').cell(tblRow.index(), 1).data(newType);
+						self.get('_menuListDataTable').cell(tblRow.index(), 2).data(newStatus);
+
+						var permission = self.get('store').peekRecord('module-permission', menuRecord.get('permission'));
+						if(permission) {
+							self.get('_menuListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+							return;
+						}
+
+						self.get('store').findRecord('module-permission', menuRecord.get('permission'))
+						.then(function(permission) {
+							self.get('_menuListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+						})
+						.catch(function(err) {
+							console.error(err);
+						});
+					}).bind(self));
+				}
+
+				if(!self.get('nameObserver')) {
+					self.set('nameObserver', (function(menuRecord) {
+						var newName = menuRecord.get('name');
+						if(menuRecord.get('shouldEnableSave'))
+							newName += ' *';
+
+						var tblRow = self.get('_menuListDataTable').row('tr#' + menuRecord.get('id'));
+						self.get('_menuListDataTable').cell(tblRow.index(), 0).data(newName);
+					}).bind(self));
+				}
+
+				if(!self.get('typeObserver')) {
+					self.set('typeObserver', (function(menuRecord) {
+						var newType = _ember['default'].String.capitalize(menuRecord.get('type'));
+
+						var tblRow = self.get('_menuListDataTable').row('tr#' + menuRecord.get('id'));
+						self.get('_menuListDataTable').cell(tblRow.index(), 1).data(newType);
+					}).bind(self));
+				}
+
+				if(!self.get('statusObserver')) {
+					self.set('statusObserver', (function(menuRecord) {
+						var newStatus = _ember['default'].String.capitalize(menuRecord.get('status'));
+
+						var tblRow = self.get('_menuListDataTable').row('tr#' + menuRecord.get('id'));
+						self.get('_menuListDataTable').cell(tblRow.index(), 2).data(newStatus);
+					}).bind(self));
+				}
+
+				if(!self.get('permissionObserver')) {
+					self.set('permissionObserver', (function(menuRecord) {
+						var permission = self.get('store').peekRecord('module-permission', menuRecord.get('permission'));
+						if(permission) {
+							var tblRow = self.get('_menuListDataTable').row('tr#' + menuRecord.get('id'));
+							self.get('_menuListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+
+							return;
+						}
+
+						self.get('store').findRecord('module-permission', menuRecord.get('permission'))
+						.then(function(permission) {
+							var tblRow = self.get('_menuListDataTable').row('tr#' + menuRecord.get('id'));
+							self.get('_menuListDataTable').cell(tblRow.index(), 3).data(permission.get('displayName'));
+						})
+						.catch(function(err) {
+							console.error(err);
+						});
+					}).bind(self));
+				}
+
+				menu.addObserver('shouldEnableSave', self.get('shouldEnableSaveObserver'));
+				menu.addObserver('name', self.get('nameObserver'));
+				menu.addObserver('type', self.get('typeObserver'));
+				menu.addObserver('status', self.get('statusObserver'));
+				menu.addObserver('permission', self.get('permissionObserver'));
+			},
+
+			'_removeMenuObservers': function(menuRecord) {
+				var self = this;
+
+				menuRecord.removeObserver('shouldEnableSave', self.get('shouldEnableSaveObserver'));
+				menuRecord.removeObserver('name', self.get('nameObserver'));
+				menuRecord.removeObserver('type', self.get('typeObserver'));
+				menuRecord.removeObserver('status', self.get('statusObserver'));
+				menuRecord.removeObserver('permission', self.get('permissionObserver'));
 			},
 
 			'_setupRowOperations': function() {
@@ -169,7 +200,19 @@ define(
 					'id': _app['default'].UUID()
 				});
 
+				self.get('_menuListDataTable').row.add({
+					'id': newMenu.get('id'),
+					'name': newMenu.get('name'),
+					'type': _ember['default'].String.capitalize(newMenu.get('type')),
+					'status': _ember['default'].String.capitalize(newMenu.get('status')),
+					'permission': '',
+					'created': newMenu.get('formattedCreatedAt'),
+					'updated': newMenu.get('formattedUpdatedAt')
+				}).draw();
+
 				newMenu.set('isEditing', true);
+				self._addMenuObservers(newMenu);
+
 				_ember['default'].run.scheduleOnce('afterRender', function() {
 					self.$('li#menu-manager-widget-list-' + newMenu.get('id') + '-link a').click();
 				});
@@ -183,9 +226,23 @@ define(
 					event.preventDefault();
 				}
 
+				var menu = self.get('store').peekRecord('menus-default', menuId);
+				if(menu) {
+					menu.set('isEditing', true);
+					self._addMenuObservers(menu);
+
+					_ember['default'].run.scheduleOnce('afterRender', function() {
+						self.$('li#menu-manager-widget-list-' + menu.get('id') + '-link a').click();
+					});
+
+					return;
+				}
+
 				self.get('store').findRecord('menus-default', menuId)
 				.then(function(menu) {
 					menu.set('isEditing', true);
+					self._addMenuObservers(menu);
+
 					_ember['default'].run.scheduleOnce('afterRender', function() {
 						self.$('li#menu-manager-widget-list-' + menu.get('id') + '-link a').click();
 					});
@@ -201,7 +258,16 @@ define(
 
 			'stopEditMenu': function(menu) {
 				var self = this,
+					isNew = menu.get('isNew'),
+					menuId = menu.get('id'),
 					confirmFn = function() {
+						self._removeMenuObservers(menu);
+						menu.set('isEditing', false);
+
+						if(isNew) {
+							self.get('_menuListDataTable').row('tr#' + menuId).remove().draw();
+						}
+
 						menu.get('menuItems')
 						.then(function(menuItems) {
 							var menuItemsIds = _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) });
@@ -209,15 +275,13 @@ define(
 								menuItemsIds.addObject(menuItem.get('id'));
 							});
 
-							menu.rollbackAttributes();
 							menuItemsIds.forEach(function(menuItemId) {
 								var menuItem = self.get('store').peekRecord('menu-item', menuItemId);
 								menuItem.rollbackAttributes();
 							});
 
-							return null;
-						})
-						.then(function() {
+							menu.rollbackAttributes();
+
 							_ember['default'].run.scheduleOnce('afterRender', function() {
 								if(!self.$('li.menu-manager-widget-list-tab a').length)
 									return;
@@ -231,9 +295,6 @@ define(
 								'type': 'danger',
 								'message': err.message
 							});
-						})
-						.finally(function() {
-							menu.set('isEditing', false);
 						});
 					};
 
@@ -255,7 +316,9 @@ define(
 			},
 
 			'saveMenu': function(menu) {
-				var self = this;
+				var self = this,
+					isNew = menu.get('isNew');
+
 				menu.save()
 				.then(function() {
 					return menu.get('menuItems');
@@ -274,10 +337,6 @@ define(
 						'type': 'ember-error',
 						'errorModel': menu
 					});
-				})
-				.finally(function() {
-					self.set('_menuCache', _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }));
-					self.get('_menuListDataTable').ajax.reload(null, false);
 				});
 			},
 
@@ -297,9 +356,12 @@ define(
 					'cancelButtonClass': 'btn btn-flat btn-primary',
 
 					'confirm': function() {
-						self.get('store').findRecord('menus-default', menuId)
-						.then(function(menu) {
-							menu.set('isEditing', false);
+						var menu = self.get('store').peekRecord('menus-default', menuId);
+
+						menu.destroyRecord()
+						.then(function() {
+							self._removeMenuObservers(menu);
+
 							_ember['default'].run.scheduleOnce('afterRender', function() {
 								if(!self.$('li.menu-manager-widget-list-tab a').length)
 									return;
@@ -307,13 +369,6 @@ define(
 								(self.$('li.menu-manager-widget-list-tab a')[0]).click();
 							});
 
-							return menu.destroyRecord();
-						})
-						.then(function() {
-							self.set('_menuCache', _ember['default'].ObjectProxy.create({ 'content': _ember['default'].Object.create({}) }));
-							return self.get('_menuListDataTable').ajax.reload(null, false);
-						})
-						.then(function() {
 							self.sendAction('controller-action', 'display-status-message', {
 								'type': 'success',
 								'message': 'Menu deleted succesfully'
@@ -324,6 +379,9 @@ define(
 								'type': 'danger',
 								'message': err.message
 							});
+						})
+						.finally(function() {
+							self.get('_menuListDataTable').row('tr#' + menuId).remove().draw();
 						});
 					},
 
