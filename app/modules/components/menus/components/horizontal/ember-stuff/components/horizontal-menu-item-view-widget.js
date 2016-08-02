@@ -5,6 +5,7 @@ define(
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/horizontal-menu-item-view-widget');
 		var HorizontalMenuItemViewerWidget = _baseWidget['default'].extend({
 			'tagName': 'li',
+			'shouldDisplay': true,
 
 			'classNames': ['dropdown'],
 			'classNameBindings': ['model.isExpanded:open'],
@@ -24,6 +25,23 @@ define(
 
 				self.get('model').get('children')
 				.then(function(menuItems) {
+					if(!menuItems.get('length')) {
+						self.get('model').get('componentMenu')
+						.then(function(componentMenu) {
+							self.set('shouldDisplay', !!componentMenu);
+							return null;
+						})
+						.catch(function(err) {
+							console.error(err);
+							self.sendAction('controller-action', 'display-status-message', {
+								'type': 'danger',
+								'message': err.message
+							});
+						});
+
+						return;
+					}
+
 					self.set('sortedMenuItems', menuItems.sortBy('displayOrder'));
 					self.set('isHorizontal', (self.get('orientation') == 'horizontal'));
 					self.set('isVertical', (self.get('orientation') == 'vertical'));

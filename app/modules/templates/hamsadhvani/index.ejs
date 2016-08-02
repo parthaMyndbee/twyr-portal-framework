@@ -101,8 +101,8 @@
 
 		<!-- Position: menubar -->
 		<% if(positions.menubar && positions.menubar.length) { %>
-		<div class="row" style="min-height:0px; margin:0px; border:0px; padding:0px;">
-			<div class = "col-sm-12" style="min-height:0px; margin:0px; border:0px; padding:0px; text-align:center;">
+		<div class="row" style="min-height:0px;">
+			<div class="col-sm-12" style="min-height:0px;">
 				<% positions.menubar.forEach(function(menuWidget) { %>
 					{{<%- menuWidget %> controller-action="controller-action"}}
 				<% }) %>

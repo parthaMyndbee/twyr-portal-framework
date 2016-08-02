@@ -203,12 +203,12 @@ var twyrComponentBase = prime({
 		.then(function(results) {
 			var promiseResolutions = [],
 				selfEmberAssets = {
-					'route': results[0],
-					'routeHandler': results[1],
-					'model': results[2],
-					'component': results[3],
-					'componentHTML': results[4],
-					'template': results[5]
+					'route': results[0] || [],
+					'routeHandler': results[1] || [],
+					'model': results[2] || [],
+					'component': results[3] || [],
+					'componentHTML': results[4] || [],
+					'template': results[5] || []
 				};
 
 			promiseResolutions.push(selfEmberAssets);

@@ -326,11 +326,37 @@ define(
 
 					'confirm': function() {
 						var page = self.get('store').peekRecord('pages-default', pageId);
-
-						page.destroyRecord()
-						.then(function() {
+						if(page) {
 							self._removePageObservers(page);
+							page.destroyRecord()
+							.then(function() {
+								self.sendAction('controller-action', 'display-status-message', {
+									'type': 'success',
+									'message': 'Page deleted succesfully'
+								});
+							})
+							.catch(function(err) {
+								self.sendAction('controller-action', 'display-status-message', {
+									'type': 'danger',
+									'message': err.message
+								});
+							})
+							.finally(function() {
+								self.get('_pageListDataTable').row('tr#' + pageId).remove().draw();
+							});
 
+							return;
+						}
+
+						_ember['default'].RSVP.allSettled([
+							_ember['default'].$.ajax({
+								'method': 'DELETE',
+								'url': window.apiServer + 'pages/pages-defaults/' + pageId,
+								'dataType': 'json',
+								'cache': false
+							})
+						])
+						.then(function() {
 							self.sendAction('controller-action', 'display-status-message', {
 								'type': 'success',
 								'message': 'Page deleted succesfully'

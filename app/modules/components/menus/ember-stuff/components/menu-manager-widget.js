@@ -357,11 +357,44 @@ define(
 
 					'confirm': function() {
 						var menu = self.get('store').peekRecord('menus-default', menuId);
-
-						menu.destroyRecord()
-						.then(function() {
+						if(menu) {
 							self._removeMenuObservers(menu);
+							menu.destroyRecord()
+							.then(function() {
+								_ember['default'].run.scheduleOnce('afterRender', function() {
+									if(!self.$('li.menu-manager-widget-list-tab a').length)
+										return;
 
+									(self.$('li.menu-manager-widget-list-tab a')[0]).click();
+								});
+
+								self.sendAction('controller-action', 'display-status-message', {
+									'type': 'success',
+									'message': 'Menu deleted succesfully'
+								});
+							})
+							.catch(function(err) {
+								self.sendAction('controller-action', 'display-status-message', {
+									'type': 'danger',
+									'message': err.message
+								});
+							})
+							.finally(function() {
+								self.get('_menuListDataTable').row('tr#' + menuId).remove().draw();
+							});
+
+							return;
+						}
+
+						_ember['default'].RSVP.allSettled([
+							_ember['default'].$.ajax({
+								'method': 'DELETE',
+								'url': window.apiServer + 'menus/menus-defaults/' + menuId,
+								'dataType': 'json',
+								'cache': false
+							})
+						])
+						.then(function() {
 							_ember['default'].run.scheduleOnce('afterRender', function() {
 								if(!self.$('li.menu-manager-widget-list-tab a').length)
 									return;
