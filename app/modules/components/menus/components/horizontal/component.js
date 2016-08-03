@@ -43,12 +43,25 @@ var horizontalComponent = prime({
 				return;
 			}
 
-			configSrvc.getModuleIdAsync(self.$module)
-			.then(function(id) {
-				return dbSrvc.raw('SELECT id FROM module_permissions WHERE module = ? AND name = ?', [id, 'menu-author']);
+			var rootModule = self;
+			while(rootModule.$module)
+				rootModule = rootModule.$module;
+
+			promises.all([
+				configSrvc.getModuleIdAsync(self.$module),
+				configSrvc.getModuleIdAsync(rootModule)
+			])
+
+			.then(function(ids) {
+				return promises.all([
+					dbSrvc.raw('SELECT id FROM module_permissions WHERE module = ? AND name = ?', [ids[0], 'menu-author']),
+					dbSrvc.raw('SELECT id FROM module_permissions WHERE module = ? AND name = ?', [ids[1], 'public'])
+				]);
 			})
-			.then(function(menuAuthorPermissionId) {
-				self['$menuAuthorPermissionId'] = menuAuthorPermissionId.rows[0].id;
+			.then(function(permissionIds) {
+				self['$menuAuthorPermissionId'] = permissionIds[0].rows[0].id;
+				self['$publicPermissionId'] = permissionIds[1].rows[0].id;
+
 				if(callback) callback(null, status);
 				return null;
 			})
@@ -64,15 +77,19 @@ var horizontalComponent = prime({
 			loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
-		if(!user) {
-			if(callback) callback(null, []);
-			return null;
+		var menuListPromises = [];
+		if(user) {
+			menuListPromises.push(dbSrvc.raw('SELECT A.ember_component FROM module_widgets A INNER JOIN menus B ON (A.id = B.module_widget) WHERE B.type = \'horizontal\' AND A.permission IN (SELECT permission FROM fn_get_user_permissions(?))', [user.id]));
+		}
+		else {
+			menuListPromises.push(dbSrvc.raw('SELECT A.ember_component FROM module_widgets A INNER JOIN menus B ON (A.id = B.module_widget) WHERE B.type = \'horizontal\' AND A.permission = ?', [ self['$publicPermissionId'] ]));
 		}
 
-		dbSrvc.raw('SELECT A.ember_component FROM module_widgets A INNER JOIN menus B ON (A.id = B.module_widget) WHERE B.type = \'horizontal\' AND A.permission IN (SELECT permission FROM fn_get_user_permissions(?))', [user.id])
+		promises.all(menuListPromises)
 		.then(function(userHorizontalMenus) {
 			var promiseResolutions = [];
-			userHorizontalMenus.rows.forEach(function(userHorizontalMenu) {
+
+			userHorizontalMenus[0].rows.forEach(function(userHorizontalMenu) {
 				var menuId = userHorizontalMenu.ember_component.replace('menu-', '');
 				promiseResolutions.push(renderer(path.join(self.basePath, 'ember-stuff/components/horizontal-menu-viewer-widget.ejs'), { 'menuId': menuId }));
 			});
@@ -104,15 +121,19 @@ var horizontalComponent = prime({
 			loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
-		if(!user) {
-			if(callback) callback(null, []);
-			return null;
+		var menuListPromises = [];
+		if(user) {
+			menuListPromises.push(dbSrvc.raw('SELECT A.ember_component FROM module_widgets A INNER JOIN menus B ON (A.id = B.module_widget) WHERE B.type = \'horizontal\' AND A.permission IN (SELECT permission FROM fn_get_user_permissions(?))', [user.id]));
+		}
+		else {
+			menuListPromises.push(dbSrvc.raw('SELECT A.ember_component FROM module_widgets A INNER JOIN menus B ON (A.id = B.module_widget) WHERE B.type = \'horizontal\' AND A.permission = ?', [ self['$publicPermissionId'] ]));
 		}
 
-		dbSrvc.raw('SELECT A.ember_component FROM module_widgets A INNER JOIN menus B ON (A.id = B.module_widget) WHERE B.type = \'horizontal\' AND A.permission IN (SELECT permission FROM fn_get_user_permissions(?))', [user.id])
+		promises.all(menuListPromises)
 		.then(function(userHorizontalMenus) {
 			var promiseResolutions = [];
-			userHorizontalMenus.rows.forEach(function(userHorizontalMenu) {
+
+			userHorizontalMenus[0].rows.forEach(function(userHorizontalMenu) {
 				var menuId = userHorizontalMenu.ember_component.replace('menu-', '');
 				promiseResolutions.push(renderer(path.join(self.basePath, 'ember-stuff/componentHTMLs/horizontal-menu-viewer-widget.ejs'), { 'menuId': menuId }));
 			});

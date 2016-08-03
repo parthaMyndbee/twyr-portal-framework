@@ -316,15 +316,26 @@ define(
 			},
 
 			'saveMenu': function(menu) {
-				var self = this,
-					isNew = menu.get('isNew');
+				var self = this;
 
 				menu.save()
 				.then(function() {
 					return menu.get('menuItems');
 				})
 				.then(function(menuItems) {
-					return menuItems.save();
+					var rootMenuItems = _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(menuItems.filterBy('parent.id', undefined)) });
+					return _ember['default'].RSVP.allSettled([rootMenuItems, rootMenuItems.invoke('save')]);
+				})
+				.then(function(results) {
+					console.log('Results: ', results)
+					var rootMenuItems = results[0].value,
+						promiseResolutions = [];
+
+					rootMenuItems.forEach(function(rootMenuItem) {
+						promiseResolutions.push(self._saveChildrenMenuItems(rootMenuItem));
+					});
+
+					return _ember['default'].RSVP.allSettled(promiseResolutions);
 				})
 				.then(function() {
 					self.sendAction('controller-action', 'display-status-message', {
@@ -333,6 +344,7 @@ define(
 					});
 				})
 				.catch(function(err) {
+					console.error(err);
 					self.sendAction('controller-action', 'display-status-message', {
 						'type': 'ember-error',
 						'errorModel': menu
@@ -440,6 +452,35 @@ define(
 				this.$('div#menu-manager-widget-dialog-menu-item-editor').modal('hide');
 				this.set('currentlyEditingMenuItem', null);
 			},
+
+			'_saveChildrenMenuItems': function(parent) {
+				var self = this;
+
+				return new _ember['default'].RSVP.Promise(function(resolve, reject) {
+					parent.get('children')
+					.then(function(menuItems) {
+						return _ember['default'].RSVP.allSettled([menuItems, menuItems.invoke('save')]);
+					})
+					.then(function(results) {
+						var menuItems = results[0].value,
+							promiseResolutions = [];
+
+						menuItems.forEach(function(menuItem) {
+							promiseResolutions.push(self._saveChildrenMenuItems(menuItem));
+						});
+
+						return _ember['default'].RSVP.allSettled(promiseResolutions);
+					})
+					.then(function(saves) {
+						resolve(saves);
+						return null;
+					})
+					.catch(function(err) {
+						console.error(err);
+						reject(err);
+					});
+				});
+			}
 		});
 
 		exports['default'] = MenuManagerWidget;

@@ -11,16 +11,16 @@ define(
 				var self = this;
 				self._super(...arguments);
 
-				self.get('store').findRecord('menus-default', '<%= menuId %>')
+				self.get('store').findRecord('menus-default-view', '<%= menuId %>')
 				.then(function(menu) {
 					self.set('model', menu);
 					return self.get('model').get('menuItems');
 				})
 				.then(function(menuItems) {
-					if(!menuItems.get('length')) self.set('shouldDisplay', false);
 					self.set('sortedMenuItems', menuItems.sortBy('displayOrder'));
 				})
 				.catch(function(err) {
+					console.error(err);
 					self.sendAction('controller-action', 'display-status-message', {
 						'type': 'danger',
 						'message': err.message

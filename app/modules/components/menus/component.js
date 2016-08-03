@@ -149,10 +149,16 @@ var menusComponent = prime({
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
-		var promiseResolutions = [];
-		promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/menus-default.js'), 'utf8'));
+		self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
+		.then(function(hasPermission) {
+			var promiseResolutions = [];
+			if(hasPermission) {
+				promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/menus-default.js'), 'utf8'));
+			}
 
-		promises.all(promiseResolutions)
+			promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/menus-default-view.js'), 'utf8'));
+			return promises.all(promiseResolutions);
+		})
 		.then(function(menuModels) {
 			if(callback) callback(null, menuModels);
 			return null;
