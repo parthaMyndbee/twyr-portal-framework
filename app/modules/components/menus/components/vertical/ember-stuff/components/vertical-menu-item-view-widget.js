@@ -1,9 +1,9 @@
 define(
-	'twyr-webapp/components/horizontal-menu-item-view-widget',
+	'twyr-webapp/components/vertical-menu-item-view-widget',
 	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
 	function(exports, _ember, _app, _baseWidget) {
-		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/horizontal-menu-item-view-widget');
-		var HorizontalMenuItemViewerWidget = _baseWidget['default'].extend({
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/vertical-menu-item-view-widget');
+		var VerticalMenuItemViewerWidget = _baseWidget['default'].extend({
 			'tagName': 'li',
 
 			'classNames': ['dropdown'],
@@ -11,27 +11,13 @@ define(
 
 			'attributeBindings': ['style'],
 			'style': 'border-bottom:1px solid #eee; padding:5px 0px;',
-
-			'isHorizontal': false,
-			'isVertical': false,
-			'caretClass': 'fa fa-caret-down',
+			'caretClass': 'fa fa-caret-right',
 
 			'sortedMenuItems': undefined,
 
 			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
-
-				self.set('isHorizontal', (self.get('orientation') == 'horizontal'));
-				self.set('isVertical', (self.get('orientation') == 'vertical'));
-
-				if(self.get('orientation') == 'vertical') {
-					self.set('caretClass', 'fa fa-caret-down');
-				}
-
-				if(self.get('orientation') == 'horizontal') {
-					self.set('caretClass', 'fa fa-caret-right');
-				}
 
 				self.get('model').get('children')
 				.then(function(menuItems) {
@@ -85,22 +71,13 @@ define(
 			},
 
 			'caretClassChanged': _ember['default'].observer('model.isExpanded', function() {
-				if(this.get('orientation') == 'vertical') {
-					if(this.get('model').get('isExpanded'))
-						this.set('caretClass', 'fa fa-caret-up');
-					else
-						this.set('caretClass', 'fa fa-caret-down');
-				}
-
-				if(this.get('orientation') == 'horizontal') {
-					if(this.get('model').get('isExpanded'))
-						this.set('caretClass', 'fa fa-caret-left');
-					else
-						this.set('caretClass', 'fa fa-caret-right');
-				}
+				if(this.get('model').get('isExpanded'))
+					this.set('caretClass', 'fa fa-caret-left');
+				else
+					this.set('caretClass', 'fa fa-caret-right');
 			})
 		});
 
-		exports['default'] = HorizontalMenuItemViewerWidget;
+		exports['default'] = VerticalMenuItemViewerWidget;
 	}
 );

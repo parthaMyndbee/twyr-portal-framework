@@ -424,10 +424,10 @@ define(
 );
 
 define(
-	'twyr-webapp/components/component-menu-item-widget',
+	'twyr-webapp/components/horizontal-component-menu-item-widget',
 	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
 	function(exports, _ember, _app, _baseWidget) {
-		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/component-menu-item-widget');
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/horizontal-component-menu-item-widget');
 		var ComponentMenuItemWidget = _baseWidget['default'].extend({
 			'tagName': 'li',
 

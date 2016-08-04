@@ -18,7 +18,6 @@ define(
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/menus-default-view');
 		var MenuViewModel = _twyrBaseModel['default'].extend({
-			'name': _attr['default']('string', { 'defaultValue': 'New Menu' }),
 			'menuItems': _relationships.hasMany('menu-item-view', { 'inverse': 'menu', 'async': true }),
 
 			'shouldDisplay': _ember['default'].computed('menuItems.@each.shouldDisplay', {

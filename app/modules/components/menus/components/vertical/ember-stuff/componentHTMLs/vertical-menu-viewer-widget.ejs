@@ -1,0 +1,14 @@
+<script type="text/x-handlebars" data-template-name="components/menu-<%= menuId %>">
+{{#if model.shouldDisplay}}
+<ul class="nav" id="vertical-menu-viewer-widget-{{model.id}}" style="text-align:left;">
+	{{#each sortedMenuItems as |menuItem index|}}
+	{{#unless menuItem.parent}}
+	{{#if menuItem.shouldDisplay}}
+		{{vertical-menu-item-view-widget model=menuItem controller-action="controller-action"}}
+	{{/if}}
+	{{/unless}}
+	{{/each}}
+</ul>
+{{/if}}
+</script>
+

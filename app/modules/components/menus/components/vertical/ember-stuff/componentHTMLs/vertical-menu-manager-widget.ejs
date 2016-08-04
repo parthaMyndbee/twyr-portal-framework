@@ -1,3 +1,85 @@
 <script type="text/x-handlebars" data-template-name="components/vertical-menu-manager-widget">
-<div>Vertical Menu Manager Widget</div>
+<div class="row" style="margin:0px; border-top:1px solid #f1f1f1;">
+	<div class="col-sm-3" id="vertical-menu-manager-widget-available-component-menus-{{model.id}}" style="text-align:center; max-height:400px; overflow-y:auto;">
+			<div id="empty-menu-item" class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="Empty Menu Item">
+				<span class="info-box-icon bg-blue">
+					<i class="fa fa-bars" />
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text">Empty Menu Item</span>
+					<span class="description">Drag this to create Menu Items not linked to the ones created by the components</span>
+				</div>
+			</div>
+
+		{{#each _availableMenus as |componentMenu|}}
+			<div id={{componentMenu.id}} class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="{{componentMenu.tooltip}}">
+				<span class="info-box-icon bg-blue">
+					<i class="{{componentMenu.iconClass}}" />
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text">{{componentMenu.displayName}}</span>
+					<span class="description">{{componentMenu.description}}</span>
+				</div>
+			</div>
+		{{/each}}
+	</div>
+	<div class="col-sm-9" style="padding-top:20px;">
+		<ul class="nav dragula-container" id="vertical-menu-manager-widget-{{model.id}}" style="min-height:50px; width:25%; background-color:#f8f8f8;">
+		{{#each sortedMenuItems as |menuItem index|}}
+		{{#unless menuItem.parent}}
+			{{vertical-menu-item-widget model=menuItem controller-action="controller-action"}}
+		{{/unless}}
+		{{/each}}
+		</ul>
+	</div>
+</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/vertical-menu-item-widget">
+<a id="{{model.id}}" href="#" title="{{model.tooltip}}">
+	{{#if model.componentMenu}}
+		<span class="{{model.componentMenu.iconClass}}" style="margin-right:5px;" />
+		{{model.componentMenu.displayName}}
+
+		{{#if model.componentMenu.children.length}}
+			<span class="{{caretClass}}" style="margin-left:5px;" />
+		{{/if}}
+	{{else}}
+		<span class="{{model.iconClass}}" style="margin-right:5px;" />
+		{{model.displayName}}
+		<span class="{{caretClass}}" style="margin-left:5px;" />
+	{{/if}}
+</a>
+{{#if model.isExpanded}}
+	{{#if model.componentMenu}}
+		{{#if model.componentMenu.children.length}}
+			<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
+				{{#each model.componentMenu.children as |menuItem|}}
+					{{vertical-component-menu-item-widget model=menuItem controller-action="controller-action"}}
+				{{/each}}
+			</ul>
+		{{/if}}
+	{{else}}
+		<ul class="dropdown-menu dragula-container" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
+			{{#each sortedMenuItems as |menuItem|}}
+				{{vertical-menu-item-widget model=menuItem controller-action="controller-action"}}
+			{{/each}}
+		</ul>
+	{{/if}}
+{{/if}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/vertical-component-menu-item-widget">
+<a id="{{model.id}}" href="#" title="{{model.tooltip}}">
+	<span class="{{model.iconClass}}" style="margin-right:5px;" />
+	{{model.displayName}}
+	<span class="{{caretClass}}" style="margin-left:5px;" />
+</a>
+{{#if model.isExpanded}}
+	<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
+		{{#each sortedMenuItems as |menuItem|}}
+			{{vertical-component-menu-item-widget model=menuItem controller-action="controller-action"}}
+		{{/each}}
+	</ul>
+{{/if}}
 </script>

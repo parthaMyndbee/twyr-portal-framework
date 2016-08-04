@@ -56,7 +56,7 @@
 			{{#if isVertical}}
 			<ul class="dropdown-menu" style="min-height:100px; width:100%; margin-top:-5px; padding:0px;">
 				{{#each model.componentMenu.children as |menuItem|}}
-					{{component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+					{{horizontal-component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 				{{/each}}
 			</ul>
 			{{/if}}
@@ -64,7 +64,7 @@
 			{{#if isHorizontal}}
 			<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
 				{{#each model.componentMenu.children as |menuItem|}}
-					{{component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+					{{horizontal-component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 				{{/each}}
 			</ul>
 			{{/if}}
@@ -89,7 +89,7 @@
 {{/if}}
 </script>
 
-<script type="text/x-handlebars" data-template-name="components/component-menu-item-widget">
+<script type="text/x-handlebars" data-template-name="components/horizontal-component-menu-item-widget">
 <a id="{{model.id}}" href="#" title="{{model.tooltip}}">
 	<span class="{{model.iconClass}}" style="margin-right:5px;" />
 	{{model.displayName}}
@@ -99,7 +99,7 @@
 	{{#if isVertical}}
 	<ul class="dropdown-menu" style="min-height:100px; width:100%; margin-top:-5px; padding:0px;">
 		{{#each sortedMenuItems as |menuItem|}}
-			{{component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+			{{horizontal-component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 		{{/each}}
 	</ul>
 	{{/if}}
@@ -107,7 +107,7 @@
 	{{#if isHorizontal}}
 	<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
 		{{#each sortedMenuItems as |menuItem|}}
-			{{component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+			{{horizontal-component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 		{{/each}}
 	</ul>
 	{{/if}}
