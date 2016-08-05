@@ -1,0 +1,35 @@
+define(
+	'twyr-webapp/components/menu-<%= menuId %>',
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-widget'],
+	function(exports, _ember, _app, _baseWidget) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/menu-<%= menuId %>');
+		var FooterMenuViewerWidget = _baseWidget['default'].extend({
+			'didInsertElement': function() {
+				var self = this;
+				self._super(...arguments);
+
+				var menu = self.get('store').peekRecord('menus-default-view', '<%= menuId %>');
+				if(menu) {
+					self.set('model', menu);
+					return;
+				}
+
+				self.get('store').findRecord('menus-default-view', '<%= menuId %>')
+				.then(function(menu) {
+					self.set('model', menu);
+					return null;
+				})
+				.catch(function(err) {
+					console.error(err);
+					self.sendAction('controller-action', 'display-status-message', {
+						'type': 'danger',
+						'message': err.message
+					});
+				});
+			}
+		});
+
+		exports['default'] = FooterMenuViewerWidget;
+	}
+);
+

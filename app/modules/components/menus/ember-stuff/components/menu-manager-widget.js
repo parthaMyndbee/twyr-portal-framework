@@ -327,7 +327,6 @@ define(
 					return _ember['default'].RSVP.allSettled([rootMenuItems, rootMenuItems.invoke('save')]);
 				})
 				.then(function(results) {
-					console.log('Results: ', results)
 					var rootMenuItems = results[0].value,
 						promiseResolutions = [];
 

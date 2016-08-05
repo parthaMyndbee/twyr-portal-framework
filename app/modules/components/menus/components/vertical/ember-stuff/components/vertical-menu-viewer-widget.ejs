@@ -4,20 +4,22 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/menu-<%= menuId %>');
 		var VerticalMenuViewerWidget = _baseWidget['default'].extend({
-			'sortedMenuItems': undefined,
 			'shouldDisplay': true,
+			'_currentlyExpandedChild': undefined,
 
 			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
 
+				var menu = self.get('store').peekRecord('menus-default-view', '<%= menuId %>');
+				if(menu) {
+					self.set('model', menu);
+					return;
+				}
+
 				self.get('store').findRecord('menus-default-view', '<%= menuId %>')
 				.then(function(menu) {
 					self.set('model', menu);
-					return self.get('model').get('menuItems');
-				})
-				.then(function(menuItems) {
-					self.set('sortedMenuItems', menuItems.sortBy('displayOrder'));
 				})
 				.catch(function(err) {
 					console.error(err);
@@ -26,7 +28,26 @@ define(
 						'message': err.message
 					});
 				});
-			}
+			},
+
+			'onChildExpandedChanged': _ember['default'].observer('model.sortedMenuItems.@each.isExpanded', function() {
+				var self = this,
+					expandedChild = self.get('model').get('sortedMenuItems').filterBy('isExpanded', true);
+
+				if(expandedChild.length <= 1) {
+					self.set('_currentlyExpandedChild', undefined);
+					self.set('_currentlyExpandedChild', expandedChild[0]);
+					return;
+				}
+
+				if(self.get('_currentlyExpandedChild')) {
+					self.get('_currentlyExpandedChild').set('isExpanded', false);
+					self.set('_currentlyExpandedChild', undefined);
+				}
+
+				expandedChild = self.get('model').get('sortedMenuItems').filterBy('isExpanded', true);
+				self.set('_currentlyExpandedChild', expandedChild[0]);
+			})
 		});
 
 		exports['default'] = VerticalMenuViewerWidget;

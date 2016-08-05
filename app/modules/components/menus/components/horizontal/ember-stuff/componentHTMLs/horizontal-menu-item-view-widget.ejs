@@ -42,7 +42,7 @@
 		{{else}}
 			{{#if isVertical}}
 			<ul class="dropdown-menu" style="width:100%; margin-top:-5px; padding:0px;">
-				{{#each sortedMenuItems as |menuItem|}}
+				{{#each model.sortedMenuItems as |menuItem|}}
 				{{#if menuItem.shouldDisplay}}
 					{{horizontal-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 				{{/if}}
@@ -52,7 +52,7 @@
 
 			{{#if isHorizontal}}
 			<ul class="dropdown-menu" style="width:100%; top:0px; left:100%; margin-top:0px;">
-				{{#each sortedMenuItems as |menuItem|}}
+				{{#each model.sortedMenuItems as |menuItem|}}
 				{{#if menuItem.shouldDisplay}}
 					{{horizontal-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 				{{/if}}
@@ -73,7 +73,7 @@
 {{#if model.isExpanded}}
 	{{#if isVertical}}
 	<ul class="dropdown-menu" style="min-height:100px; width:100%; margin-top:-5px; padding:0px;">
-		{{#each sortedMenuItems as |menuItem|}}
+		{{#each model.sortedMenuItems as |menuItem|}}
 			{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 		{{/each}}
 	</ul>
@@ -81,7 +81,7 @@
 
 	{{#if isHorizontal}}
 	<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
-		{{#each sortedMenuItems as |menuItem|}}
+		{{#each model.sortedMenuItems as |menuItem|}}
 			{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 		{{/each}}
 	</ul>

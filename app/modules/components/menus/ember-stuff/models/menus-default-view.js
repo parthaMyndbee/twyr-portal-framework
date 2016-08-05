@@ -24,6 +24,17 @@ define(
 				'get': function(key) {
 					return !!this.get('menuItems').filterBy('shouldDisplay', true).length;
 				}
+			}).readOnly(),
+
+			'sortedMenuItems': _ember['default'].computed('menuItems.[]', 'menuItems.@each.displayOrder', {
+				'get': function(key) {
+					var children = this.get('menuItems').filterBy('parent.id', undefined),
+						sortedMenuItems = children.sort(function(left, right) {
+							return left.get('displayOrder') - right.get('displayOrder');
+						});
+
+					return sortedMenuItems;
+				}
 			}).readOnly()
 		});
 
@@ -76,6 +87,12 @@ define(
 
 					return false;
 				}
+			}).readOnly(),
+
+			'sortedMenuItems': _ember['default'].computed('children.[]', 'children.@each.displayOrder', {
+				'get': function(key) {
+					return this.get('children').sortBy('displayOrder');
+				}
 			}).readOnly()
 		});
 
@@ -110,7 +127,13 @@ define(
 			'iconClass': _attr['default']('string'),
 			'displayName': _attr['default']('string'),
 			'description': _attr['default']('string'),
-			'tooltip': _attr['default']('string')
+			'tooltip': _attr['default']('string'),
+
+			'sortedMenuItems': _ember['default'].computed('children.[]', 'children.@each.displayOrder', {
+				'get': function(key) {
+					return this.get('children').sortBy('displayOrder');
+				}
+			}).readOnly()
 		});
 
 		exports['default'] = ComponentMenuViewModel;

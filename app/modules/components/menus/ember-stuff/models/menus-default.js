@@ -26,6 +26,19 @@ define(
 
 			'menuItems': _relationships.hasMany('menu-item', { 'inverse': 'menu', 'async': true }),
 
+			'sortedMenuItems': _ember['default'].computed('menuItems.[]', 'menuItems.@each.displayOrder', 'menuItems.@each.isDeleted', {
+				'get': function(key) {
+					var children = this.get('menuItems').filterBy('parent.id', undefined).filter(function(menuItem) {
+							return !menuItem.get('isDeleted');
+						}),
+						sortedMenuItems = children.sort(function(left, right) {
+							return left.get('displayOrder') - right.get('displayOrder');
+						});
+
+					return sortedMenuItems;
+				}
+			}).readOnly(),
+
 			'menuEditorWidget': _ember['default'].computed('type', {
 				'get': function(key) {
 					return this.get('type') + '-menu-manager-widget';
@@ -89,7 +102,15 @@ define(
 
 			'displayOrder': _attr['default']('number', { 'defaultValue': 0 }),
 
-			'shouldEnableSave': _ember['default'].computed('hasDirtyAttributes', 'menuItems.@each.hasDirtyAttributes', {
+			'sortedMenuItems': _ember['default'].computed('children.[]', 'children.@each.displayOrder', 'children.@each.isDeleted', {
+				'get': function(key) {
+					return this.get('children').sortBy('displayOrder').filter(function(menuItem) {
+						return !menuItem.get('isDeleted');
+					});
+				}
+			}).readOnly(),
+
+			'shouldEnableSave': _ember['default'].computed('hasDirtyAttributes', 'children.@each.hasDirtyAttributes', {
 				'get': function(key) {
 					return (this.get('hasDirtyAttributes') || this.get('children').filterBy('shouldEnableSave', true).length);
 				}
@@ -127,7 +148,15 @@ define(
 			'iconClass': _attr['default']('string'),
 			'displayName': _attr['default']('string'),
 			'description': _attr['default']('string'),
-			'tooltip': _attr['default']('string')
+			'tooltip': _attr['default']('string'),
+
+			'sortedMenuItems': _ember['default'].computed('children.[]', 'children.@each.displayOrder', 'children.@each.isDeleted', {
+				'get': function(key) {
+					return this.get('children').sortBy('displayOrder').filter(function(menuItem) {
+						return !menuItem.get('isDeleted');
+					});
+				}
+			}).readOnly()
 		});
 
 		exports['default'] = ComponentMenuModel;

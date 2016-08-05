@@ -25,7 +25,7 @@
 	</div>
 	<div class="col-sm-9" style="padding-top:20px;">
 		<ul class="nav navbar-nav dragula-container" id="horizontal-menu-manager-widget-{{model.id}}" style="min-height:50px; width:100%; background-color:#f8f8f8;">
-		{{#each sortedMenuItems as |menuItem index|}}
+		{{#each model.sortedMenuItems as |menuItem index|}}
 		{{#unless menuItem.parent}}
 			{{horizontal-menu-item-widget model=menuItem orientation="vertical" controller-action="controller-action"}}
 		{{/unless}}
@@ -72,7 +72,7 @@
 	{{else}}
 		{{#if isVertical}}
 		<ul class="dropdown-menu dragula-container" style="min-height:100px; width:100%; margin-top:-5px; padding:0px;">
-			{{#each sortedMenuItems as |menuItem|}}
+			{{#each model.sortedMenuItems as |menuItem|}}
 				{{horizontal-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 			{{/each}}
 		</ul>
@@ -80,7 +80,7 @@
 
 		{{#if isHorizontal}}
 		<ul class="dropdown-menu dragula-container" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
-			{{#each sortedMenuItems as |menuItem|}}
+			{{#each model.sortedMenuItems as |menuItem|}}
 				{{horizontal-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 			{{/each}}
 		</ul>
@@ -98,7 +98,7 @@
 {{#if model.isExpanded}}
 	{{#if isVertical}}
 	<ul class="dropdown-menu" style="min-height:100px; width:100%; margin-top:-5px; padding:0px;">
-		{{#each sortedMenuItems as |menuItem|}}
+		{{#each model.sortedMenuItems as |menuItem|}}
 			{{horizontal-component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 		{{/each}}
 	</ul>
@@ -106,7 +106,7 @@
 
 	{{#if isHorizontal}}
 	<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
-		{{#each sortedMenuItems as |menuItem|}}
+		{{#each model.sortedMenuItems as |menuItem|}}
 			{{horizontal-component-menu-item-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 		{{/each}}
 	</ul>

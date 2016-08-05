@@ -1,0 +1,40 @@
+<script type="text/x-handlebars" data-template-name="components/footer-menu-manager-widget">
+<div class="row" style="margin:0px; border-top:1px solid #f1f1f1;">
+	<div class="col-sm-3" id="footer-menu-manager-widget-available-component-menus-{{model.id}}" style="text-align:center; max-height:400px; overflow-y:auto;">
+		{{#each _availableMenus as |componentMenu|}}
+			<div id={{componentMenu.id}} class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="{{componentMenu.tooltip}}">
+				<span class="info-box-icon bg-blue">
+					<i class="{{componentMenu.iconClass}}" />
+				</span>
+				<div class="info-box-content">
+					<span class="info-box-text">{{componentMenu.displayName}}</span>
+					<span class="description">{{componentMenu.description}}</span>
+				</div>
+			</div>
+		{{/each}}
+	</div>
+	<div class="col-sm-9" style="padding-top:20px;">
+		<ul class="nav navbar-nav dragula-container" id="footer-menu-manager-widget-{{model.id}}" style="min-height:50px; min-width:100%; background-color:#f8f8f8;">
+		{{#each model.sortedMenuItems as |menuItem index|}}
+		{{#unless menuItem.parent}}
+			{{footer-menu-item-widget model=menuItem controller-action="controller-action"}}
+		{{/unless}}
+		{{/each}}
+		</ul>
+	</div>
+</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/footer-menu-item-widget">
+<a id="{{model.id}}" href="#" title="{{model.tooltip}}">
+	<span class="{{model.componentMenu.iconClass}}" style="margin-right:5px;" />
+	{{model.componentMenu.displayName}}
+</a>
+{{#unless model.parent}}
+<ul class="dropdown-menu dragula-container" style="min-height:100px; min-width:100%; margin-top:-5px;">
+	{{#each model.children as |menuItem|}}
+		{{footer-menu-item-widget model=menuItem controller-action="controller-action"}}
+	{{/each}}
+</ul>
+{{/unless}}
+</script>

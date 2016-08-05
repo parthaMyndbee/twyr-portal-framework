@@ -25,7 +25,7 @@
 	</div>
 	<div class="col-sm-9" style="padding-top:20px;">
 		<ul class="nav dragula-container" id="vertical-menu-manager-widget-{{model.id}}" style="min-height:50px; width:25%; background-color:#f8f8f8;">
-		{{#each sortedMenuItems as |menuItem index|}}
+		{{#each model.sortedMenuItems as |menuItem index|}}
 		{{#unless menuItem.parent}}
 			{{vertical-menu-item-widget model=menuItem controller-action="controller-action"}}
 		{{/unless}}
@@ -61,7 +61,7 @@
 		{{/if}}
 	{{else}}
 		<ul class="dropdown-menu dragula-container" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
-			{{#each sortedMenuItems as |menuItem|}}
+			{{#each model.sortedMenuItems as |menuItem|}}
 				{{vertical-menu-item-widget model=menuItem controller-action="controller-action"}}
 			{{/each}}
 		</ul>
@@ -77,7 +77,7 @@
 </a>
 {{#if model.isExpanded}}
 	<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
-		{{#each sortedMenuItems as |menuItem|}}
+		{{#each model.sortedMenuItems as |menuItem|}}
 			{{vertical-component-menu-item-widget model=menuItem controller-action="controller-action"}}
 		{{/each}}
 	</ul>

@@ -1,0 +1,32 @@
+<script type="text/x-handlebars" data-template-name="components/menu-<%= menuId %>">
+{{#if model.shouldDisplay}}
+<ul class="nav navbar-nav" id="footer-menu-viewer-widget-{{model.id}}" style="text-align:left;">
+	{{#each model.sortedMenuItems as |menuItem index|}}
+	{{#unless menuItem.parent}}
+	<li>
+		<ul class="nav">
+			<li style="font-weight:600;">
+				{{#link-to menuItem.componentMenu.emberRoute title=menuItem.componentMenu.tooltip}}
+					<span class="{{menuItem.componentMenu.iconClass}}" style="margin-right:5px;" />
+					{{menuItem.componentMenu.displayName}}
+				{{/link-to}}
+			</li>
+
+			{{#if menuItem.children.length}}
+			{{#each menuItem.children as |subMenuItem|}}
+			<li>
+				{{#link-to subMenuItem.componentMenu.emberRoute title=subMenuItem.componentMenu.tooltip}}
+					<span class="{{subMenuItem.componentMenu.iconClass}}" style="margin-right:5px;" />
+					{{subMenuItem.componentMenu.displayName}}
+				{{/link-to}}
+			</li>
+			{{/each}}
+			{{/if}}
+		</ul>
+	</li>
+	{{/unless}}
+	{{/each}}
+</ul>
+{{/if}}
+</script>
+
