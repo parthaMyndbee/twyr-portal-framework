@@ -1,7 +1,7 @@
 <script type="text/x-handlebars" data-template-name="components/horizontal-menu-item-view-widget">
 {{#if model.shouldDisplay}}
 	{{#if model.componentMenu}}
-		{{#link-to model.componentMenu.emberRoute title=model.componentMenu.tooltip}}
+		{{#link-to model.componentMenu.emberRoute title=model.componentMenu.tooltip  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"}}
 			<span class="{{model.componentMenu.iconClass}}" style="margin-right:5px;" />
 			{{model.componentMenu.displayName}}
 
@@ -10,41 +10,20 @@
 			{{/if}}
 		{{/link-to}}
 	{{else}}
-		<a id="{{model.id}}" href="#" title="{{model.tooltip}}">
+		<a id="{{model.id}}" href="#" title="{{model.tooltip}}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="{{model.iconClass}}" style="margin-right:5px;" />
 			{{model.displayName}}
 			<span class="{{caretClass}}" style="margin-left:5px;" />
 		</a>
 	{{/if}}
-	{{#if model.isExpanded}}
-		{{#if model.componentMenu}}
-			{{#if model.componentMenu.children.length}}
-				{{#if isVertical}}
-				<ul class="dropdown-menu" style="width:100%; margin-top:-5px; padding:0px;">
-					{{#each model.componentMenu.children as |menuItem|}}
-					{{#if menuItem.shouldDisplay}}
-						{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
-					{{/if}}
-					{{/each}}
-				</ul>
-				{{/if}}
 
-				{{#if isHorizontal}}
-				<ul class="dropdown-menu" style="width:100%; top:0px; left:100%; margin-top:0px;">
-					{{#each model.componentMenu.children as |menuItem|}}
-					{{#if menuItem.shouldDisplay}}
-						{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
-					{{/if}}
-					{{/each}}
-				</ul>
-				{{/if}}
-			{{/if}}
-		{{else}}
+	{{#if model.componentMenu}}
+		{{#if model.componentMenu.children.length}}
 			{{#if isVertical}}
 			<ul class="dropdown-menu" style="width:100%; margin-top:-5px; padding:0px;">
-				{{#each model.sortedMenuItems as |menuItem|}}
+				{{#each model.componentMenu.children as |menuItem|}}
 				{{#if menuItem.shouldDisplay}}
-					{{horizontal-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+					{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 				{{/if}}
 				{{/each}}
 			</ul>
@@ -52,39 +31,58 @@
 
 			{{#if isHorizontal}}
 			<ul class="dropdown-menu" style="width:100%; top:0px; left:100%; margin-top:0px;">
-				{{#each model.sortedMenuItems as |menuItem|}}
+				{{#each model.componentMenu.children as |menuItem|}}
 				{{#if menuItem.shouldDisplay}}
-					{{horizontal-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+					{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 				{{/if}}
 				{{/each}}
 			</ul>
 			{{/if}}
+		{{/if}}
+	{{else}}
+		{{#if isVertical}}
+		<ul class="dropdown-menu" style="width:100%; margin-top:-5px; padding:0px;">
+			{{#each model.sortedMenuItems as |menuItem|}}
+			{{#if menuItem.shouldDisplay}}
+				{{horizontal-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+			{{/if}}
+			{{/each}}
+		</ul>
+		{{/if}}
+
+		{{#if isHorizontal}}
+		<ul class="dropdown-menu" style="width:100%; top:0px; left:100%; margin-top:0px;">
+			{{#each model.sortedMenuItems as |menuItem|}}
+			{{#if menuItem.shouldDisplay}}
+				{{horizontal-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+			{{/if}}
+			{{/each}}
+		</ul>
 		{{/if}}
 	{{/if}}
 {{/if}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/horizontal-component-menu-item-view-widget">
-<a id="{{model.id}}" href="#" title="{{model.tooltip}}">
+<a id="{{model.id}}" href="#" title="{{model.tooltip}}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 	<span class="{{model.iconClass}}" style="margin-right:5px;" />
 	{{model.displayName}}
 	<span class="{{caretClass}}" style="margin-left:5px;" />
 </a>
-{{#if model.isExpanded}}
-	{{#if isVertical}}
-	<ul class="dropdown-menu" style="min-height:100px; width:100%; margin-top:-5px; padding:0px;">
-		{{#each model.sortedMenuItems as |menuItem|}}
-			{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
-		{{/each}}
-	</ul>
-	{{/if}}
 
-	{{#if isHorizontal}}
-	<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
-		{{#each model.sortedMenuItems as |menuItem|}}
-			{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
-		{{/each}}
-	</ul>
-	{{/if}}
+{{#if isVertical}}
+<ul class="dropdown-menu" style="min-height:100px; width:100%; margin-top:-5px; padding:0px;">
+	{{#each model.sortedMenuItems as |menuItem|}}
+		{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+	{{/each}}
+</ul>
+{{/if}}
+
+{{#if isHorizontal}}
+<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
+	{{#each model.sortedMenuItems as |menuItem|}}
+		{{horizontal-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
+	{{/each}}
+</ul>
 {{/if}}
 </script>
