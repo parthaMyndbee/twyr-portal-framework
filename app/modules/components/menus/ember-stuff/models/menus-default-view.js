@@ -123,11 +123,12 @@ define(
 			'parent': _relationships.belongsTo('component-menu-view', {  'inverse': 'children', 'async': true  }),
 			'children': _relationships.hasMany('component-menu-view', {  'inverse': 'parent', 'async': true  }),
 
-			'emberRoute': _attr['default']('string'),
 			'iconClass': _attr['default']('string'),
 			'displayName': _attr['default']('string'),
 			'description': _attr['default']('string'),
 			'tooltip': _attr['default']('string'),
+
+			'emberRoute': _attr['default']('string'),
 
 			'sortedMenuItems': _ember['default'].computed('children.[]', 'children.@each.displayOrder', {
 				'get': function(key) {

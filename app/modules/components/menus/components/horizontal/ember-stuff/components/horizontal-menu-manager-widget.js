@@ -15,9 +15,25 @@ define(
 
 				self.get('store')
 				.findAll('component-menu')
-				.then(function(allMenus) {
-					self.set('_availableMenus', allMenus);
-					self._initDragula();
+				.then(function(componentMenus) {
+					var categorizedMenus = _ember['default'].Object.create({});
+
+					componentMenus.forEach(function(componentMenu) {
+						var componentMenuList = categorizedMenus.get(componentMenu.get('category'));
+						if(componentMenuList) {
+							componentMenuList.addObject(componentMenu);
+							return;
+						}
+
+						categorizedMenus.set(componentMenu.get('category'), _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }));
+						componentMenuList = categorizedMenus.get(componentMenu.get('category'));
+						componentMenuList.addObject(componentMenu);
+					});
+
+					self.set('_availableMenus', categorizedMenus);
+					_ember['default'].run.scheduleOnce('afterRender', function() {
+						self._initDragula();
+					});
 				})
 				.catch(function(err) {
 					console.error(window.apiServer + 'menus/component-menus error:\n', arguments);
@@ -53,11 +69,15 @@ define(
 				var self = this;
 				self._uninitDragula();
 
-				var availableMenuContainer = self.$('div#horizontal-menu-manager-widget-available-component-menus-' + self.get('model').get('id'))[0];
+				var availableMenuContainers = [];
+				window.$.each(self.$('div.panel-body'), function(index, item) {
+					availableMenuContainers.push(item);
+				});
 
-				self.set('_dragula', dragula([availableMenuContainer], {
+				console.log('Available Menu Containers: ', availableMenuContainers);
+				self.set('_dragula', dragula(availableMenuContainers, {
 					'copy': function(element, source) {
-						return (source === availableMenuContainer);
+						return ((availableMenuContainers.indexOf(source) >= 0) && window.$(element).hasClass('info-box'));
 					},
 
 					'isContainer': function(element) {

@@ -1,27 +1,57 @@
 <script type="text/x-handlebars" data-template-name="components/vertical-menu-manager-widget">
 <div class="row" style="margin:0px; border-top:1px solid #f1f1f1;">
 	<div class="col-sm-3" id="vertical-menu-manager-widget-available-component-menus-{{model.id}}" style="text-align:center; max-height:400px; overflow-y:auto;">
-			<div id="empty-menu-item" class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="Empty Menu Item">
-				<span class="info-box-icon bg-blue">
-					<i class="fa fa-bars" />
-				</span>
-				<div class="info-box-content">
-					<span class="info-box-text">Empty Menu Item</span>
-					<span class="description">Drag this to create Menu Items not linked to the ones created by the components</span>
+		<div class="panel-group" id="vertical-menu-manager-widget-available-component-menus-accordion-{{model.id}}">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#vertical-menu-manager-widget-available-component-menus-accordion-{{model.id}}" href="#vertical-menu-manager-widget-available-component-menus-accordion-miscellaneous-{{model.id}}">
+							<span>Miscellaneous</span>
+						</a>
+					</h4>
+				</div>
+				<div class="panel-collapse collpase in" id="vertical-menu-manager-widget-available-component-menus-accordion-miscellaneous-{{model.id}}">
+					<div class="panel-body">
+						<div id="empty-menu-item" class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="Empty Menu Item">
+							<span class="info-box-icon bg-blue">
+								<i class="fa fa-bars" />
+							</span>
+							<div class="info-box-content">
+								<span class="info-box-text">Empty Menu Item</span>
+								<span class="description">Drag this to create Menu Items not linked to the ones created by the components</span>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
-
-		{{#each _availableMenus as |componentMenu|}}
-			<div id={{componentMenu.id}} class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="{{componentMenu.tooltip}}">
-				<span class="info-box-icon bg-blue">
-					<i class="{{componentMenu.iconClass}}" />
-				</span>
-				<div class="info-box-content">
-					<span class="info-box-text">{{componentMenu.displayName}}</span>
-					<span class="description">{{componentMenu.description}}</span>
+		{{#each-in _availableMenus as |category componentMenus|}}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#vertical-menu-manager-widget-available-component-menus-accordion-{{model.id}}" href="#vertical-menu-manager-widget-available-component-menus-accordion-{{category}}-{{model.id}}">
+							<span>{{category}}</span>
+						</a>
+					</h4>
+				</div>
+				<div class="panel-collapse collpase in" id="vertical-menu-manager-widget-available-component-menus-accordion-{{category}}-{{model.id}}">
+					<div class="panel-body">
+						{{#each componentMenus as |componentMenu|}}
+						{{log 'Component Menu: ' componentMenu}}
+						<div id={{componentMenu.id}} class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="{{componentMenu.tooltip}}">
+							<span class="info-box-icon bg-blue">
+								<i class="{{componentMenu.iconClass}}" />
+							</span>
+							<div class="info-box-content">
+								<span class="info-box-text">{{componentMenu.displayName}}</span>
+								<span class="description">{{componentMenu.description}}</span>
+							</div>
+						</div>
+						{{/each}}
+					</div>
 				</div>
 			</div>
-		{{/each}}
+		{{/each-in}}
+		</div>
 	</div>
 	<div class="col-sm-9" style="padding-top:20px;">
 		<ul class="nav dragula-container" id="vertical-menu-manager-widget-{{model.id}}" style="min-height:50px; width:25%; background-color:#f8f8f8;">

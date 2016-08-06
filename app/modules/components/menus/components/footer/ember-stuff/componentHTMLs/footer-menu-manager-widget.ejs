@@ -1,20 +1,38 @@
 <script type="text/x-handlebars" data-template-name="components/footer-menu-manager-widget">
 <div class="row" style="margin:0px; border-top:1px solid #f1f1f1;">
 	<div class="col-sm-3" id="footer-menu-manager-widget-available-component-menus-{{model.id}}" style="text-align:center; max-height:400px; overflow-y:auto;">
-		{{#each _availableMenus as |componentMenu|}}
-			<div id={{componentMenu.id}} class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="{{componentMenu.tooltip}}">
-				<span class="info-box-icon bg-blue">
-					<i class="{{componentMenu.iconClass}}" />
-				</span>
-				<div class="info-box-content">
-					<span class="info-box-text">{{componentMenu.displayName}}</span>
-					<span class="description">{{componentMenu.description}}</span>
+		<div class="panel-group" id="footer-menu-manager-widget-available-component-menus-accordion-{{model.id}}">
+		{{#each-in _availableMenus as |category componentMenus|}}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#footer-menu-manager-widget-available-component-menus-accordion-{{model.id}}" href="#footer-menu-manager-widget-available-component-menus-accordion-{{category}}-{{model.id}}">
+							<span>{{category}}</span>
+						</a>
+					</h4>
+				</div>
+				<div class="panel-collapse collpase in" id="footer-menu-manager-widget-available-component-menus-accordion-{{category}}-{{model.id}}">
+					<div class="panel-body">
+						{{#each componentMenus as |componentMenu|}}
+						{{log 'Component Menu: ' componentMenu}}
+						<div id={{componentMenu.id}} class="info-box" style="cursor:move; text-align:left; border:1px solid #f1f1f1;" title="{{componentMenu.tooltip}}">
+							<span class="info-box-icon bg-blue">
+								<i class="{{componentMenu.iconClass}}" />
+							</span>
+							<div class="info-box-content">
+								<span class="info-box-text">{{componentMenu.displayName}}</span>
+								<span class="description">{{componentMenu.description}}</span>
+							</div>
+						</div>
+						{{/each}}
+					</div>
 				</div>
 			</div>
-		{{/each}}
+		{{/each-in}}
+		</div>
 	</div>
 	<div class="col-sm-9" style="padding-top:20px;">
-		<ul class="nav navbar-nav dragula-container" id="footer-menu-manager-widget-{{model.id}}" style="min-height:50px; min-width:100%; background-color:#f8f8f8;">
+		<ul class="nav navbar-nav dragula-container" id="footer-menu-manager-widget-{{model.id}}" style="min-height:50px; min-width:100%; border:1px dashed #000;">
 		{{#each model.sortedMenuItems as |menuItem index|}}
 		{{#unless menuItem.parent}}
 			{{footer-menu-item-widget model=menuItem controller-action="controller-action"}}

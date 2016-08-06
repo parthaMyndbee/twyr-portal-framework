@@ -17,6 +17,10 @@ define(
 				self.get('store').findRecord('menus-default-view', '<%= menuId %>')
 				.then(function(menu) {
 					self.set('model', menu);
+
+					_ember['default'].run.later(self, function() {
+						self.$().find('a.footer-top').css('margin-top', '-10px');
+					}, 500);
 					return null;
 				})
 				.catch(function(err) {
