@@ -62,6 +62,8 @@
 		"lodash": "*",
 		"method-override": "*",
 		"morgan": "*",
+		"nodemailer": "*",
+		"nodemailer-smtp-transport": "*",
 		"node-print": "*",
 		"node-uuid": "*",
 		"passport": "*",

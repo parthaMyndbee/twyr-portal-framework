@@ -74,7 +74,6 @@ define(
 					availableMenuContainers.push(item);
 				});
 
-				console.log('Available Menu Containers: ', availableMenuContainers);
 				self.set('_dragula', dragula(availableMenuContainers, {
 					'copy': function(element, source) {
 						return ((availableMenuContainers.indexOf(source) >= 0) && window.$(element).hasClass('info-box'));

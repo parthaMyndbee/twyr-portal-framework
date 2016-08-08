@@ -121,7 +121,7 @@ var app = prime({
 		var self = this;
 
 		// Step 1: Which template do we use?
-		self._getConfiguredTemplatesAsync()
+		self._getConfiguredTemplatesAsync(user)
 		.then(function(possibleTemplates) {
 			return self._selectTemplateAsync(user, mediaType, possibleTemplates);
 		})
@@ -177,19 +177,23 @@ var app = prime({
 		});
 	},
 
-	'_getConfiguredTemplates': function(callback) {
+	'_getConfiguredTemplates': function(user, callback) {
 		var self = this,
 			configSrvc = (self.$services['configuration-service']).getInterface(),
 			dbSrvc = (self.$services['database-service']).getInterface().knex;
 
 		configSrvc.getModuleIdAsync(self)
 		.then(function(id) {
-			return dbSrvc.raw('SELECT id, module, name, media, role, configuration FROM module_templates WHERE module = ? AND is_default = true;', [id])
+			if(user) {
+				return dbSrvc.raw('SELECT id, module, name, media, configuration FROM module_templates WHERE module = ? AND permission IN (SELECT permission FROM fn_get_user_permissions(?)) AND permission NOT IN (SELECT id FROM module_permissions WHERE name = \'public\') AND is_default = true;', [id, user.id]);
+			}
+			else {
+				return dbSrvc.raw('SELECT id, module, name, media, configuration FROM module_templates WHERE module = ? AND permission = (SELECT id FROM module_permissions WHERE name = \'public\') AND is_default = true;', [id]);
+			}
 		})
 		.then(function(moduleTemplates) {
 			if(!moduleTemplates.rows.length) {
 				throw new Error('No client side assets for: ' + self.name);
-				return null;
 			}
 
 			return moduleTemplates.rows;
@@ -206,9 +210,9 @@ var app = prime({
 	'_selectTemplate': function(user, mediaType, possibleTemplates, callback) {
 		var selectedTemplate = null;
 
-		// Step 1: Check for exact match
+		// Step 1: Filter by media type match
 		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return ((modTmpl.media == mediaType) && (modTmpl.role == (user ? 'registered': 'public')));
+			return (modTmpl.media == mediaType);
 		});
 
 		if(selectedTemplate.length) {
@@ -216,29 +220,9 @@ var app = prime({
 			return;
 		}
 
-		// Step 2: Check for role match
+		// Step 2: Check for generic match
 		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return ((modTmpl.media == 'all') && (modTmpl.role == (user ? 'registered': 'public')));
-		});
-
-		if(selectedTemplate.length) {
-			if(callback) callback(null, selectedTemplate[0]);
-			return;
-		}
-
-		// Step 3: Check for media type match
-		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return ((modTmpl.media == mediaType) && (modTmpl.role == 'all'));
-		});
-
-		if(selectedTemplate.length) {
-			if(callback) callback(null, selectedTemplate[0]);
-			return;
-		}
-
-		// Step 4: Check for generic match
-		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return ((modTmpl.media == 'all') && (modTmpl.role == 'all'));
+			return (modTmpl.media == 'all');
 		});
 
 		if(selectedTemplate.length) {

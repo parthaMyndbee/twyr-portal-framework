@@ -7,7 +7,6 @@
 		<ul class="nav">
 			<li style="font-weight:600;">
 				{{#link-to menuItem.componentMenu.emberRoute title=menuItem.componentMenu.tooltip class="footer-top"}}
-					<span class="{{menuItem.componentMenu.iconClass}}" style="margin-right:5px;" />
 					{{menuItem.componentMenu.displayName}}
 				{{/link-to}}
 			</li>
@@ -16,7 +15,6 @@
 			{{#each menuItem.children as |subMenuItem|}}
 			<li>
 				{{#link-to subMenuItem.componentMenu.emberRoute title=subMenuItem.componentMenu.tooltip}}
-					<span class="{{subMenuItem.componentMenu.iconClass}}" style="margin-right:5px;" />
 					{{subMenuItem.componentMenu.displayName}}
 				{{/link-to}}
 			</li>

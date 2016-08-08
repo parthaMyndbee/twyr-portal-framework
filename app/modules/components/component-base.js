@@ -172,7 +172,7 @@ var twyrComponentBase = prime({
 			loggerSrvc = self.dependencies['logger-service'];
 
 		// Step 1: Which templates do we use?
-		self._getConfiguredTemplatesAsync()
+		self._getConfiguredTemplatesAsync(user)
 		.then(function(possibleTemplates) {
 			return self._selectTemplatesAsync(user, mediaType, possibleTemplates);
 		})
@@ -238,7 +238,7 @@ var twyrComponentBase = prime({
 		});
 	},
 
-	'_getConfiguredTemplates': function(callback) {
+	'_getConfiguredTemplates': function(user, callback) {
 		var self = this,
 			configSrvc = (self.dependencies['configuration-service']),
 			dbSrvc = (self.dependencies['database-service']).knex,
@@ -246,7 +246,12 @@ var twyrComponentBase = prime({
 
 		configSrvc.getModuleIdAsync(self)
 		.then(function(id) {
-			return dbSrvc.raw('SELECT id, module, name, media, role, configuration FROM module_templates WHERE module = ? AND is_default = true;', [id])
+			if(user) {
+				return dbSrvc.raw('SELECT id, module, name, media, configuration FROM module_templates WHERE module = ? AND permission IN (SELECT permission FROM fn_get_user_permissions(?)) AND is_default = true;', [id, user.id]);
+			}
+			else {
+				return dbSrvc.raw('SELECT id, module, name, media, configuration FROM module_templates WHERE module = ? AND permission = (SELECT id FROM module_permissions WHERE name = \'public\') AND is_default = true;', [id]);
+			}
 		})
 		.then(function(moduleTemplates) {
 			if(callback) callback(null, moduleTemplates.rows);

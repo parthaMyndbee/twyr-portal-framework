@@ -30,11 +30,6 @@ var sessionComponent = prime({
 		base.call(this, module);
 	},
 
-	'_getConfiguredTemplates': function(callback) {
-		if(callback) callback(null, []);
-		return null;
-	},
-
 	'_getEmberComponents': function(user, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
