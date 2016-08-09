@@ -323,11 +323,21 @@ define(
 					return menu.get('menuItems');
 				})
 				.then(function(menuItems) {
-					var rootMenuItems = _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(menuItems.filterBy('parent.id', undefined)) });
-					return _ember['default'].RSVP.allSettled([rootMenuItems, rootMenuItems.invoke('save')]);
+					var rootMenuItems = _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(menuItems.filterBy('parent.id', undefined)) }),
+						promiseResolutions = [];
+
+					promiseResolutions.push(rootMenuItems);
+					rootMenuItems.forEach(function() {
+						promiseResolutions.push(rootMenuItem.save());
+					});
+
+					return _ember['default'].RSVP.allSettled(promiseResolutions);
 				})
-				.then(function(results) {
-					var rootMenuItems = results[0].value,
+				.then(function() {
+					return menu.get('menuItems');
+				})
+				.then(function(menuItems) {
+					var rootMenuItems = _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A(menuItems.filterBy('parent.id', undefined)) }),
 						promiseResolutions = [];
 
 					rootMenuItems.forEach(function(rootMenuItem) {
@@ -458,12 +468,20 @@ define(
 				return new _ember['default'].RSVP.Promise(function(resolve, reject) {
 					parent.get('children')
 					.then(function(menuItems) {
-						return _ember['default'].RSVP.allSettled([menuItems, menuItems.invoke('save')]);
-					})
-					.then(function(results) {
-						var menuItems = results[0].value,
-							promiseResolutions = [];
+						var promiseResolutions = [];
+						promiseResolutions.push(menuItems);
 
+						menuItems.forEach(function(menuItem) {
+							promiseResolutions.push(menuItem.save());
+						});
+
+						return _ember['default'].RSVP.allSettled(promiseResolutions);
+					})
+					.then(function() {
+						return parent.get('children');
+					})
+					.then(function(menuItems) {
+						var promiseResolutions = [];
 						menuItems.forEach(function(menuItem) {
 							promiseResolutions.push(self._saveChildrenMenuItems(menuItem));
 						});
