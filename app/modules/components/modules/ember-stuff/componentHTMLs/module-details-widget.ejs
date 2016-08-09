@@ -20,7 +20,7 @@
 	<div class="info-box" style="border-radius:0px;">
 		<div class="info-box-content" style="margin-left:0px;">
 			<div class="row">
-				<div class="col-sm-11">
+				<div class="col-sm-11" style="border-right:1px solid #f4f4f4;">
 					<div class="row" style="margin:10px 0px;">
 						<div class="col-sm-12">
 							<span class="info-box-text">{{model.description}}</span>
@@ -32,7 +32,7 @@
 						<div class="col-sm-4" style="text-align:right;">Demo: <a href="{{model.parsedMetadata.demo}}" target="_blank">{{model.parsedMetadata.demo}}</a></div>
 					</div>
 				</div>
-				<div class="col-sm-1" style="border-left:1px solid #f4f4f4;">
+				<div class="col-sm-1">
 					<table class="table" style="margin:10px 0px;">
 					<tbody>
 						<tr>
@@ -80,125 +80,71 @@
 		<div class="tab-content">
 			{{#if model.staticDataExists}}
 			<div class="tab-pane fade" role="tabpanel" id="module-details-widget-static-data-{{model.id}}-div">
-				{{#if model.permissions.length}}
-				<div class="info-box" style="border-radius:0px; box-shadow:none; margin-bottom:0px;">
-					<div class="info-box-content" style="margin-left:0px;">
-						<div class="row" style="margin:10px 0px;">
-							<div class="col-sm-12">
-								<span class="info-box-text">Permissions</span>
-							</div>
-						</div>
-						<div class="row" style="margin:10px 0px;">
-							<div class="col-sm-12 table-responsive">
-								<table class="table table-hover">
-								<thead>
+				<div class="row" style="margin:10px 0px;">
+					<div class="col-sm-12 table-responsive">
+						<table class="table table-hover">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Permission</th>
+							<th>Description</th>
+							<th>Created At</th>
+							<th>Updated At</th>
+						</tr>
+						</thead>
+						<tbody>
+							{{#if model.permissions.length}}
 								<tr>
-									<th>Permission Name</th>
-									<th>Internal Name</th>
-									<th>Description</th>
-									<th>Created At</th>
-									<th>Updated At</th>
+									<td colspan="5" style="padding:25px 8px;">
+										<span class="info-box-text">Permissions</span>
+									</td>
 								</tr>
-								</thead>
-								<tbody>
 								{{#each model.permissions as |permission|}}
 								<tr>
 									<td>{{permission.displayName}}</td>
-									<td>{{permission.name}}</td>
+									<td>&nbsp;</td>
 									<td>{{permission.description}}</td>
 									<td>{{permission.formattedCreatedAt}}</td>
 									<td>{{permission.formattedUpdatedAt}}</td>
 								</tr>
 								{{/each}}
-								</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-				{{/if}}
-
-				{{#if model.widgets.length}}
-				<div class="info-box" style="border-radius:0px; box-shadow:none; margin-bottom:0px;">
-					<div class="info-box-content" style="margin-left:0px;">
-						<div class="row" style="margin:10px 0px;">
-							<div class="col-sm-12">
-								<span class="info-box-text">Widgets</span>
-							</div>
-						</div>
-						<div class="row" style="margin:10px 0px;">
-							<div class="col-sm-12 table-responsive">
-								<table class="table table-hover">
-								<thead>
+							{{/if}}
+							{{#if model.menus.length}}
 								<tr>
-									<th>Widget Name</th>
-									<th>Internal Name</th>
-									<th>Permission</th>
-									<th>Description</th>
-									<th>Created At</th>
-									<th>Updated At</th>
+									<td colspan="5" style="padding:25px 8px;">
+										<span class="info-box-text">Menu Items</span>
+									</td>
 								</tr>
-								</thead>
-								<tbody>
+								{{#each model.menus as |menu|}}
+								<tr title="{{menu.tooltip}}">
+									<td><span class="{{menu.iconClass}}" style="margin-right:5px;" />{{menu.displayName}}</td>
+									<td>{{menu.permission.displayName}}</td>
+									<td>{{menu.description}}</td>
+									<td>{{menu.formattedCreatedAt}}</td>
+									<td>{{menu.formattedUpdatedAt}}</td>
+								</tr>
+								{{/each}}
+							{{/if}}
+							{{#if model.widgets.length}}
+								<tr>
+									<td colspan="5" style="padding:25px 8px;">
+										<span class="info-box-text">Widgets</span>
+									</td>
+								</tr>
 								{{#each model.widgets as |widget|}}
 								<tr>
 									<td>{{widget.displayName}}</td>
-									<td>{{widget.emberComponent}}</td>
 									<td>{{widget.permission.displayName}}</td>
 									<td>{{widget.description}}</td>
 									<td>{{widget.formattedCreatedAt}}</td>
 									<td>{{widget.formattedUpdatedAt}}</td>
 								</tr>
 								{{/each}}
-								</tbody>
-								</table>
-							</div>
-						</div>
+							{{/if}}
+						</tbody>
+						</table>
 					</div>
 				</div>
-				{{/if}}
-
-				{{#if model.menus.length}}
-				<div class="info-box" style="border-radius:0px; box-shadow:none; margin-bottom:0px;">
-					<div class="info-box-content" style="margin-left:0px;">
-						<div class="row" style="margin:10px 0px;">
-							<div class="col-sm-12">
-								<span class="info-box-text">Menus</span>
-							</div>
-						</div>
-						<div class="row" style="margin:10px 0px;">
-							<div class="col-sm-12 table-responsive">
-								<table class="table table-hover">
-								<thead>
-								<tr>
-									<th>Menu Item Name</th>
-									<th>Internal Name</th>
-									<th>Permission</th>
-									<th>Description</th>
-									<th>Tooltip</th>
-									<th>Created At</th>
-									<th>Updated At</th>
-								</tr>
-								</thead>
-								<tbody>
-								{{#each model.menus as |menu|}}
-								<tr>
-									<td><span class="{{menu.iconClass}}" style="margin-right:10px;" />{{menu.displayName}}</td>
-									<td>{{menu.emberRoute}}</td>
-									<td>{{menu.permission.displayName}}</td>
-									<td>{{menu.description}}</td>
-									<td>{{menu.tooltip}}</td>
-									<td>{{menu.formattedCreatedAt}}</td>
-									<td>{{menu.formattedUpdatedAt}}</td>
-								</tr>
-								{{/each}}
-								</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-				{{/if}}
 			</div>
 			{{/if}}
 
@@ -231,13 +177,13 @@
 						</tr>
 						</thead>
 						<tbody>
-						{{#if allUserTemplates.length}}
+						{{#each-in model.categorizedTemplates as |permissionName templates|}}
 							<tr>
 								<td colspan="7" style="padding:25px 8px;">
-									<span class="info-box-text">All User Templates</span>
+									<span class="info-box-text">{{permissionName}}</span>
 								</td>
 							</tr>
-							{{#each allUserTemplates as |template|}}
+							{{#each templates as |template|}}
 							<tr>
 								<td style="text-align:center;">{{input type="checkbox" checked=template.isDefault disabled=template.isDefault}}</td>
 								<td>{{template.name}}</td>
@@ -259,127 +205,7 @@
 								</td>
 							</tr>
 							{{/each}}
-						{{/if}}
-
-						{{#if publicUserTemplates.length}}
-							<tr>
-								<td colspan="7" style="padding:25px 8px;">
-									<span class="info-box-text">Public User Templates</span>
-								</td>
-							</tr>
-							{{#each publicUserTemplates as |template|}}
-							<tr>
-								<td style="text-align:center;">{{input type="checkbox" checked=template.isDefault disabled=template.isDefault}}</td>
-								<td>{{template.name}}</td>
-								<td>{{template.displayMedia}}</td>
-								<td>{{template.description}}</td>
-								<td>{{template.formattedCreatedAt}}</td>
-								<td>{{template.formattedUpdatedAt}}</td>
-								<td style="text-align:right;">
-									<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "editTemplate" template bubbles=false}}>
-										<i class="fa fa-edit" />
-										<span style="font-size:12px;">Edit</span>
-									</button>
-									{{#unless template.isDefault}}
-									<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "deleteTemplate" template bubbles=false}}>
-										<i class="fa fa-trash" />
-										<span style="font-size:12px;">Delete</span>
-									</button>
-									{{/unless}}
-								</td>
-							</tr>
-							{{/each}}
-						{{/if}}
-
-						{{#if registeredUserTemplates.length}}
-							<tr>
-								<td colspan="7" style="padding:25px 8px;">
-									<span class="info-box-text">Registered User Templates</span>
-								</td>
-							</tr>
-							{{#each registeredUserTemplates as |template|}}
-							<tr>
-								<td style="text-align:center;">{{input type="checkbox" checked=template.isDefault disabled=template.isDefault}}</td>
-								<td>{{template.name}}</td>
-								<td>{{template.displayMedia}}</td>
-								<td>{{template.description}}</td>
-								<td>{{template.formattedCreatedAt}}</td>
-								<td>{{template.formattedUpdatedAt}}</td>
-								<td style="text-align:right;">
-									<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "editTemplate" template bubbles=false}}>
-										<i class="fa fa-edit" />
-										<span style="font-size:12px;">Edit</span>
-									</button>
-									{{#unless template.isDefault}}
-									<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "deleteTemplate" template bubbles=false}}>
-										<i class="fa fa-trash" />
-										<span style="font-size:12px;">Delete</span>
-									</button>
-									{{/unless}}
-								</td>
-							</tr>
-							{{/each}}
-						{{/if}}
-
-						{{#if administratorUserTemplates.length}}
-							<tr>
-								<td colspan="7" style="padding:25px 8px;">
-									<span class="info-box-text">Administrator User Templates</span>
-								</td>
-							</tr>
-							{{#each administratorUserTemplates as |template|}}
-							<tr>
-								<td style="text-align:center;">{{input type="checkbox" checked=template.isDefault disabled=template.isDefault}}</td>
-								<td>{{template.name}}</td>
-								<td>{{template.displayMedia}}</td>
-								<td>{{template.description}}</td>
-								<td>{{template.formattedCreatedAt}}</td>
-								<td>{{template.formattedUpdatedAt}}</td>
-								<td style="text-align:right;">
-									<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "editTemplate" template bubbles=false}}>
-										<i class="fa fa-edit" />
-										<span style="font-size:12px;">Edit</span>
-									</button>
-									{{#unless template.isDefault}}
-									<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "deleteTemplate" template bubbles=false}}>
-										<i class="fa fa-trash" />
-										<span style="font-size:12px;">Delete</span>
-									</button>
-									{{/unless}}
-								</td>
-							</tr>
-							{{/each}}
-						{{/if}}
-
-						{{#if superadministratorUserTemplates.length}}
-							<tr>
-								<td colspan="7" style="padding:25px 8px;">
-									<span class="info-box-text">Super-Administrator User Templates</span>
-								</td>
-							</tr>
-							{{#each superadministratorUserTemplates as |template|}}
-							<tr>
-								<td style="text-align:center;">{{input type="checkbox" checked=template.isDefault disabled=template.isDefault}}</td>
-								<td>{{template.name}}</td>
-								<td>{{template.displayMedia}}</td>
-								<td>{{template.description}}</td>
-								<td>{{template.formattedCreatedAt}}</td>
-								<td>{{template.formattedUpdatedAt}}</td>
-								<td style="text-align:right;">
-									<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "editTemplate" template bubbles=false}}>
-										<i class="fa fa-edit" />
-										<span style="font-size:12px;">Edit</span>
-									</button>
-									{{#unless template.isDefault}}
-									<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "deleteTemplate" template bubbles=false}}>
-										<i class="fa fa-trash" />
-										<span style="font-size:12px;">Delete</span>
-									</button>
-									{{/unless}}
-								</td>
-							</tr>
-							{{/each}}
-						{{/if}}
+						{{/each-in}}
 						</tbody>
 						</table>
 					</div>

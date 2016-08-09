@@ -23,6 +23,7 @@ define(
 			'type': _attr['default']('string', { 'defaultValue': 'horizontal' }),
 			'status': _attr['default']('string', { 'defaultValue': 'draft' }),
 			'permission': _attr['default']('string'),
+			'description': _attr['default']('string'),
 
 			'menuItems': _relationships.hasMany('menu-item', { 'inverse': 'menu', 'async': true }),
 

@@ -50,8 +50,15 @@
 </div>
 
 <div class="row" style="margin:0px;">
-<div class="col-sm-12">
-{{component model.menuEditorWidget model=model controller-action="controller-action"}}
+	<div class="form-group col-sm-12">
+		<label>Description</label>
+		{{input type="text" value=model.description class="form-control"}}
+	</div>
 </div>
+
+<div class="row" style="margin:0px;">
+	<div class="col-sm-12">
+	{{component model.menuEditorWidget model=model controller-action="controller-action"}}
+	</div>
 </div>
 </script>

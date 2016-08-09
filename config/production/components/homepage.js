@@ -11,6 +11,8 @@
 "use strict";
 
 exports.config = ({
+	'defaultHome': 'homepage-home',
+
 	'templates': {
 		'path': './templates'
 	}

@@ -46,6 +46,33 @@ define(
 				}
 			}).readOnly(),
 
+			'categorizedTemplates': _ember['default'].computed('templates.@each.permission.displayName', {
+				'get': function(key) {
+					var templates = this.get('templates'),
+						categorizedTmpls = _ember['default'].Object.create({});
+
+					templates.forEach(function(template) {
+						var tmplPermission = template.get('permission');
+						if(!tmplPermission) {
+							return;
+						}
+
+						tmplPermission = tmplPermission.get('displayName');
+						if(!tmplPermission) {
+							return;
+						}
+
+						if(!categorizedTmpls.get(tmplPermission)) {
+							categorizedTmpls.set(tmplPermission, _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }));
+						}
+
+						categorizedTmpls.get(tmplPermission).addObject(template);
+					});
+
+					return categorizedTmpls;
+				}
+			}).readOnly(),
+
 			'staticDataExists': _ember['default'].computed('permissions', 'widgets', 'menus', {
 				'get': function(key) {
 					return !!(this.get('permissions').get('length') || this.get('menus').get('length') || this.get('widgets').get('length'));
@@ -90,7 +117,8 @@ define(
 			'description': _attr['default']('string'),
 
 			'widgets': _relationships.hasMany('module-widget', { 'inverse': 'permission' }),
-			'menus': _relationships.hasMany('module-menu', { 'inverse': 'permission' })
+			'menus': _relationships.hasMany('module-menu', { 'inverse': 'permission' }),
+			'templates': _relationships.hasMany('module-template', { 'inverse': 'permission' })
 		});
 
 		exports['default'] = PermissionModel;
@@ -192,13 +220,12 @@ define(
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/models/module-template');
 		var TemplateModel = _twyrBaseModel['default'].extend({
 			'module': _relationships.belongsTo('module', { 'inverse': 'templates' }),
+			'permission': _relationships.belongsTo('module-permission', { 'inverse': 'templates' }),
 
 			'name': _attr['default']('string'),
 			'description': _attr['default']('string'),
 
 			'media': _attr['default']('string', { 'defaultValue': 'all' }),
-			'role': _attr['default']('string', { 'defaultValue': 'all' }),
-
 			'isDefault': _attr['default']('boolean'),
 
 			'metadata': _attr['default']('string'),
@@ -210,12 +237,6 @@ define(
 			'displayMedia': _ember['default'].computed('media', {
 				'get': function(key) {
 					return _ember['default'].String.capitalize(this.get('media'));
-				}
-			}).readOnly(),
-
-			'displayRole': _ember['default'].computed('role', {
-				'get': function(key) {
-					return _ember['default'].String.capitalize(this.get('role'));
 				}
 			}).readOnly(),
 

@@ -68,44 +68,28 @@ var homepageComponent = prime({
 
 	'_getUserHomeRouteName': function(user, callback) {
 		var self = this,
-			homeRouteName = 'homepage-home',
+			homeRouteName = self.$config.defaultHomeRoute,
 			dbSrvc = self.dependencies['database-service'].knex,
 			loggerSrvc = self.dependencies['logger-service'];
 
 		if(!user) {
-			dbSrvc.raw('SELECT ember_route FROM module_menus WHERE permission = (SELECT id FROM module_permissions WHERE module = (SELECT id FROM modules WHERE name = ?) AND name = \'public\') AND is_default_home = true', [this.$module.$application])
-			.then(function(defaultPublicRoute) {
-				if(defaultPublicRoute.rows.length) {
-					homeRouteName = defaultPublicRoute.rows[0].ember_route;
-				}
-
-				if(callback) callback(null, homeRouteName);
-				return null;
-			})
-			.catch(function(err) {
-				loggerSrvc.error(self.name + '::_getEmberRoutes:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
-				if(callback) callback(err);
-			});
-
+			if(callback) callback(null, homeRouteName);
 			return null;
 		}
 
 		dbSrvc.raw('SELECT ember_route FROM module_menus WHERE id = (SELECT home_module_menu FROM users WHERE id = ?)', [user.id])
 		.then(function(userHomeRoute) {
-			if(!userHomeRoute.rows.length)
-				return dbSrvc.raw('SELECT ember_route FROM module_menus WHERE permission IN (SELECT id FROM module_permissions WHERE module = (SELECT id FROM modules WHERE name = ?) AND name IN (\'public\', \'registered\')) AND is_default_home = true', [self.$module.$application]);
-
-			if(!userHomeRoute.rows[0].ember_route)
-				return dbSrvc.raw('SELECT ember_route FROM module_menus WHERE permission IN (SELECT id FROM module_permissions WHERE module = (SELECT id FROM modules WHERE name = ?) AND name IN (\'public\', \'registered\')) AND is_default_home = true', [self.$module.name]);
-
-			return userHomeRoute;
-		})
-		.then(function(userHomeRoute) {
-			if(userHomeRoute.rows.length) {
-				homeRouteName = userHomeRoute.rows[0].ember_route;
+			if(!userHomeRoute.rows.length) {
+				if(callback) callback(null, homeRouteName);
+				return null;
 			}
 
-			if(callback) callback(null, homeRouteName);
+			if(!userHomeRoute.rows[0].ember_route) {
+				if(callback) callback(null, homeRouteName);
+				return null;
+			}
+
+			if(callback) callback(null, userHomeRoute.rows[0].ember_route);
 			return null;
 		})
 		.catch(function(err) {

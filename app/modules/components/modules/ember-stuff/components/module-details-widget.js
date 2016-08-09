@@ -4,16 +4,10 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/module-details-widget');
 		var ModuleDetailsWidget = _baseWidget['default'].extend({
-			'_configurationEditor': null,
-			'_switchery': null,
+			'_configurationEditor': undefined,
+			'_switchery': undefined,
 
-			'allUserTemplates': _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }),
-			'publicUserTemplates': _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }),
-			'registeredUserTemplates': _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }),
-			'administratorUserTemplates': _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }),
-			'superadministratorUserTemplates': _ember['default'].ArrayProxy.create({ 'content': _ember['default'].A([]) }),
-
-			'currentlyEditingTemplate': null,
+			'currentlyEditingTemplate': undefined,
 
 			'onModelChanged': _ember['default'].observer('model', function() {
 				var self = this;
@@ -35,75 +29,6 @@ define(
 					(self.$('li.module-details-widget-tab a')[0]).click();
 				});
 			}),
-
-			'onModelTemplateRoleChanged': _ember['default'].observer('model.templates.@each.role', function() {
-				var self = this;
-
-				self.get('allUserTemplates').clear();
-				self.get('publicUserTemplates').clear();
-				self.get('registeredUserTemplates').clear();
-				self.get('administratorUserTemplates').clear();
-				self.get('superadministratorUserTemplates').clear();
-
-				if(!self.get('model')) {
-					return;
-				}
-
-				self.get('model').get('templates')
-				.then(function(templates) {
-					templates.forEach(function(template) {
-						template.addObserver('isDefault', self, 'onModelTemplateDefaultChanged');
-						self.get(template.get('role').replace('-', '') + 'UserTemplates').addObject(template);
-					});
-
-					self.get('allUserTemplates').sortBy('media');
-					self.get('publicUserTemplates').sortBy('media');
-					self.get('registeredUserTemplates').sortBy('media');
-					self.get('administratorUserTemplates').sortBy('media');
-					self.get('superadministratorUserTemplates').sortBy('media');
-				})
-				.catch(function(err) {
-					self.sendAction('controller-action', 'display-status-message', {
-						'type': 'danger',
-						'message': err.message
-					});
-				});
-			}),
-
-			'onModelTemplateDefaultChanged': function(template) {
-				if(!template.get('isDefault')) {
-					template.save()
-					.catch(function(err) {
-						self.sendAction('controller-action', 'display-status-message', {
-							'type': 'danger',
-							'message': err.message
-						});
-					});
-
-					return;
-				}
-
-				var self = this,
-					otherTmpls = self.get(template.get('role').replace('-', '') + 'UserTemplates').filterBy('media', template.get('media'));
-
-				otherTmpls.forEach(function(tmpl) {
-					if(tmpl.get('id') == template.get('id'))
-						return;
-
-					tmpl.set('isDefault', false);
-				});
-
-				self.get('model').get('templates')
-				.then(function(templates) {
-					return templates.save();
-				})
-				.catch(function(err) {
-					self.sendAction('controller-action', 'display-status-message', {
-						'type': 'danger',
-						'message': err.message
-					});
-				});
-			},
 
 			'save': function() {
 				var self = this;
