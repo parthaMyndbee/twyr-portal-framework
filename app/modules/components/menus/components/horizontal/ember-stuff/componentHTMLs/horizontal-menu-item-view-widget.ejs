@@ -1,14 +1,25 @@
 <script type="text/x-handlebars" data-template-name="components/horizontal-menu-item-view-widget">
 {{#if model.shouldDisplay}}
 	{{#if model.componentMenu}}
-		{{#link-to model.componentMenu.emberRoute title=model.componentMenu.tooltip  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"}}
-			<span class="{{model.componentMenu.iconClass}}" style="margin-right:5px;" />
-			{{model.componentMenu.displayName}}
+		{{#if model.componentMenu.linkToParams}}
+			{{#link-to model.componentMenu.linkToRoute model.componentMenu.linkToParams title=model.componentMenu.tooltip  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"}}
+				<span class="{{model.componentMenu.iconClass}}" style="margin-right:5px;" />
+				{{model.componentMenu.displayName}}
 
-			{{#if model.componentMenu.children.length}}
-				<span class="{{caretClass}}" style="margin-left:5px;" />
-			{{/if}}
-		{{/link-to}}
+				{{#if model.componentMenu.children.length}}
+					<span class="{{caretClass}}" style="margin-left:5px;" />
+				{{/if}}
+			{{/link-to}}
+		{{else}}
+			{{#link-to model.componentMenu.linkToRoute title=model.componentMenu.tooltip  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"}}
+				<span class="{{model.componentMenu.iconClass}}" style="margin-right:5px;" />
+				{{model.componentMenu.displayName}}
+
+				{{#if model.componentMenu.children.length}}
+					<span class="{{caretClass}}" style="margin-left:5px;" />
+				{{/if}}
+			{{/link-to}}
+		{{/if}}
 	{{else}}
 		<a id="{{model.id}}" href="#" title="{{model.tooltip}}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="{{model.iconClass}}" style="margin-right:5px;" />

@@ -130,6 +130,30 @@ define(
 
 			'emberRoute': _attr['default']('string'),
 
+			'linkToRoute': _ember['default'].computed('emberRoute', {
+				'get': function(key) {
+					var route = this.get('emberRoute');
+					if(route) {
+						route = (route.split(' ')[0]).trim();
+					}
+
+					return route;
+				}
+			}).readOnly(),
+
+			'linkToParams': _ember['default'].computed('emberRoute', {
+				'get': function(key) {
+					var route = this.get('emberRoute');
+					if(route) {
+						route = route.split(' ');
+						route.shift();
+						route = route.join(' ').trim();
+					}
+
+					return route;
+				}
+			}).readOnly(),
+
 			'sortedMenuItems': _ember['default'].computed('children.[]', 'children.@each.displayOrder', {
 				'get': function(key) {
 					return this.get('children').sortBy('displayOrder');

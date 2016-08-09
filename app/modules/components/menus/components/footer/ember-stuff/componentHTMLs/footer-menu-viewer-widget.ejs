@@ -6,17 +6,29 @@
 	<li>
 		<ul class="nav">
 			<li style="font-weight:600;">
-				{{#link-to menuItem.componentMenu.emberRoute title=menuItem.componentMenu.tooltip class="footer-top"}}
-					{{menuItem.componentMenu.displayName}}
-				{{/link-to}}
+				{{#if menuItem.componentMenu.linkToParams}}
+					{{#link-to menuItem.componentMenu.linkToRoute menuItem.componentMenu.linkToParams title=menuItem.componentMenu.tooltip  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"}}
+						{{menuItem.componentMenu.displayName}}
+					{{/link-to}}
+				{{else}}
+					{{#link-to menuItem.componentMenu.linkToRoute title=menuItem.componentMenu.tooltip  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"}}
+						{{menuItem.componentMenu.displayName}}
+					{{/link-to}}
+				{{/if}}
 			</li>
 
 			{{#if menuItem.children.length}}
-			{{#each menuItem.children as |subMenuItem|}}
+			{{#each menuItem.children as |submenuItem|}}
 			<li>
-				{{#link-to subMenuItem.componentMenu.emberRoute title=subMenuItem.componentMenu.tooltip}}
-					{{subMenuItem.componentMenu.displayName}}
-				{{/link-to}}
+				{{#if submenuItem.componentMenu.linkToParams}}
+					{{#link-to submenuItem.componentMenu.linkToRoute submenuItem.componentMenu.linkToParams title=submenuItem.componentMenu.tooltip  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"}}
+						{{submenuItem.componentMenu.displayName}}
+					{{/link-to}}
+				{{else}}
+					{{#link-to submenuItem.componentMenu.linkToRoute title=submenuItem.componentMenu.tooltip  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"}}
+						{{submenuItem.componentMenu.displayName}}
+					{{/link-to}}
+				{{/if}}
 			</li>
 			{{/each}}
 			{{/if}}

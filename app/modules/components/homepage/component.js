@@ -51,8 +51,18 @@ var homepageComponent = prime({
 				return '';
 			}
 
-			if(homeRouteName[0] !== '"') {
-				homeRouteName = '"' + homeRouteName + '"';
+			homeRouteName = homeRouteName.split(' ');
+			if(homeRouteName.length == 1) {
+				homeRouteName = '\'' + homeRouteName[0] + '\'';
+			}
+			else {
+				var homeRouteSegments = [];
+				homeRouteName.forEach(function(homeRouteSegment) {
+					homeRouteSegment = '\'' + homeRouteSegment.trim() + '\'';
+					homeRouteSegments.push(homeRouteSegment);
+				});
+
+				homeRouteName = homeRouteSegments.join(', ');
 			}
 
 			return renderer(path.join(self.basePath, 'ember-stuff/routeHandlers/default.ejs'), { 'homeRouteName': homeRouteName })
