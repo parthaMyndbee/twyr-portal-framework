@@ -1,0 +1,18 @@
+define(
+	'twyr-webapp/routes/media-default',
+	['exports', 'ember'],
+	function(exports, _ember) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/routes/media-default');
+		var ManageMediaRoute = _ember['default'].Route.extend({
+			'model': function() {
+				return this.store.peekAll('media-default');
+			},
+
+			'setupController': function(controller, model) {
+				controller.set('model', model);
+			}
+		});
+
+		exports['default'] = ManageMediaRoute;
+	}
+);

@@ -1,0 +1,171 @@
+<script type="text/x-handlebars" data-template-name="components/media-editor-widget">
+<div class="box box-solid" style="text-align:left; box-shadow:none; margin-bottom:0px;">
+	<div class="box-header with-border">
+		{{#each folderPathSegments as |segment|}}
+			<button type="button" class="btn btn-flat btn-info" {{action "controller-action" "change-folder" segment}}>{{segment}}</button>
+		{{/each}}
+
+		<div class="box-tools pull-right" style="margin-top:5px;">
+			<div class="btn-group">
+				{{#if model.isGridDisplay}}
+				<button type="button" class="btn btn-flat btn-primary" title="Large Grid View" {{action "controller-action" "change-display-view" "grid"}}>
+					<i class="fa fa-th-large" />
+				</button>
+				{{else}}
+				<button type="button" class="btn btn-flat btn-default" title="Large Grid View" {{action "controller-action" "change-display-view" "grid"}}>
+					<i class="fa fa-th-large" />
+				</button>
+				{{/if}}
+
+				{{#if model.isCompactDisplay}}
+				<button type="button" class="btn btn-flat btn-primary" title="Compact Grid View" {{action "controller-action" "change-display-view" "compact"}}>
+					<i class="fa fa-th" />
+				</button>
+				{{else}}
+				<button type="button" class="btn btn-flat btn-default" title="Compact Grid View" {{action "controller-action" "change-display-view" "compact"}}>
+					<i class="fa fa-th" />
+				</button>
+				{{/if}}
+
+				{{#if model.isListDisplay}}
+				<button type="button" class="btn btn-flat btn-primary" title="List View" {{action "controller-action" "change-display-view" "list"}}>
+					<i class="fa fa-list" />
+				</button>
+				{{else}}
+				<button type="button" class="btn btn-flat btn-default" title="List View" {{action "controller-action" "change-display-view" "list"}}>
+					<i class="fa fa-list" />
+				</button>
+				{{/if}}
+			</div>
+		</div>
+	</div>
+
+	<div class="box-body no-padding">
+		{{component model.mediaDisplayType model=model controller-action="controller-action"}}
+	</div>
+</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-grid-display-view-widget">
+<div class="row" style="min-height:200px;">
+{{#if model.children.length}}
+	{{#each model.childFolders as |folder|}}
+		<div class="col-sm-2" style="cursor:pointer;" {{action "controller-action" "change-folder" folder.id}}>
+			<table class="table" style="border:0px;" title={{folder.id}}>
+			<tbody>
+				<tr>
+					<td style="text-align:center; vertical-align:middle; border:0px;">
+						<i class="fa fa-4x fa-folder" style="color:#f39c12;" />
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:center; vertical-align:middle; border:0px;">
+						{{folder.name}}
+					</td>
+				</tr>
+			</tbody>
+			</table>
+		</div>
+	{{/each}}
+	{{#each model.childFiles as |file|}}
+		<div class="col-sm-2">
+			<table class="table" style="border:0px;" title="Size: {{file.displaySize}}">
+			<tbody>
+				<tr>
+					<td style="text-align:center; vertical-align:middle; border:0px;">
+						<i class="fa fa-4x fa-file-o" />
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:center; vertical-align:middle; border:0px;">
+						{{file.name}}
+					</td>
+				</tr>
+			</tbody>
+			</table>
+		</div>
+	{{/each}}
+{{else}}
+	<div class="col-sm-12" style="text-align:center; font-size:16px;">
+		Empty Folder! Drag and drop a file to upload!!
+	</div>
+{{/if}}
+</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-compact-display-view-widget">
+<div class="row" style="min-height:200px;">
+{{#if model.children.length}}
+	{{#each model.childFolders as |folder|}}
+		<div class="col-sm-1" style="cursor:pointer;" {{action "controller-action" "change-folder" folder.id}}>
+			<table class="table" style="border:0px;" title="{{folder.id}}">
+			<tbody>
+				<tr>
+					<td style="text-align:center; vertical-align:middle; border:0px;">
+						<i class="fa fa-2x fa-folder" style="color:#f39c12;" />
+					</td>
+					<td style="text-align:center; vertical-align:middle; border:0px;">
+						{{folder.name}}
+					</td>
+				</tr>
+			</tbody>
+			</table>
+		</div>
+	{{/each}}
+	{{#each model.childFiles as |file|}}
+		<div class="col-sm-1">
+			<table class="table" style="border:0px;" title="Size: {{file.displaySize}}">
+			<tbody>
+				<tr>
+					<td style="text-align:center; vertical-align:middle; border:0px;">
+						<i class="fa fa-2x fa-file-o" />
+					</td>
+					<td style="text-align:center; vertical-align:middle; border:0px;">
+						{{file.name}}
+					</td>
+				</tr>
+			</tbody>
+			</table>
+		</div>
+	{{/each}}
+{{else}}
+	<div class="col-sm-12" style="text-align:center; font-size:16px;">
+		Empty Folder! Drag and drop a file to upload!!
+	</div>
+{{/if}}
+</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-list-display-view-widget">
+<table class="table table-hover">
+<thead>
+	<tr>
+		<th>Name</th>
+		<th>Type</th>
+		<th>Size</th>
+		<th>Created</th>
+		<th>Updated</th>
+	</tr>
+</thead>
+<tbody>
+	{{#each model.childFolders as |folder|}}
+	<tr style="cursor:pointer;" {{action "controller-action" "change-folder" folder.id}}>
+		<td style="border:0px;"><i class="fa fa-folder" style="margin-right:5px; color:#f39c12;" />{{folder.name}}</td>
+		<td style="border:0px;">{{folder.type}}</td>
+		<td style="border:0px;">{{folder.displaySize}}</td>
+		<td style="border:0px;">{{folder.formattedCreatedAt}}</td>
+		<td style="border:0px;">{{folder.formattedUpdatedAt}}</td>
+	</tr>
+	{{/each}}
+	{{#each model.childFiles as |file|}}
+	<tr>
+		<td style="border:0px;"><i class="fa fa-file-o" style="margin-right:5px;" />{{file.name}}</td>
+		<td style="border:0px;">{{file.type}}</td>
+		<td style="border:0px;">{{file.displaySize}}</td>
+		<td style="border:0px;">{{file.formattedCreatedAt}}</td>
+		<td style="border:0px;">{{file.formattedUpdatedAt}}</td>
+	</tr>
+	{{/each}}
+</tbody>
+</table>
+</script>

@@ -91,19 +91,21 @@ define(
 					self.set('_imageCroppie', null);
 				}
 
+				var croppieDimensions = ((profileImageElem.width() < profileImageElem.height()) ? profileImageElem.width() : profileImageElem.height()) - 40;
 				self.set('_imageCroppie', new Croppie(document.getElementById('profile-basics-widget-image'), {
 					'boundary': {
-						'width': profileImageElem.width(),
-						'height': profileImageElem.height()
+						'width': croppieDimensions,
+						'height': croppieDimensions
 					},
 
 					'viewport': {
-						'width': (profileImageElem.width() < profileImageElem.height()) ? profileImageElem.width() : profileImageElem.height(),
-						'height': (profileImageElem.width() < profileImageElem.height()) ? profileImageElem.width() : profileImageElem.height(),
+						'width': croppieDimensions,
+						'height': croppieDimensions,
 						'type': 'circle'
 					},
 
-					'showZoomer': false,
+					'showZoomer': true,
+					'useCanvas': true,
 					'update': self._processCroppieUpdate.bind(self)
 				}));
 
@@ -111,12 +113,11 @@ define(
 				var imgMetadata = JSON.parse(self.get('model').get('profileImageMetadata'));
 				self.get('_imageCroppie')
 				.bind({
-					'url': '/profiles/get-image?_random=' + window.moment().valueOf(),
-					'points': (imgMetadata && imgMetadata.points) ? imgMetadata.points : [0, 0, 600, 600]
+					'url': 'profiles/get-image',
+					'points': (imgMetadata && imgMetadata.points) ? imgMetadata.points : [0, 0, croppieDimensions, croppieDimensions]
 				})
 				.then(function() {
 					if(imgMetadata && imgMetadata.zoom) self.get('_imageCroppie').setZoom(imgMetadata.zoom);
-
 					self.set('_enableCroppieUpdates', true);
 				})
 				.catch(function(err) {
@@ -239,7 +240,7 @@ define(
 					self.get('_imageCroppie').setZoom(metadata.zoom);
 					self.set('_enableCroppieUpdates', true);
 
-					return null;
+					return self.get('model').reload();
 				})
 				.catch(function(err) {
 					console.error('Upload Profile Image Error: ', err);

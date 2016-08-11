@@ -327,7 +327,7 @@ define(
 						promiseResolutions = [];
 
 					promiseResolutions.push(rootMenuItems);
-					rootMenuItems.forEach(function() {
+					rootMenuItems.forEach(function(rootMenuItem) {
 						promiseResolutions.push(rootMenuItem.save());
 					});
 

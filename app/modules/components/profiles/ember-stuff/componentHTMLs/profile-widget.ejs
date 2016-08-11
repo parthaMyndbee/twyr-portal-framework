@@ -1,7 +1,7 @@
 <script type="text/x-handlebars" data-template-name="components/profile-widget">
 {{#link-to "profiles-default" title="Profile"}}
 <div style="padding:12px 0px; cursor:pointer;">
-	<img src="/profiles/get-image" alt="<%= fullname %>" style="width:25px;">
+	<img src="{{imageSource}}" alt="<%= fullname %>" style="width:25px;">
 	<span style="color:#333;">
 		<%= fullname %>
 	</span>

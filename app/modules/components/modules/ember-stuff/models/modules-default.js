@@ -1,4 +1,17 @@
 define(
+	'twyr-webapp/adapters/module',
+	['exports', 'twyr-webapp/adapters/application'],
+	function(exports, _appAdapter) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/adapters/module');
+
+		var ModulePermissionAdapter = _appAdapter['default'].extend({
+		});
+
+		exports['default'] = ModulePermissionAdapter;
+	}
+);
+
+define(
 	'twyr-webapp/models/module',
 	['exports', 'twyr-webapp/models/base', 'ember', 'ember-data/attr', 'ember-data/relationships'],
 	function(exports, _twyrBaseModel, _ember, _attr, _relationships) {
