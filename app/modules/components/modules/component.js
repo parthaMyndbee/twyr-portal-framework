@@ -309,7 +309,7 @@ var modulesComponent = prime({
 
 			templateHTML.replace(componentSelectorRegExp, function(comp) {
 				if(comp == '{{outlet}}') {
-					replacers[comp] = '<div class="box box-solid box-primary" style="text-align:left; width:auto; margin:5px;"><div class="box-header with-border"><h3 class="box-title">Main Template Area</h3></div><div class="box-body" style="min-height:50px; background-color:#f1f1f1;"></div></div>';
+					replacers[comp] = '<div class="box box-solid box-primary" style="text-align:left; width:auto; margin:5px;"><div class="box-header with-border"><h3 class="box-title">Main Template Area</h3></div><div class="box-body" style="min-height:50px; background-color:#fafafa;"></div></div>';
 					return comp;
 				}
 

@@ -1,21 +1,26 @@
 <script type="text/x-handlebars" data-template-name="components/page-manager-widget">
-<table class="table table-bordered table-hover dataTable" id="pages-default-page-list">
-<thead>
-	<tr>
-		<th>Title</th>
-		<th>Author</th>
-		<th>Status</th>
-		<th>Permission</th>
-		<th>Created</th>
-		<th>Updated</th>
-		<th style="min-width:100px;">&nbsp;</th>
-	</tr>
-</thead>
-</table>
-
+<div class="row" style="margin:10px 0px 0px;">
+<div class="col-sm-12" style="padding:0px 10px;">
+	<table class="table table-bordered table-hover dataTable" id="pages-default-page-list">
+	<thead>
+		<tr>
+			<th>Title</th>
+			<th>Author</th>
+			<th>Status</th>
+			<th>Permission</th>
+			<th>Created</th>
+			<th>Updated</th>
+			<th style="min-width:100px;">&nbsp;</th>
+		</tr>
+	</thead>
+	</table>
+</div>
+</div>
 {{#if anyPagesEditing}}
-	<div class="nav-tabs-custom" style="margin-top:20px; margin-bottom:0px;">
-		<ul class="nav nav-tabs" role="tablist" style="background-color:#f4f4f4;">
+<div class="row" style="margin:10px 0px 0px;">
+<div class="col-sm-12" style="padding:0px;">
+	<div class="nav-tabs-custom" style="margin-bottom:0px; box-shadow:none;">
+		<ul class="nav nav-tabs" role="tablist" style="background-color:#fafafa;">
 			{{#each model as |page|}}
 			{{#if page.isEditing}}
 				<li class="page-manager-widget-list-tab" role="presentation" id="page-manager-widget-list-{{page.id}}-link">
@@ -41,12 +46,14 @@
 			{{/each}}
 		</div>
 	</div>
+</div>
+</div>
 {{/if}}
 </script>
 
 
 <script type="text/x-handlebars" data-template-name="components/page-edit-widget">
-<div class="row" style="margin:0px; padding:10px 0px;">
+<div class="row" style="margin:10px 0px 0px;">
 	<div class="col-sm-12" style="text-align:right;">
 	{{#if model.hasDirtyAttributes}}
 		<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "savePage" model bubbles=false}}>
@@ -74,7 +81,7 @@
 	</div>
 </div>
 
-<div class="row" style="margin:0px;">
+<div class="row" style="margin:10px 0px 0px;">
 	<div class="form-group col-sm-6">
 		<label>Title</label>
 		{{input type="text" value=model.title class="form-control"}}
@@ -96,7 +103,7 @@
 	</div>
 </div>
 
-<div class="row" style="margin:0px;">
+<div class="row" style="margin:10px 0px 0px;">
 	<div class="col-sm-12">
 		<textarea id="page-edit-widget-textarea-content-{{model.id}}" name="page-edit-widget-textarea-content-{{model.id}}" style="width:100%; resize:none;">{{model.content}}</textarea>
 	</div>

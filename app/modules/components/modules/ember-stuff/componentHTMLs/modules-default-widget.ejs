@@ -4,13 +4,13 @@
 		<h3 class="box-title">Modules Manager</h3>
 	</div>
 
-	<div class="box-body no-padding" style="background-color:#fafafa;">
-	<div class="col-sm-2" style="padding:0px; overflow:hidden;">
-		{{module-tree-widget controller-action="controller-action"}}
-	</div>
-	<div class="col-sm-10" style="padding:0px;">
-		{{module-details-widget model=_selectedModule controller-action="controller-action"}}
-	</div>
+	<div class="box-body no-padding">
+		<div id="div-modules-default-widget-tree-container" class="col-sm-2" style="padding:0px 0px 10px; background-color:#fafafa;">
+			{{module-tree-widget controller-action="controller-action"}}
+		</div>
+		<div id="div-modules-default-widget-details-container" class="col-sm-10" style="padding:0px;">
+			{{module-details-widget model=selectedModule controller-action="controller-action"}}
+		</div>
 	</div>
 </div>
 </script>

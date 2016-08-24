@@ -29,13 +29,13 @@ define(
 				'get': function(key) {
 					return (this.get('type') == 'folder');
 				}
-			}),
+			}).readOnly(),
 
 			'isFile': _ember['default'].computed('type', {
 				'get': function(key) {
 					return (this.get('type') == 'file');
 				}
-			}),
+			}).readOnly(),
 
 			'displaySize': _ember['default'].computed('size', {
 				'get': function(key) {
@@ -67,37 +67,41 @@ define(
 					rBytes = rBytes / 1024;
 					return rBytes.toFixed(2) + 'PB';
 				}
-			}),
+			}).readOnly(),
 
 			'childFolders': _ember['default'].computed('children.@each.type', {
 				'get': function(key) {
-					return (this.get('children').filterBy('isFolder', true));
+					return (this.get('children').filterBy('isFolder', true).sort(function(left, right) {
+						return (left.get('name') <= right.get('name'));
+					}));
 				}
-			}),
+			}).readOnly(),
 
 			'childFiles': _ember['default'].computed('children.@each.type', {
 				'get': function(key) {
-					return (this.get('children').filterBy('isFile', true));
+					return (this.get('children').filterBy('isFile', true).sort(function(left, right) {
+						return (left.get('name') <= right.get('name'));
+					}));
 				}
-			}),
+			}).readOnly(),
 
 			'isGridDisplay': _ember['default'].computed('mediaDisplayType', {
 				'get': function(key) {
 					return (this.get('mediaDisplayType') == 'media-grid-display-view-widget');
 				}
-			}),
+			}).readOnly(),
 
 			'isCompactDisplay': _ember['default'].computed('mediaDisplayType', {
 				'get': function(key) {
 					return (this.get('mediaDisplayType') == 'media-compact-display-view-widget');
 				}
-			}),
+			}).readOnly(),
 
 			'isListDisplay': _ember['default'].computed('mediaDisplayType', {
 				'get': function(key) {
 					return (this.get('mediaDisplayType') == 'media-list-display-view-widget');
 				}
-			})
+			}).readOnly()
 		});
 
 		exports['default'] = MediaModel;

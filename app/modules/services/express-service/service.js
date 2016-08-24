@@ -186,7 +186,7 @@ var expressService = prime({
 			requestDomain.add(response);
 
 			requestDomain.on('error', function(error) {
-				loggerSrvc.error('Error servicing request "' + request.path + '":\nQuery: ', request.query, '\nBody: ', request.body, '\nParams: ', request.params, '\nError: ', error);
+				loggerSrvc.error('Error servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nBody: ', request.body, '\nParams: ', request.params, '\nError: ', error.message);
 			});
 
 			next();

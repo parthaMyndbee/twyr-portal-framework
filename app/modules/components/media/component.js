@@ -21,6 +21,7 @@ var base = require('./../component-base').baseComponent,
  * Module dependencies, required for this module
  */
 var filesystem = promises.promisifyAll(require('fs-extra')),
+	inflection = require('inflection'),
 	path = require('path');
 
 var mediaComponent = prime({
@@ -65,7 +66,11 @@ var mediaComponent = prime({
 
 	'_addRoutes': function() {
 		this.$router.get('/tree', this._getMediaTree.bind(this));
+
 		this.$router.get('/media-defaults/:id', this._getMediaInFolder.bind(this));
+		this.$router.post('/media-defaults', this._addMediaToFolder.bind(this));
+		this.$router.patch('/media-defaults/:id', this._updateMediaInFolder.bind(this));
+		this.$router.delete('/media-defaults/:id', this._deleteMediaInFolder.bind(this));
 	},
 
 	'_getMediaTree': function(request, response, next) {
@@ -264,6 +269,121 @@ var mediaComponent = prime({
 			}
 
 			response.status(200).json(responseData);
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error('Error servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nBody: ', request.body, '\nParams: ', request.params, '\nError: ', err);
+			response.status(422).json({
+				'errors': [{
+					'status': 422,
+					'source': { 'pointer': '/data/id' },
+					'title': 'Get media error',
+					'detail': (err.stack.split('\n', 1)[0]).replace('error: ', '').trim()
+				}]
+			});
+		});
+	},
+
+	'_addMediaToFolder': function(request, response, next) {
+		var self = this,
+			loggerSrvc = self.dependencies['logger-service'];
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+		response.type('application/javascript');
+
+		self._checkPermissionAsync(request.user, self['$mediaManagerPermissionId'])
+		.then(function(hasPermission) {
+			if(!hasPermission) {
+				throw new Error('Unauthorized Access');
+			}
+
+			if(request.body.data.attributes.type != 'folder') {
+				throw new Error('Random Command');
+			}
+
+			var newFolderPath = path.join(self.$mediaStoragePath, path.dirname(request.body.data.id), request.body.data.attributes.name);
+			return filesystem.ensureDirAsync(newFolderPath);
+		})
+		.then(function() {
+			response.status(200).json({
+				'data': {
+					'type': request.body.data.type,
+					'id': request.body.data.id
+				}
+			});
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error('Error servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nBody: ', request.body, '\nParams: ', request.params, '\nError: ', err);
+			response.status(422).json({
+				'errors': [{
+					'status': 422,
+					'source': { 'pointer': '/data/id' },
+					'title': 'Get media error',
+					'detail': (err.stack.split('\n', 1)[0]).replace('error: ', '').trim()
+				}]
+			});
+		});
+	},
+
+	'_updateMediaInFolder': function(request, response, next) {
+		var self = this,
+			loggerSrvc = self.dependencies['logger-service'];
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+		response.type('application/javascript');
+
+		self._checkPermissionAsync(request.user, self['$mediaManagerPermissionId'])
+		.then(function(hasPermission) {
+			if(!hasPermission) {
+				throw new Error('Unauthorized Access');
+			}
+
+			var oldPath = path.join(self.$mediaStoragePath, request.body.data.id),
+				newPath = path.join(self.$mediaStoragePath, request.body.data.attributes.name);
+
+			return filesystem.moveAsync(oldPath, newPath, { 'clobber': true });
+		})
+		.then(function() {
+			response.status(200).json({
+				'data': {
+					'type': request.body.data.type,
+					'id': request.body.data.id
+				}
+			});
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error('Error servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nBody: ', request.body, '\nParams: ', request.params, '\nError: ', err);
+			response.status(422).json({
+				'errors': [{
+					'status': 422,
+					'source': { 'pointer': '/data/id' },
+					'title': 'Get media error',
+					'detail': (err.stack.split('\n', 1)[0]).replace('error: ', '').trim()
+				}]
+			});
+		});
+	},
+
+	'_deleteMediaInFolder': function(request, response, next) {
+		var self = this,
+			loggerSrvc = self.dependencies['logger-service'];
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+		response.type('application/javascript');
+
+		self._checkPermissionAsync(request.user, self['$mediaManagerPermissionId'])
+		.then(function(hasPermission) {
+			if(!hasPermission) {
+				throw new Error('Unauthorized Access');
+			}
+
+			var mediaPath = path.join(self.$mediaStoragePath, request.params.id);
+			return filesystem.removeAsync(mediaPath);
+		})
+		.then(function() {
+			response.status(204).json({});
 			return null;
 		})
 		.catch(function(err) {

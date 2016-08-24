@@ -1,9 +1,13 @@
 <script type="text/x-handlebars" data-template-name="components/media-editor-widget">
 <div class="box box-solid" style="text-align:left; box-shadow:none; margin-bottom:0px;">
-	<div class="box-header with-border">
-		{{#each folderPathSegments as |segment|}}
-			<button type="button" class="btn btn-flat btn-info" {{action "controller-action" "change-folder" segment}}>{{segment}}</button>
-		{{/each}}
+	<div class="box-header with-border" style="background-color:#fafafa;">
+		<button type="button" class="btn btn-flat btn-info" title="Create Folder" {{action "controller-action" "create-folder" model}}>
+			<i class="fa fa-folder" />
+		</button>
+
+		<button type="button" class="btn btn-flat btn-info" title="Upload File" {{action "controller-action" "upload-file" model}}>
+			<i class="fa fa-file" />
+		</button>
 
 		<div class="box-tools pull-right" style="margin-top:5px;">
 			<div class="btn-group">
@@ -40,6 +44,17 @@
 		</div>
 	</div>
 
+	<div class="box-header with-border" style="background-color:#fafafa;">
+		{{#each folderPathSegments as |segment index|}}
+			{{#if index}}
+				<span>&gt;</span>
+				<button type="button" class="btn btn-flat btn-default" {{action "controller-action" "change-folder" segment}}>{{segment}}</button>
+			{{else}}
+				<button type="button" class="btn btn-flat btn-default" {{action "controller-action" "change-folder" segment}}>{{segment}}</button>
+			{{/if}}
+		{{/each}}
+	</div>
+
 	<div class="box-body no-padding">
 		{{component model.mediaDisplayType model=model controller-action="controller-action"}}
 	</div>
@@ -47,43 +62,13 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/media-grid-display-view-widget">
-<div class="row" style="min-height:200px;">
+<div class="row" style="min-height:200px; margin:0px;">
 {{#if model.children.length}}
 	{{#each model.childFolders as |folder|}}
-		<div class="col-sm-2" style="cursor:pointer;" {{action "controller-action" "change-folder" folder.id}}>
-			<table class="table" style="border:0px;" title={{folder.id}}>
-			<tbody>
-				<tr>
-					<td style="text-align:center; vertical-align:middle; border:0px;">
-						<i class="fa fa-4x fa-folder" style="color:#f39c12;" />
-					</td>
-				</tr>
-				<tr>
-					<td style="text-align:center; vertical-align:middle; border:0px;">
-						{{folder.name}}
-					</td>
-				</tr>
-			</tbody>
-			</table>
-		</div>
+		{{media-grid-display-folder-widget model=folder controller-action="controller-action"}}
 	{{/each}}
 	{{#each model.childFiles as |file|}}
-		<div class="col-sm-2">
-			<table class="table" style="border:0px;" title="Size: {{file.displaySize}}">
-			<tbody>
-				<tr>
-					<td style="text-align:center; vertical-align:middle; border:0px;">
-						<i class="fa fa-4x fa-file-o" />
-					</td>
-				</tr>
-				<tr>
-					<td style="text-align:center; vertical-align:middle; border:0px;">
-						{{file.name}}
-					</td>
-				</tr>
-			</tbody>
-			</table>
-		</div>
+		{{media-grid-display-file-widget model=file controller-action="controller-action"}}
 	{{/each}}
 {{else}}
 	<div class="col-sm-12" style="text-align:center; font-size:16px;">
@@ -91,42 +76,58 @@
 	</div>
 {{/if}}
 </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-grid-display-folder-widget">
+<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="{{model.id}}">
+<tbody>
+	<tr>
+		<td style="text-align:center; vertical-align:middle; border:0px;">
+			<i class="fa fa-4x fa-folder" style="color:#f39c12;" />
+		</td>
+	</tr>
+	<tr>
+		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px;">
+		{{#if model.isEditing}}
+			{{input type="text" class="form-control input-sm" value=model.name}}
+		{{else}}
+			<span>{{model.name}}</span>
+		{{/if}}
+		</td>
+	</tr>
+</tbody>
+</table>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-grid-display-file-widget">
+<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="Size: {{model.displaySize}}">
+<tbody>
+	<tr>
+		<td style="text-align:center; vertical-align:middle; border:0px;">
+			<i class="fa fa-4x fa-file-o" />
+		</td>
+	</tr>
+	<tr>
+		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px;">
+		{{#if model.isEditing}}
+			{{input type="text" class="form-control input-sm" value=model.name}}
+		{{else}}
+			<span>{{model.name}}</span>
+		{{/if}}
+		</td>
+	</tr>
+</tbody>
+</table>
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/media-compact-display-view-widget">
-<div class="row" style="min-height:200px;">
+<div class="row" style="min-height:200px; margin:0px;">
 {{#if model.children.length}}
 	{{#each model.childFolders as |folder|}}
-		<div class="col-sm-1" style="cursor:pointer;" {{action "controller-action" "change-folder" folder.id}}>
-			<table class="table" style="border:0px;" title="{{folder.id}}">
-			<tbody>
-				<tr>
-					<td style="text-align:center; vertical-align:middle; border:0px;">
-						<i class="fa fa-2x fa-folder" style="color:#f39c12;" />
-					</td>
-					<td style="text-align:center; vertical-align:middle; border:0px;">
-						{{folder.name}}
-					</td>
-				</tr>
-			</tbody>
-			</table>
-		</div>
+		{{media-compact-display-folder-widget model=folder controller-action="controller-action"}}
 	{{/each}}
 	{{#each model.childFiles as |file|}}
-		<div class="col-sm-1">
-			<table class="table" style="border:0px;" title="Size: {{file.displaySize}}">
-			<tbody>
-				<tr>
-					<td style="text-align:center; vertical-align:middle; border:0px;">
-						<i class="fa fa-2x fa-file-o" />
-					</td>
-					<td style="text-align:center; vertical-align:middle; border:0px;">
-						{{file.name}}
-					</td>
-				</tr>
-			</tbody>
-			</table>
-		</div>
+		{{media-compact-display-file-widget model=file controller-action="controller-action"}}
 	{{/each}}
 {{else}}
 	<div class="col-sm-12" style="text-align:center; font-size:16px;">
@@ -136,36 +137,60 @@
 </div>
 </script>
 
-<script type="text/x-handlebars" data-template-name="components/media-list-display-view-widget">
-<table class="table table-hover">
-<thead>
-	<tr>
-		<th>Name</th>
-		<th>Type</th>
-		<th>Size</th>
-		<th>Created</th>
-		<th>Updated</th>
-	</tr>
-</thead>
+<script type="text/x-handlebars" data-template-name="components/media-compact-display-folder-widget">
+<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="{{model.id}}">
 <tbody>
-	{{#each model.childFolders as |folder|}}
-	<tr style="cursor:pointer;" {{action "controller-action" "change-folder" folder.id}}>
-		<td style="border:0px;"><i class="fa fa-folder" style="margin-right:5px; color:#f39c12;" />{{folder.name}}</td>
-		<td style="border:0px;">{{folder.type}}</td>
-		<td style="border:0px;">{{folder.displaySize}}</td>
-		<td style="border:0px;">{{folder.formattedCreatedAt}}</td>
-		<td style="border:0px;">{{folder.formattedUpdatedAt}}</td>
-	</tr>
-	{{/each}}
-	{{#each model.childFiles as |file|}}
 	<tr>
-		<td style="border:0px;"><i class="fa fa-file-o" style="margin-right:5px;" />{{file.name}}</td>
-		<td style="border:0px;">{{file.type}}</td>
-		<td style="border:0px;">{{file.displaySize}}</td>
-		<td style="border:0px;">{{file.formattedCreatedAt}}</td>
-		<td style="border:0px;">{{file.formattedUpdatedAt}}</td>
+		<td style="text-align:center; vertical-align:middle; border:0px;">
+			<i class="fa fa-2x fa-folder" style="color:#f39c12;" />
+		</td>
+		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px; padding:8px 0px;">
+		{{#if model.isEditing}}
+			{{input type="text" class="form-control input-sm" value=model.name}}
+		{{else}}
+			<span>{{model.name}}</span>
+		{{/if}}
+		</td>
 	</tr>
-	{{/each}}
 </tbody>
 </table>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-compact-display-file-widget">
+<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="Size: {{model.displaySize}}">
+<tbody>
+	<tr>
+		<td style="text-align:center; vertical-align:middle; border:0px;">
+			<i class="fa fa-2x fa-file-o" />
+		</td>
+		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px; padding:8px 0px;">
+		{{#if model.isEditing}}
+			{{input type="text" class="form-control input-sm" value=model.name}}
+		{{else}}
+			<span>{{model.name}}</span>
+		{{/if}}
+		</td>
+	</tr>
+</tbody>
+</table>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-list-display-view-widget">
+<div class="row" style="margin:0px; margin-top:10px;">
+	<div class="col-sm-12">
+	<table class="table table-hover dataTable">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Size</th>
+			<th>Created</th>
+			<th>Updated</th>
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+	</table>
+	</div>
+</div>
 </script>

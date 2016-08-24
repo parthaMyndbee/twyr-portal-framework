@@ -59,7 +59,7 @@ define(
 				}
 			}).readOnly(),
 
-			'categorizedTemplates': _ember['default'].computed('templates.@each.permission.displayName', {
+			'categorizedTemplates': _ember['default'].computed('templates.@each.permission', {
 				'get': function(key) {
 					var templates = this.get('templates'),
 						categorizedTmpls = _ember['default'].Object.create({});

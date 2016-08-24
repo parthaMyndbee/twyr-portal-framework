@@ -54,7 +54,7 @@
 		</div>
 	</div>
 	<div class="col-sm-9" style="padding-top:20px;">
-		<ul class="nav dragula-container" id="vertical-menu-manager-widget-{{model.id}}" style="min-height:50px; width:25%; background-color:#f8f8f8;">
+		<ul class="nav dragula-container" id="vertical-menu-manager-widget-{{model.id}}" style="min-height:50px; width:25%; background-color:#fafafa;">
 		{{#each model.sortedMenuItems as |menuItem index|}}
 		{{#unless menuItem.parent}}
 			{{vertical-menu-item-widget model=menuItem controller-action="controller-action"}}

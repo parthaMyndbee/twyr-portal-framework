@@ -89,6 +89,7 @@ define(
 						templateContainer = self.$('div#module-details-template-editor-widget-position-editor-template-preview-' + self.get('model').get('id'))[0];
 
 					window.$(templateContainer).html((data[1]).value);
+					self.rerender();
 
 					var dragulaContainers = window.$(templateContainer).find('div.dragula-container'),
 						passedInContainers = [availableWidgetContainer];

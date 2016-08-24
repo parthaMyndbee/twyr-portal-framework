@@ -48,6 +48,7 @@
     "json-editor": "*",
     "jstree": "> 3.3.0",
     "jstree-bootstrap-theme": "*",
+    "swisnl/jQuery-contextMenu": "*",
     "loader.js": "ember-cli/loader.js",
     "moment": "*",
     "normalize-css": "*",
