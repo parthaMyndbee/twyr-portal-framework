@@ -22,6 +22,7 @@ var base = require('./../component-base').baseComponent,
  */
 var filesystem = promises.promisifyAll(require('fs-extra')),
 	inflection = require('inflection'),
+	mime = require('mime'),
 	path = require('path');
 
 var mediaComponent = prime({
@@ -42,6 +43,8 @@ var mediaComponent = prime({
 				if(callback) callback(err);
 				return;
 			}
+
+			mime.load(path.join(self.basePath, 'types.json'));
 
 			configSrvc.getModuleIdAsync(self)
 			.then(function(id) {
@@ -235,6 +238,62 @@ var mediaComponent = prime({
 				filesData[index]['children'] = true;
 			});
 
+			var mediaType = 'folder';
+			if(parentStat.isFile()) {
+				var mimeType = mime.lookup(path.join(self['$mediaStoragePath'], request.params.id)).split('/');
+				if(mimeType[0] != 'application')
+					mediaType = mimeType[0];
+				else {
+					mediaType = mimeType[1];
+				}
+
+				if(mediaType.indexOf('vnd.openxmlformats-officedocument') >= 0) {
+					mediaType = mediaType.split('.');
+					mediaType = mediaType.pop();
+				}
+
+				if(mediaType.indexOf('vnd.oasis.opendocument') >= 0) {
+					mediaType = mediaType.split('.');
+					mediaType = mediaType.pop().split('-')[0];
+				}
+
+				if(mediaType.indexOf('vnd.ms-cab') >= 0) {
+					mediaType = 'zip';
+				}
+
+				if(mediaType.indexOf('vnd.ms-excel') >= 0) {
+					mediaType = 'sheet';
+				}
+
+				if(mediaType.indexOf('vnd.ms-powerpoint') >= 0) {
+					mediaType = 'presentation';
+				}
+
+				if(mediaType.indexOf('vnd.ms-word') >= 0) {
+					mediaType = 'document';
+				}
+
+				if(mediaType.indexOf('msword') >= 0) {
+					mediaType = 'document';
+				}
+
+				if(mediaType.indexOf('oda') >= 0) {
+					mediaType = 'document';
+				}
+
+				if(mediaType.indexOf('java') >= 0) {
+					mediaType = 'code';
+				}
+
+				if(mediaType.indexOf('xml') >= 0) {
+					mediaType = 'code';
+				}
+
+				if(mediaType.indexOf('compressed') >= 0) {
+					mediaType = 'zip';
+				}
+			}
+
 			var responseData = {
 				'data': {
 					'type': 'media-defaults',
@@ -242,7 +301,7 @@ var mediaComponent = prime({
 
 					'attributes': {
 						'name': ((request.params.id == '/') ? 'Root' : request.params.id.split('/').pop()),
-						'type': (parentStat.isFile() ? 'file' : 'folder'),
+						'type': mediaType,
 						'size': parentStat.size,
 						'created_at': parentStat.ctime,
 						'updated_at': parentStat.mtime

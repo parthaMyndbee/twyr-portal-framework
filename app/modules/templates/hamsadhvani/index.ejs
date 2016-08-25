@@ -49,6 +49,8 @@
 	<!-- Bootstrap plugins -->
 	<link href="/bhairavi/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
 	<link href="/bhairavi/bower_components/jstree-bootstrap-theme/dist/themes/proton/style.min.css" rel="stylesheet" type="text/css" />
+	<link href="/bhairavi/bower_components/bootstrap-popover-x/css/bootstrap-popover-x.min.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="/bhairavi/bower_components/bootstrap-fileinput/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
 
 	<!-- Font Awesome, for the Glyphs -->
 	<link href="/bhairavi/bower_components/fontawesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
@@ -339,6 +341,13 @@
 
 	<!-- Bootstrap Plugins -->
 	<script type="application/javascript" src="/bhairavi/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+	<% if(developmentMode) { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap-fileinput/js/fileinput.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap-popover-x/js/bootstrap-popover-x.js"></script>
+	<% } else { %>
+	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap-fileinput/js/fileinput.min.js"></script>
+	<script type="application/javascript" src="/bhairavi/bower_components/bootstrap-popover-x/js/bootstrap-popover-x.min.js"></script>
+	<% } %>
 
 	<!-- CKEditor - for editing the page content -->
 	<script type="application/javascript" src="/bhairavi/ckeditor/ckeditor.js"></script>

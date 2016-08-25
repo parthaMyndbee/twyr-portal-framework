@@ -33,39 +33,71 @@ define(
 
 			'isFile': _ember['default'].computed('type', {
 				'get': function(key) {
-					return (this.get('type') == 'file');
+					return (this.get('type') != 'folder');
 				}
 			}).readOnly(),
 
 			'displaySize': _ember['default'].computed('size', {
 				'get': function(key) {
-					var rBytes = this.get('size');
-					if(rBytes < 1024) {
-						return rBytes + 'B';
+					var rBytes = this.get('size'),
+						i = Math.floor(Math.log(rBytes) / Math.log(1024)),
+						sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+					return (rBytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+				}
+			}).readOnly(),
+
+			'displayIcon': _ember['default'].computed('type', {
+				'get': function(key) {
+					var faClass = '';
+					switch(this.get('type')) {
+						case 'folder':
+							faClass = 'fa fa-folder';
+						break;
+
+						case 'audio':
+							faClass = 'fa fa-file-audio-o';
+						break;
+
+						case 'document':
+							faClass = 'fa fa-file-word-o';
+						break;
+
+						case 'image':
+							faClass = 'fa fa-file-image-o';
+						break;
+
+						case 'pdf':
+							faClass = 'fa fa-file-pdf-o';
+						break;
+
+						case 'presentation':
+							faClass = 'fa fa-file-powerpoint-o';
+						break;
+
+						case 'sheet':
+						case 'spreadsheet':
+							faClass = 'fa fa-file-excel-o';
+						break;
+
+						case 'text':
+							faClass = 'fa fa-file-text-o';
+						break;
+
+						case 'video':
+							faClass = 'fa fa-file-movie-o';
+						break;
+
+						case 'zip':
+							faClass = 'fa fa-file-archive-o';
+						break;
+
+						default:
+							faClass = 'fa fa-file-o';
+						break;
 					}
 
-					rBytes = rBytes / 1024;
-					if(rBytes < 1024) {
-						return rBytes.toFixed(2) + 'KB';
-					}
-
-					rBytes = rBytes / 1024;
-					if(rBytes < 1024) {
-						return rBytes.toFixed(2) + 'MB';
-					}
-
-					rBytes = rBytes / 1024;
-					if(rBytes < 1024) {
-						return rBytes.toFixed(2) + 'GB';
-					}
-
-					rBytes = rBytes / 1024;
-					if(rBytes < 1024) {
-						return rBytes.toFixed(2) + 'TB';
-					}
-
-					rBytes = rBytes / 1024;
-					return rBytes.toFixed(2) + 'PB';
+					return faClass;
 				}
 			}).readOnly(),
 

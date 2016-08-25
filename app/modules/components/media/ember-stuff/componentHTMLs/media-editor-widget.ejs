@@ -2,11 +2,11 @@
 <div class="box box-solid" style="text-align:left; box-shadow:none; margin-bottom:0px;">
 	<div class="box-header with-border" style="background-color:#fafafa;">
 		<button type="button" class="btn btn-flat btn-info" title="Create Folder" {{action "controller-action" "create-folder" model}}>
-			<i class="fa fa-folder" />
+			<i class="fa fa-folder" style="margin-right:5px;" />New Folder
 		</button>
 
-		<button type="button" class="btn btn-flat btn-info" title="Upload File" {{action "controller-action" "upload-file" model}}>
-			<i class="fa fa-file" />
+		<button type="button" id="media-editor-widget-file-upload-button" class="btn btn-flat btn-info" title="Upload File" {{action "controller-action" "upload-file" model}}>
+			<i class="fa fa-file" style="margin-right:5px;" />Upload File
 		</button>
 
 		<div class="box-tools pull-right" style="margin-top:5px;">
@@ -58,6 +58,16 @@
 	<div class="box-body no-padding">
 		{{component model.mediaDisplayType model=model controller-action="controller-action"}}
 	</div>
+
+	<div id="media-editor-widget-file-upload-popover" class="popover popover-info" style="min-width:600px;">
+		<div class="arrow"></div>
+		<div class="popover-title">
+			<span class="close pull-right" data-dismiss="popover-x">&times;</span>Title
+		</div>
+		<div class="popover-content">
+			<input id="media-editor-widget-file-upload-input" type="file" multiple class="form-control file" />
+		</div>
+	</div>
 </div>
 </script>
 
@@ -79,11 +89,11 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/media-grid-display-folder-widget">
-<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="{{model.id}}">
+<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="{{model.children.length}} Items">
 <tbody>
 	<tr>
 		<td style="text-align:center; vertical-align:middle; border:0px;">
-			<i class="fa fa-4x fa-folder" style="color:#f39c12;" />
+			<i class="{{model.displayIcon}} fa-4x" style="color:#f39c12;" />
 		</td>
 	</tr>
 	<tr>
@@ -104,7 +114,7 @@
 <tbody>
 	<tr>
 		<td style="text-align:center; vertical-align:middle; border:0px;">
-			<i class="fa fa-4x fa-file-o" />
+			<i class="{{model.displayIcon}} fa-4x" />
 		</td>
 	</tr>
 	<tr>
@@ -138,11 +148,11 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/media-compact-display-folder-widget">
-<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="{{model.id}}">
+<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="{{model.children.length}} Items">
 <tbody>
 	<tr>
 		<td style="text-align:center; vertical-align:middle; border:0px;">
-			<i class="fa fa-2x fa-folder" style="color:#f39c12;" />
+			<i class="{{model.displayIcon}} fa-2x" style="color:#f39c12;" />
 		</td>
 		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px; padding:8px 0px;">
 		{{#if model.isEditing}}
@@ -161,7 +171,7 @@
 <tbody>
 	<tr>
 		<td style="text-align:center; vertical-align:middle; border:0px;">
-			<i class="fa fa-2x fa-file-o" />
+			<i class="{{model.displayIcon}} fa-2x" />
 		</td>
 		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px; padding:8px 0px;">
 		{{#if model.isEditing}}

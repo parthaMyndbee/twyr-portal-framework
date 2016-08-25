@@ -6,13 +6,25 @@ define(
 		var MediaEditorWidget = _baseWidget['default'].extend({
 			'folderPathSegments': undefined,
 
+			'didInsertElement': function() {
+				var self = this;
+				self._super(...arguments);
+
+				self.$('div#media-editor-widget-file-upload-popover').popoverX({
+					'placement': 'bottom bottom-left',
+					'target': self.$('button#media-editor-widget-file-upload-button')
+				});
+			},
+
 			'onModelChanged': _ember['default'].observer('model', function() {
 				var self = this;
+				self.$('input#media-editor-widget-file-upload-input').fileinput('destroy');
+
 				if(!self.get('model'))
 					return;
 
-				if(!this.get('model').get('mediaDisplayType')) {
-					this.get('model').set('mediaDisplayType', 'media-grid-display-view-widget');
+				if(!self.get('model').get('mediaDisplayType')) {
+					self.get('model').set('mediaDisplayType', 'media-grid-display-view-widget');
 				}
 
 				var segments = self.get('model').get('id').split('/').filter(function(segment) {
@@ -21,6 +33,18 @@ define(
 
 				segments.unshift('Root');
 				self.set('folderPathSegments', segments);
+
+				self.$('input#media-editor-widget-file-upload-input').fileinput({
+					'autoReplace': true,
+
+					'minFileCount': 1,
+					'maxFileCount': 10,
+
+					'showPreview': false,
+
+					'uploadUrl': '/media/upload-media',
+					'uploadExtraData': { 'parent': self.get('model').get('id') }
+				});
 			}),
 
 			'change-display-view': function(displayType) {
@@ -102,6 +126,9 @@ define(
 				});
 			},
 
+			'upload-file': function(data) {
+				this.$('div#media-editor-widget-file-upload-popover').popoverX('show');
+			},
 
 			'rename-media': function(data) {
 				var self = this;
@@ -353,8 +380,9 @@ define(
 				}
 
 				var focusChangeTimeout = setTimeout(function() {
-					self.set('focusChangeTimeout', undefined);
+					if(self.get('isDestroyed')) return false;
 
+					self.set('focusChangeTimeout', undefined);
 					if(self.$(event.currentTarget).find('input.input-sm').is(':focus'))
 						return;
 
@@ -429,7 +457,7 @@ define(
 		var CompactMediaDisplayFolderWidget = _baseWidget['default'].extend({
 			'attributeBindings': ['style', 'tabindex'],
 
-			'style': _ember['default'].String.htmlSafe('cursor:pointer; display:inline-block; margin:0px 30px; padding:0px;'),
+			'style': _ember['default'].String.htmlSafe('cursor:pointer; display:inline-block; margin:0px 30px; padding:5px;'),
 			'tabindex': 0
 		});
 
@@ -445,7 +473,7 @@ define(
 		var CompactMediaDisplayFileWidget = _baseWidget['default'].extend({
 			'attributeBindings': ['style', 'tabindex'],
 
-			'style': _ember['default'].String.htmlSafe('display:inline-block; margin:0px 30px; padding:0px;'),
+			'style': _ember['default'].String.htmlSafe('display:inline-block; margin:0px 30px; padding:5px;'),
 			'tabindex': 0
 		});
 
@@ -563,10 +591,18 @@ define(
 						if(doesAlreadyExist >= 0)
 							return;
 
+						var displayName = '';
+						if(child.get('isFolder')) {
+							displayName = '<i class="' + child.get('displayIcon') + '" style="color:#f39c12; margin-right:5px;"></i>' + child.get('name');
+						}
+						else {
+							displayName = '<i class="' + child.get('displayIcon') + '" style="margin-right:5px;"></i>' + child.get('name');
+						}
+
 						self.get('_mediaListDataTable').row.add({
 							'id': child.get('id'),
-							'name': '<i class="fa fa-' + child.get('type') + '-o" style="margin-right:5px;"></i>' + child.get('name'),
-							'type': child.get('type'),
+							'name': displayName,
+							'type': ((child.get('type') == 'folder') ? 'Folder' : 'File <i>(' + child.get('type') + ')</i>'),
 							'size': child.get('displaySize'),
 							'created': child.get('formattedCreatedAt'),
 							'updated': child.get('formattedUpdatedAt')

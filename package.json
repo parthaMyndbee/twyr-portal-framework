@@ -61,6 +61,7 @@
 		"knex": "*",
 		"lodash": "*",
 		"method-override": "*",
+		"mime": "*",
 		"morgan": "*",
 		"nodemailer": "*",
 		"nodemailer-smtp-transport": "*",
