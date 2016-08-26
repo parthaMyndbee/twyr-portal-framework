@@ -1,7 +1,6 @@
 exports.config = ({
-	"mediaStoragePath": "./media-store",
-
 	"templates": {
 		"path": "./templates"
-	}
+	},
+	"mediaStoragePath": "./media-store"
 });

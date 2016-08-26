@@ -168,28 +168,28 @@ else {
 
 		// Call load / initialize / start...
 		twyrPortal.loadAsync(null)
-		.timeout(60000)
+		.timeout(180000)
 		.then(function(status) {
 			allStatuses.push('Twyr Portal #' + cluster.worker.id + '::Load status:\n' + JSON.stringify(status, null, '\t') + '\n\n');
 			if(!status) throw status;
 
 			return twyrPortal.initializeAsync();
 		})
-		.timeout(60000)
+		.timeout(180000)
 		.then(function(status) {
 			allStatuses.push('Twyr Portal #' + cluster.worker.id + '::Initialize status:\n' + JSON.stringify(status, null, '\t') + '\n\n');
 			if(!status) throw status;
 
 			return twyrPortal.startAsync(null);
 		})
-		.timeout(60000)
+		.timeout(180000)
 		.then(function(status) {
 			allStatuses.push('Twyr Portal #' + cluster.worker.id + '::Start Status:\n' + JSON.stringify(status, null, '\t') + '\n\n');
 			if(!status) throw status;
 
 			return null;
 		})
-		.timeout(60000)
+		.timeout(180000)
 		.catch(function(err) {
 			console.error('\n\n' + 'Twyr Portal #' + cluster.worker.id + '::Startup Error:\n', err, '\n\n');
 	        cluster.worker.disconnect();
@@ -206,28 +206,28 @@ else {
 		if(!twyrPortal) return;
 
 		twyrPortal.stopAsync()
-		.timeout(60000)
+		.timeout(180000)
 		.then(function (status) {
 			allStatuses.push('Twyr Portal #' + cluster.worker.id + '::Stop Status:\n' + JSON.stringify(status, null, '\t') + '\n\n');
 			if (!status) throw status;
 
 			return twyrPortal.uninitializeAsync();
 		})
-		.timeout(60000)
+		.timeout(180000)
 		.then(function (status) {
 			allStatuses.push('Twyr Portal #' + cluster.worker.id + '::Uninitialize Status:\n' + JSON.stringify(status, null, '\t') + '\n\n');
 			if (!status) throw status;
 
 			return twyrPortal.unloadAsync();
 		})
-		.timeout(60000)
+		.timeout(180000)
 		.then(function (status) {
 			allStatuses.push('Twyr Portal #' + cluster.worker.id + '::Unload Status:\n' + JSON.stringify(status, null, '\t') + '\n\n');
 			if (!status) throw status;
 
 			return null;
 		})
-		.timeout(60000)
+		.timeout(180000)
 		.then(function() {
 	        cluster.worker.disconnect();
 			return null;

@@ -39,8 +39,10 @@ define(
 
 			'displaySize': _ember['default'].computed('size', {
 				'get': function(key) {
-					var rBytes = this.get('size'),
-						i = Math.floor(Math.log(rBytes) / Math.log(1024)),
+					var rBytes = this.get('size');
+					if(rBytes == 0) return '0B';
+
+					var i = Math.floor(Math.log(rBytes) / Math.log(1024)),
 						sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
 					return (rBytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];

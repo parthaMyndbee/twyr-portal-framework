@@ -95,7 +95,6 @@ var profilesComponent = prime({
 
 	'_updateProfileImage': function(request, response, next) {
 		var self = this,
-			Busboy = require('busboy'),
 			loggerSrvc = self.dependencies['logger-service'];
 
 		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);

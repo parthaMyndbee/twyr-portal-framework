@@ -74,6 +74,12 @@ var mediaComponent = prime({
 		this.$router.post('/media-defaults', this._addMediaToFolder.bind(this));
 		this.$router.patch('/media-defaults/:id', this._updateMediaInFolder.bind(this));
 		this.$router.delete('/media-defaults/:id', this._deleteMediaInFolder.bind(this));
+
+		this.$router.post('/upload-media', this._uploadMediaToFolder.bind(this));
+		this.$router.get('/download-media', this._downloadMedia.bind(this));
+		this.$router.get('/download-compressed-media', this._downloadCompressedMedia.bind(this));
+
+		this.$router.get('/decompress-media', this._decompressMedia.bind(this));
 	},
 
 	'_getMediaTree': function(request, response, next) {
@@ -399,7 +405,7 @@ var mediaComponent = prime({
 			}
 
 			var oldPath = path.join(self.$mediaStoragePath, request.body.data.id),
-				newPath = path.join(self.$mediaStoragePath, request.body.data.attributes.name);
+				newPath = path.join(self.$mediaStoragePath, path.dirname(request.body.data.id), request.body.data.attributes.name);
 
 			return filesystem.moveAsync(oldPath, newPath, { 'clobber': true });
 		})
@@ -455,6 +461,155 @@ var mediaComponent = prime({
 					'detail': (err.stack.split('\n', 1)[0]).replace('error: ', '').trim()
 				}]
 			});
+		});
+	},
+
+	'_uploadMediaToFolder': function(request, response, next) {
+		var self = this,
+			Busboy = require('busboy'),
+			loggerSrvc = self.dependencies['logger-service'];
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+		response.type('application/javascript');
+
+		self._checkPermissionAsync(request.user, self['$mediaManagerPermissionId'])
+		.then(function(hasPermission) {
+			if(!hasPermission) {
+				throw new Error('Unauthorized Access');
+			}
+
+			var busboy = new Busboy({ 'headers': request.headers });
+
+			busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+				var mediaName = path.join(self.$mediaStoragePath, request.query.parent, filename);
+				file.pipe(filesystem.createWriteStream(mediaName, { 'defaultEncoding': 'ascii' }));
+			});
+
+			busboy.on('finish', function() {
+				response.status(200).json({});
+			});
+
+			request.pipe(busboy);
+		})
+		.catch(function(err) {
+			loggerSrvc.error('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body, '\nError: ', err);
+			response.sendStatus(500);
+		});
+	},
+
+	'_downloadMedia': function(request, response, next) {
+		var self = this,
+			loggerSrvc = self.dependencies['logger-service'],
+			mediaPath = path.join(self.$mediaStoragePath, request.query.id);
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+
+		self._checkPermissionAsync(request.user, self['$mediaManagerPermissionId'])
+		.then(function(hasPermission) {
+			if(!hasPermission) {
+				throw new Error('Unauthorized Access');
+			}
+
+			return filesystem.statAsync(mediaPath);
+		})
+		.then(function(mediaStat) {
+			if(mediaStat.isFile()) {
+				response.attachment(request.query.id);
+				response.sendFile(mediaPath, { 'dotfiles': 'allow' });
+				return null;
+			}
+
+			if(mediaStat.isDirectory()) {
+				var EasyZip = require('easy-zip2').EasyZip,
+					compressor = new EasyZip();
+
+				compressor.zipFolder(mediaPath, function() {
+					compressor.writeToResponse(response, path.basename(request.query.id, path.extname(request.query.id)));
+				});
+
+				return null;
+			}
+
+			throw new Error('Unknown Media Type!');
+		})
+		.catch(function(err) {
+			loggerSrvc.error('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body, '\nError: ', err);
+			response.sendStatus(500);
+		});
+	},
+
+	'_downloadCompressedMedia': function(request, response, next) {
+		var self = this,
+			loggerSrvc = self.dependencies['logger-service'],
+			mediaPath = path.join(self.$mediaStoragePath, request.query.id);
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+
+		self._checkPermissionAsync(request.user, self['$mediaManagerPermissionId'])
+		.then(function(hasPermission) {
+			if(!hasPermission) {
+				throw new Error('Unauthorized Access');
+			}
+
+			return filesystem.statAsync(mediaPath);
+		})
+		.then(function(mediaStat) {
+			var EasyZip = require('easy-zip2').EasyZip,
+				compressor = new EasyZip();
+
+			if(mediaStat.isFile()) {
+				compressor.addFile(path.basename(request.query.id), mediaPath, function() {
+					compressor.writeToResponse(response, path.basename(request.query.id, path.extname(request.query.id)));
+				});
+
+				return null;
+			}
+
+			if(mediaStat.isDirectory()) {
+				compressor.zipFolder(mediaPath, function() {
+					compressor.writeToResponse(response, path.basename(request.query.id, path.extname(request.query.id)));
+				});
+
+				return null;
+			}
+
+			throw new Error('Unknown Media Type!');
+		})
+		.catch(function(err) {
+			loggerSrvc.error('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body, '\nError: ', err);
+			response.sendStatus(500);
+		});
+	},
+
+	'_decompressMedia': function(request, response, next) {
+		var self = this,
+			loggerSrvc = self.dependencies['logger-service'],
+			mediaPath = path.join(self.$mediaStoragePath, request.query.id),
+			writePath = path.dirname(mediaPath);
+
+		loggerSrvc.debug('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body);
+		response.type('application/javascript');
+
+		self._checkPermissionAsync(request.user, self['$mediaManagerPermissionId'])
+		.then(function(hasPermission) {
+			if(!hasPermission) {
+				throw new Error('Unauthorized Access');
+			}
+
+			var decompressor = require('unzip');
+
+			filesystem
+			.createReadStream(mediaPath)
+			.pipe(decompressor.Extract({ 'path': writePath }))
+			.on('close', function() {
+				response.status(200).json({ 'status': true });
+			});
+
+			return null;
+		})
+		.catch(function(err) {
+			loggerSrvc.error('Servicing request ' + request.method + ' "' + request.originalUrl + '":\nQuery: ', request.query, '\nParams: ', request.params, '\nBody: ', request.body, '\nError: ', err);
+			response.sendStatus(500);
 		});
 	},
 

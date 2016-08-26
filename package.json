@@ -48,7 +48,8 @@
 		"cors": "*",
 		"deep-equal": "*",
 		"deepmerge": "*",
-		"dependency-graph" :"*",
+		"dependency-graph": "*",
+		"easy-zip2": "*",
 		"express": ">= 4.0",
 		"express-device": "*",
 		"ejs": "*",
@@ -80,6 +81,7 @@
 		"redis": "*",
 		"serve-favicon": "*",
 		"serve-static": "*",
+		"unzip": "*",
 		"winston": "*"
 	},
 	"devDependencies": {

@@ -40,10 +40,20 @@ define(
 					'minFileCount': 1,
 					'maxFileCount': 10,
 
-					'showPreview': false,
-
-					'uploadUrl': '/media/upload-media',
-					'uploadExtraData': { 'parent': self.get('model').get('id') }
+					'uploadUrl': '/media/upload-media?parent=' + self.get('model').get('id')
+				})
+				.on('fileunlock', function() {
+					self.get('model')
+					.reload()
+					.then(function() {
+						_ember['default'].run.later(self, function() {
+							self.$('input#media-editor-widget-file-upload-input').fileinput('clear');
+							self.$('div#media-editor-widget-file-upload-popover').popoverX('hide');
+						}, 100);
+					})
+					.catch(function(err) {
+						console.error(err);
+					});
 				});
 			}),
 
@@ -209,6 +219,34 @@ define(
 						'message': err.message
 					});
 				})
+			},
+
+			'download-media': function(data) {
+				window.location.href = 'media/download-media?id=' + data.media.get('id');
+			},
+
+			'download-compressed-media': function(data) {
+				window.location.href = 'media/download-compressed-media?id=' + data.media.get('id');
+			},
+
+			'extract-media': function(data) {
+				_ember['default'].$.ajax({
+					'url': 'media/decompress-media?id=' + data.get('id'),
+					'dataType': 'json',
+					'cache': true
+				})
+				.done(function() {
+					data.get('parent')
+					.then(function(parentFolder) {
+						return parentFolder.reload();
+					})
+					.catch(function(err) {
+						console.error(err);
+					});
+				})
+				.fail(function() {
+					console.error('media/decompress-media?id=' + data.get('id') + ' error:\n', arguments);
+				});
 			}
 		});
 
@@ -222,70 +260,6 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/base-media-display-view-widget');
 		var BaseMediaDisplayViewWidget = _baseWidget['default'].extend({
-			'didInsertElement': function() {
-				var self = this;
-				self._super(...arguments);
-
-				self.$().contextMenu({
-					'selector': 'table.contextMenu',
-
-					'items': {
-						'rename': {
-							'name': 'Rename',
-							'callback': function(itemKey, options) {
-								var mediaToRename = self.get('store').peekRecord('media-default', self.$(options.$trigger).attr('id'));
-								self.sendAction('controller-action', 'rename-media', {
-									'media': mediaToRename,
-									'element': options.$trigger[0]
-								});
-								return true;
-							}
-						},
-
-						'delete': {
-							'name': 'Delete',
-							'callback': function(itemKey, options) {
-								var mediaToRemove = self.get('store').peekRecord('media-default', self.$(options.$trigger).attr('id'));
-								self.sendAction('controller-action', 'delete-media', mediaToRemove);
-								return true;
-							}
-						}
-					}
-				});
-			},
-
-			'willDestroyElement': function() {
-				var self = this;
-				self._super(...arguments);
-				self.$().contextMenu('destroy');
-			},
-
-			'select-media': function(data) {
-				var self = this;
-				self.$().find('span').removeClass('bg-light-blue color-palette');
-
-				data.media.get('parent')
-				.then(function(parentFolder) {
-					return parentFolder.get('children');
-				})
-				.then(function(children) {
-					children.invoke('rollbackAttributes');
-					children.invoke('set', 'isEditing', false);
-
-					_ember['default'].run.scheduleOnce('afterRender', function() {
-						self.$(data.element).focus();
-						self.$(data.element).find('span').addClass('bg-light-blue color-palette');
-					});
-				})
-				.catch(function(err) {
-					console.error(err);
-				});
-			},
-
-			'deselect-media': function(data) {
-				var self = this;
-				self.$(data.element).find('span').removeClass('bg-light-blue color-palette');
-			}
 		});
 
 		exports['default'] = BaseMediaDisplayViewWidget;
@@ -322,15 +296,6 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/base-media-display-media-widget');
 		var BaseMediaDisplayMediaWidget = _baseWidget['default'].extend({
-			'click': function(event) {
-				this.sendAction('controller-action', 'select-media', {
-					'media': this.get('model'),
-					'element': event.currentTarget
-				});
-
-				return false;
-			},
-
 			'doubleClick': function() {
 				if(this.get('model').get('type') != 'folder')
 					return false;
@@ -401,12 +366,9 @@ define(
 						}
 					}
 					else {
-						self.sendAction('controller-action', 'deselect-media', {
-							'media': self.get('model'),
-							'element': event.currentTarget
-						});
+						self.$(event.currentTarget).find('span').removeClass('bg-light-blue color-palette');
 					}
-				}, 100);
+				}, 10);
 
 				self.set('focusChangeTimeout', focusChangeTimeout);
 				return false;
@@ -418,15 +380,203 @@ define(
 );
 
 define(
-	'twyr-webapp/components/media-grid-display-folder-widget',
+	'twyr-webapp/components/base-media-display-folder-widget',
 	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-media-widget'],
+	function(exports, _ember, _app, _baseWidget) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/base-media-display-folder-widget');
+		var BaseMediaDisplayFolderWidget = _baseWidget['default'].extend({
+			'didInsertElement': function() {
+				var self = this;
+				self._super(...arguments);
+
+				self.$().contextMenu({
+					'selector': 'table.contextMenu',
+
+					'items': {
+						'change-folder': {
+							'name': 'Navigate To',
+							'icon': 'fa-folder',
+
+							'callback': function(itemKey, options) {
+								self.sendAction('controller-action', 'change-folder', self.get('model').get('id'));
+								return true;
+							}
+						},
+
+						'sep1': '---------',
+
+						'download': {
+							'name': 'Download',
+							'icon': 'fa-download',
+
+							'callback': function(itemKey, options) {
+								var mediaToDownload = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+								self.sendAction('controller-action', 'download-media', {
+									'media': mediaToDownload,
+									'element': options.$trigger[0]
+								});
+								return true;
+							}
+						},
+
+						'sep2': '---------',
+
+						'rename': {
+							'name': 'Rename',
+							'icon': 'fa-copy',
+
+							'callback': function(itemKey, options) {
+								var mediaToRename = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+								self.sendAction('controller-action', 'rename-media', {
+									'media': mediaToRename,
+									'element': options.$trigger[0]
+								});
+								return true;
+							}
+						},
+
+						'sep3': '---------',
+
+						'delete': {
+							'name': 'Delete',
+							'icon': 'fa-trash',
+
+							'callback': function(itemKey, options) {
+								var mediaToRemove = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+								self.sendAction('controller-action', 'delete-media', mediaToRemove);
+								return true;
+							}
+						}
+					}
+				});
+			},
+
+			'willDestroyElement': function() {
+				var self = this;
+				self._super(...arguments);
+				self.$().contextMenu('destroy');
+			}
+		});
+
+		exports['default'] = BaseMediaDisplayFolderWidget;
+	}
+);
+
+define(
+	'twyr-webapp/components/base-media-display-file-widget',
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-media-widget'],
+	function(exports, _ember, _app, _baseWidget) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/base-media-display-file-widget');
+		var BaseMediaDisplayFileWidget = _baseWidget['default'].extend({
+			'didInsertElement': function() {
+				var self = this;
+				self._super(...arguments);
+
+				var contextMenuSelector = 'table.contextMenu',
+					contextMenuItems = {};
+
+				contextMenuItems['download'] = {
+					'name': 'Download',
+					'icon': 'fa-download',
+
+					'callback': function(itemKey, options) {
+						var mediaToDownload = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+						self.sendAction('controller-action', 'download-media', {
+							'media': mediaToDownload,
+							'element': options.$trigger[0]
+						});
+						return true;
+					}
+				};
+
+				contextMenuItems['sep1'] = '---------';
+
+				if(self.get('model').get('type') == 'zip') {
+					contextMenuItems['extract'] = {
+						'name': 'Extract',
+						'icon': 'fa-file-archive-o',
+
+						'callback': function(itemKey, options) {
+							var mediaToExtract = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+							self.sendAction('controller-action', 'extract-media', mediaToExtract);
+							return true;
+						}
+					};
+
+					contextMenuItems['sep2'] = '---------';
+				}
+				else {
+					contextMenuItems['download-compressed'] = {
+						'name': 'Compress and Download',
+						'icon': 'fa-download',
+
+						'callback': function(itemKey, options) {
+							var mediaToDownload = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+							self.sendAction('controller-action', 'download-compressed-media', {
+								'media': mediaToDownload,
+								'element': options.$trigger[0]
+							});
+							return true;
+						}
+					};
+
+					contextMenuItems['sep2'] = '---------';
+				}
+
+				contextMenuItems['rename'] = {
+					'name': 'Rename',
+					'icon': 'fa-copy',
+
+					'callback': function(itemKey, options) {
+						var mediaToRename = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+						self.sendAction('controller-action', 'rename-media', {
+							'media': mediaToRename,
+							'element': options.$trigger[0]
+						});
+						return true;
+					}
+				};
+
+				contextMenuItems['sep3'] = '---------';
+
+				contextMenuItems['delete'] = {
+					'name': 'Delete',
+					'icon': 'fa-trash',
+
+					'callback': function(itemKey, options) {
+						var mediaToRemove = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+						self.sendAction('controller-action', 'delete-media', mediaToRemove);
+						return true;
+					}
+				};
+
+				self.$().contextMenu({
+					'selector': contextMenuSelector,
+					'items': contextMenuItems
+				});
+			},
+
+			'willDestroyElement': function() {
+				var self = this;
+				self._super(...arguments);
+				self.$().contextMenu('destroy');
+			}
+		});
+
+		exports['default'] = BaseMediaDisplayFileWidget;
+	}
+);
+
+define(
+	'twyr-webapp/components/media-grid-display-folder-widget',
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-folder-widget'],
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-grid-display-folder-widget');
 		var GridMediaDisplayFolderWidget = _baseWidget['default'].extend({
 			'attributeBindings': ['style', 'tabindex'],
 
 			'style': _ember['default'].String.htmlSafe('cursor:pointer; display:inline-block; margin:0px 40px; padding:0px;'),
-			'tabindex': 0,
+			'tabindex': 0
 		});
 
 		exports['default'] = GridMediaDisplayFolderWidget;
@@ -435,7 +585,7 @@ define(
 
 define(
 	'twyr-webapp/components/media-grid-display-file-widget',
-	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-media-widget'],
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-file-widget'],
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-grid-display-file-widget');
 		var GridMediaDisplayFileWidget = _baseWidget['default'].extend({
@@ -451,7 +601,7 @@ define(
 
 define(
 	'twyr-webapp/components/media-compact-display-folder-widget',
-	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-media-widget'],
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-folder-widget'],
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-compact-display-folder-widget');
 		var CompactMediaDisplayFolderWidget = _baseWidget['default'].extend({
@@ -467,7 +617,7 @@ define(
 
 define(
 	'twyr-webapp/components/media-compact-display-file-widget',
-	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-media-widget'],
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-file-widget'],
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-compact-display-file-widget');
 		var CompactMediaDisplayFileWidget = _baseWidget['default'].extend({

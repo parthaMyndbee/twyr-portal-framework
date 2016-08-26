@@ -62,10 +62,10 @@
 	<div id="media-editor-widget-file-upload-popover" class="popover popover-info" style="min-width:600px;">
 		<div class="arrow"></div>
 		<div class="popover-title">
-			<span class="close pull-right" data-dismiss="popover-x">&times;</span>Title
+			<span class="close pull-right" data-dismiss="popover-x">&times;</span>Upload File
 		</div>
 		<div class="popover-content">
-			<input id="media-editor-widget-file-upload-input" type="file" multiple class="form-control file" />
+			<input id="media-editor-widget-file-upload-input" type="file" multiple class="file" />
 		</div>
 	</div>
 </div>
@@ -80,10 +80,6 @@
 	{{#each model.childFiles as |file|}}
 		{{media-grid-display-file-widget model=file controller-action="controller-action"}}
 	{{/each}}
-{{else}}
-	<div class="col-sm-12" style="text-align:center; font-size:16px;">
-		Empty Folder! Drag and drop a file to upload!!
-	</div>
 {{/if}}
 </div>
 </script>
@@ -139,10 +135,6 @@
 	{{#each model.childFiles as |file|}}
 		{{media-compact-display-file-widget model=file controller-action="controller-action"}}
 	{{/each}}
-{{else}}
-	<div class="col-sm-12" style="text-align:center; font-size:16px;">
-		Empty Folder! Drag and drop a file to upload!!
-	</div>
 {{/if}}
 </div>
 </script>
