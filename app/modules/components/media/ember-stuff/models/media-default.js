@@ -106,7 +106,7 @@ define(
 			'childFolders': _ember['default'].computed('children.@each.type', {
 				'get': function(key) {
 					return (this.get('children').filterBy('isFolder', true).sort(function(left, right) {
-						return (left.get('name') <= right.get('name'));
+						return (left.get('name') >= right.get('name'));
 					}));
 				}
 			}).readOnly(),
@@ -114,7 +114,7 @@ define(
 			'childFiles': _ember['default'].computed('children.@each.type', {
 				'get': function(key) {
 					return (this.get('children').filterBy('isFile', true).sort(function(left, right) {
-						return (left.get('name') <= right.get('name'));
+						return (left.get('name') >= right.get('name'));
 					}));
 				}
 			}).readOnly(),

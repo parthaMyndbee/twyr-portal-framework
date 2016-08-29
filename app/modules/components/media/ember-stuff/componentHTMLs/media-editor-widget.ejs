@@ -1,6 +1,6 @@
 <script type="text/x-handlebars" data-template-name="components/media-editor-widget">
 <div class="box box-solid" style="text-align:left; box-shadow:none; margin-bottom:0px;">
-	<div class="box-header with-border" style="background-color:#fafafa;">
+	<div class="box-header with-border">
 		<button type="button" class="btn btn-flat btn-info" title="Create Folder" {{action "controller-action" "create-folder" model}}>
 			<i class="fa fa-folder" style="margin-right:5px;" />New Folder
 		</button>
@@ -44,7 +44,7 @@
 		</div>
 	</div>
 
-	<div class="box-header with-border" style="background-color:#fafafa;">
+	<div class="box-header with-border">
 		{{#each folderPathSegments as |segment index|}}
 			{{#if index}}
 				<span>&gt;</span>
@@ -93,7 +93,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px;">
+		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px; padding:0px 8px;">
 		{{#if model.isEditing}}
 			{{input type="text" class="form-control input-sm" value=model.name}}
 		{{else}}
@@ -114,7 +114,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px;">
+		<td class="form-group" style="text-align:center; vertical-align:middle; border:0px; padding:0px 8px;">
 		{{#if model.isEditing}}
 			{{input type="text" class="form-control input-sm" value=model.name}}
 		{{else}}
@@ -195,4 +195,14 @@
 	</table>
 	</div>
 </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-list-display-folder-widget">
+	{{log 'media-list-display-folder-widget' model.id}}
+	<i class="{{model.displayIcon}}" style="color:#f39c12; margin-right:5px;" />{{model.name}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/media-list-display-file-widget">
+	{{log 'media-list-display-file-widget' model.id}}
+	<i class="{{model.displayIcon}}" style="margin-right:5px;" />{{model.name}}
 </script>

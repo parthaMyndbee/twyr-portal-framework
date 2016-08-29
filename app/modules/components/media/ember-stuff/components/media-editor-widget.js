@@ -389,72 +389,76 @@ define(
 				var self = this;
 				self._super(...arguments);
 
-				self.$().contextMenu({
-					'selector': 'table.contextMenu',
+				_ember['default'].run.later(self, function() {
+					if(!self.$()) return;
+					self.$().contextMenu({
+						'selector': 'table.contextMenu',
 
-					'items': {
-						'change-folder': {
-							'name': 'Navigate To',
-							'icon': 'fa-folder',
+						'items': {
+							'change-folder': {
+								'name': 'Navigate To',
+								'icon': 'fa-folder',
 
-							'callback': function(itemKey, options) {
-								self.sendAction('controller-action', 'change-folder', self.get('model').get('id'));
-								return true;
-							}
-						},
+								'callback': function(itemKey, options) {
+									self.sendAction('controller-action', 'change-folder', self.get('model').get('id'));
+									return true;
+								}
+							},
 
-						'sep1': '---------',
+							'sep1': '---------',
 
-						'download': {
-							'name': 'Download',
-							'icon': 'fa-download',
+							'download': {
+								'name': 'Download',
+								'icon': 'fa-download',
 
-							'callback': function(itemKey, options) {
-								var mediaToDownload = self.get('store').peekRecord('media-default', self.get('model').get('id'));
-								self.sendAction('controller-action', 'download-media', {
-									'media': mediaToDownload,
-									'element': options.$trigger[0]
-								});
-								return true;
-							}
-						},
+								'callback': function(itemKey, options) {
+									var mediaToDownload = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+									self.sendAction('controller-action', 'download-media', {
+										'media': mediaToDownload,
+										'element': options.$trigger[0]
+									});
+									return true;
+								}
+							},
 
-						'sep2': '---------',
+							'sep2': '---------',
 
-						'rename': {
-							'name': 'Rename',
-							'icon': 'fa-copy',
+							'rename': {
+								'name': 'Rename',
+								'icon': 'fa-copy',
 
-							'callback': function(itemKey, options) {
-								var mediaToRename = self.get('store').peekRecord('media-default', self.get('model').get('id'));
-								self.sendAction('controller-action', 'rename-media', {
-									'media': mediaToRename,
-									'element': options.$trigger[0]
-								});
-								return true;
-							}
-						},
+								'callback': function(itemKey, options) {
+									var mediaToRename = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+									self.sendAction('controller-action', 'rename-media', {
+										'media': mediaToRename,
+										'element': options.$trigger[0]
+									});
+									return true;
+								}
+							},
 
-						'sep3': '---------',
+							'sep3': '---------',
 
-						'delete': {
-							'name': 'Delete',
-							'icon': 'fa-trash',
+							'delete': {
+								'name': 'Delete',
+								'icon': 'fa-trash',
 
-							'callback': function(itemKey, options) {
-								var mediaToRemove = self.get('store').peekRecord('media-default', self.get('model').get('id'));
-								self.sendAction('controller-action', 'delete-media', mediaToRemove);
-								return true;
+								'callback': function(itemKey, options) {
+									var mediaToRemove = self.get('store').peekRecord('media-default', self.get('model').get('id'));
+									self.sendAction('controller-action', 'delete-media', mediaToRemove);
+									return true;
+								}
 							}
 						}
-					}
-				});
+					});
+				}, 1000);
 			},
 
 			'willDestroyElement': function() {
 				var self = this;
 				self._super(...arguments);
-				self.$().contextMenu('destroy');
+
+				self.$('table.contextMenu').contextMenu('destroy');
 			}
 		});
 
@@ -550,16 +554,20 @@ define(
 					}
 				};
 
-				self.$().contextMenu({
-					'selector': contextMenuSelector,
-					'items': contextMenuItems
-				});
+				_ember['default'].run.later(self, function() {
+					if(!self.$()) return;
+					self.$().contextMenu({
+						'selector': contextMenuSelector,
+						'items': contextMenuItems
+					});
+				}, 1000);
 			},
 
 			'willDestroyElement': function() {
 				var self = this;
 				self._super(...arguments);
-				self.$().contextMenu('destroy');
+
+				self.$('table.contextMenu').contextMenu('destroy');
 			}
 		});
 
@@ -633,8 +641,8 @@ define(
 
 define(
 	'twyr-webapp/components/media-list-display-view-widget',
-	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-view-widget'],
-	function(exports, _ember, _app, _baseWidget) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-view-widget', 'twyr-webapp/components/media-list-display-folder-widget', 'twyr-webapp/components/media-list-display-file-widget'],
+	function(exports, _ember, _app, _baseWidget, _folderWidget, _fileWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-list-display-view-widget');
 		var ListMediaDisplayViewWidget = _baseWidget['default'].extend({
 			'_mediaListDataTable': undefined,
@@ -656,6 +664,13 @@ define(
 						{ 'data': 'created' },
 						{ 'data': 'updated' }
 					],
+
+					'columnDefs': [{
+						'targets': [0],
+						'render': function(whatever, type, row) {
+							return '<div class="media-list-display-name-col" id="' + row.id + '" style="width:100%;" />';
+						}
+					}],
 
 					'order': [
 						[ 1, 'desc' ],
@@ -736,14 +751,15 @@ define(
 					});
 
 					// Add all rows from the children of the current model not in the table
+					var rowIDs = self.get('_mediaListDataTable').rows().ids();
 					children.forEach(function(child) {
-						var doesAlreadyExist = self.get('_mediaListDataTable').rows().ids().indexOf(child.get('id'));
+						var doesAlreadyExist = rowIDs.indexOf(child.get('id'));
 						if(doesAlreadyExist >= 0)
 							return;
 
 						var displayName = '';
 						if(child.get('isFolder')) {
-							displayName = '<i class="' + child.get('displayIcon') + '" style="color:#f39c12; margin-right:5px;"></i>' + child.get('name');
+							displayName = '<div style="cursor:pointer;"><i class="' + child.get('displayIcon') + '" style="color:#f39c12; margin-right:5px;"></i>' + child.get('name') + '</div>';
 						}
 						else {
 							displayName = '<i class="' + child.get('displayIcon') + '" style="margin-right:5px;"></i>' + child.get('name');
@@ -762,6 +778,17 @@ define(
 					// Redraw for display...
 					self.get('_mediaListDataTable').draw();
 					self.$('table.table-hover tr').dblclick(self._onDblClickRow.bind(self));
+
+					// Addin the Ember Components dynamically
+					var nameCols = self.$('div.media-list-display-name-col');
+					window.$.each(nameCols, function(idx, nameColDiv) {
+						var nameColComponent = _fileWidget['default'].create({
+							'model': self.get('store').peekRecord('media-default', window.$(nameColDiv).attr('id')),
+							'controller-action': self.get('controller-action')
+						});
+
+						nameColComponent.appendTo(window.$(nameColDiv));
+					});
 				})
 				.catch(function(err) {
 					console.error(err);
@@ -774,5 +801,63 @@ define(
 		});
 
 		exports['default'] = ListMediaDisplayViewWidget;
+	}
+);
+
+define(
+	'twyr-webapp/components/media-list-display-folder-widget',
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-folder-widget'],
+	function(exports, _ember, _app, _baseWidget) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-list-display-folder-widget');
+		var ListMediaDisplayFolderWidget = _baseWidget['default'].extend({
+			'attributeBindings': ['style', 'tabindex'],
+
+			'style': _ember['default'].String.htmlSafe('cursor:pointer;'),
+			'tabindex': 0,
+
+			'didRender': function() {
+				var self = this;
+				self._super(...arguments);
+/*
+				var nameCols = window.$('div.media-list-display-name-col');
+				window.$.each(nameCols, function(idx, nameColDiv) {
+					if(window.$(nameColDiv).attr('id') != self.get('model').get('id')) {
+						return;
+					}
+
+					self.$().appendTo(window.$(nameColDiv));
+				});
+*/
+			}
+		});
+
+		exports['default'] = ListMediaDisplayFolderWidget;
+	}
+);
+
+define(
+	'twyr-webapp/components/media-list-display-file-widget',
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-file-widget'],
+	function(exports, _ember, _app, _baseWidget) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-list-display-file-widget');
+		var ListMediaDisplayFileWidget = _baseWidget['default'].extend({
+			'attributeBindings': ['tabindex'],
+			'tabindex': 0,
+
+			'didInsertElement': function() {
+				var self = this;
+				self._super(...arguments);
+
+				var nameCols = window.$('div.media-list-display-name-col');
+				window.$.each(nameCols, function(idx, nameColDiv) {
+					if(window.$(nameColDiv).attr('id') != self.get('model').get('id'))
+						return;
+
+					self.$().appendTo(window.$(nameColDiv));
+				});
+			}
+		});
+
+		exports['default'] = ListMediaDisplayFileWidget;
 	}
 );
