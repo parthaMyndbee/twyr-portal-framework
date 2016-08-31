@@ -722,7 +722,6 @@ define(
 
 					// Remove all rows from the table who are not children of the current model
 					var rowIds = self.get('_mediaListDataTable').rows().ids(),
-						rowIdsAdded = [],
 						toBeRemoved = [];
 
 					window.$.each(rowIds, function(index, rowId) {
@@ -745,7 +744,6 @@ define(
 						if(doesAlreadyExist >= 0)
 							return;
 
-						rowIdsAdded.push(child.get('id'));
 						self.get('_mediaListDataTable').row.add({
 							'id': child.get('id'),
 							'name': child.get('name'),
@@ -758,7 +756,7 @@ define(
 
 					// Redraw for display...
 					self.get('_mediaListDataTable').draw();
-					self.$('table.table-hover td').css({
+					self.$('table.table-hover > tbody > tr > td').css({
 						'border': '0px',
 						'padding': '0px 8px',
 						'vertical-align': 'middle'
@@ -767,10 +765,9 @@ define(
 					// Add in the Ember Components dynamically
 					var nameCols = self.$('div.media-list-display-name-col');
 					window.$.each(nameCols, function(idx, nameColDiv) {
-						if(rowIdsAdded.indexOf(window.$(nameColDiv).attr('id')) < 0)
-							return;
-
 						var mediaModel = self.get('store').peekRecord('media-default', window.$(nameColDiv).attr('id'));
+						if(!mediaModel) return;
+
 						if(mediaModel.get('type') == 'folder') {
 							var folderWidget = _ember['default'].getOwner(self).lookup('component:media-list-display-folder-widget');
 							folderWidget.setProperties({
@@ -833,9 +830,6 @@ define(
 
 				var dataTableElem = window.$(self.get('colElement').parents('table.dataTable')[0]);
 				dataTableElem.on('draw.dt', function() {
-					if(dataTableElem.DataTable().rows().ids().indexOf(self.get('model.id')) >= 0)
-						return;
-
 					self.destroy();
 				});
 
@@ -868,9 +862,6 @@ define(
 
 				var dataTableElem = window.$(self.get('colElement').parents('table.dataTable')[0]);
 				dataTableElem.on('draw.dt', function() {
-					if(dataTableElem.DataTable().rows().ids().indexOf(self.get('model.id')) >= 0)
-						return;
-
 					self.destroy();
 				});
 
