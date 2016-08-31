@@ -198,11 +198,35 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/media-list-display-folder-widget">
-	{{log 'media-list-display-folder-widget' model.id}}
-	<i class="{{model.displayIcon}}" style="color:#f39c12; margin-right:5px;" />{{model.name}}
+<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="{{model.children.length}} Items">
+<tbody>
+	<tr>
+		<td style="vertical-align:middle; border:0px;">
+			<i class="{{model.displayIcon}}" style="color:#f39c12;" />
+		{{#if model.isEditing}}
+			{{input type="text" class="input-sm" value=model.name}}
+		{{else}}
+			<span>{{model.name}}</span>
+		{{/if}}
+		</td>
+	</tr>
+</tbody>
+</table>
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/media-list-display-file-widget">
-	{{log 'media-list-display-file-widget' model.id}}
-	<i class="{{model.displayIcon}}" style="margin-right:5px;" />{{model.name}}
+<table id="{{model.id}}" class="table contextMenu" style="margin:0px; border:0px;" title="Size: {{model.displaySize}}">
+<tbody>
+	<tr>
+		<td style="vertical-align:middle; border:0px;">
+			<i class="{{model.displayIcon}}" />
+		{{#if model.isEditing}}
+			{{input type="text" class="input-sm" value=model.name}}
+		{{else}}
+			<span>{{model.name}}</span>
+		{{/if}}
+		</td>
+	</tr>
+</tbody>
+</table>
 </script>

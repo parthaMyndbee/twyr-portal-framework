@@ -641,8 +641,8 @@ define(
 
 define(
 	'twyr-webapp/components/media-list-display-view-widget',
-	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-view-widget', 'twyr-webapp/components/media-list-display-folder-widget', 'twyr-webapp/components/media-list-display-file-widget'],
-	function(exports, _ember, _app, _baseWidget, _folderWidget, _fileWidget) {
+	['exports', 'ember', 'twyr-webapp/application', 'twyr-webapp/components/base-media-display-view-widget'],
+	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-list-display-view-widget');
 		var ListMediaDisplayViewWidget = _baseWidget['default'].extend({
 			'_mediaListDataTable': undefined,
@@ -668,7 +668,7 @@ define(
 					'columnDefs': [{
 						'targets': [0],
 						'render': function(whatever, type, row) {
-							return '<div class="media-list-display-name-col" id="' + row.id + '" style="width:100%;" />';
+							return '<div class="media-list-display-name-col" id="' + row.id + '" style="width:100%;">' + whatever + '</div>';
 						}
 					}],
 
@@ -751,23 +751,15 @@ define(
 					});
 
 					// Add all rows from the children of the current model not in the table
-					var rowIDs = self.get('_mediaListDataTable').rows().ids();
+					rowIds = self.get('_mediaListDataTable').rows().ids();
 					children.forEach(function(child) {
-						var doesAlreadyExist = rowIDs.indexOf(child.get('id'));
+						var doesAlreadyExist = rowIds.indexOf(child.get('id'));
 						if(doesAlreadyExist >= 0)
 							return;
 
-						var displayName = '';
-						if(child.get('isFolder')) {
-							displayName = '<div style="cursor:pointer;"><i class="' + child.get('displayIcon') + '" style="color:#f39c12; margin-right:5px;"></i>' + child.get('name') + '</div>';
-						}
-						else {
-							displayName = '<i class="' + child.get('displayIcon') + '" style="margin-right:5px;"></i>' + child.get('name');
-						}
-
 						self.get('_mediaListDataTable').row.add({
 							'id': child.get('id'),
-							'name': displayName,
+							'name': child.get('name'),
 							'type': ((child.get('type') == 'folder') ? 'Folder' : 'File <i>(' + child.get('type') + ')</i>'),
 							'size': child.get('displaySize'),
 							'created': child.get('formattedCreatedAt'),
@@ -778,16 +770,41 @@ define(
 					// Redraw for display...
 					self.get('_mediaListDataTable').draw();
 					self.$('table.table-hover tr').dblclick(self._onDblClickRow.bind(self));
+					self.$('table.table-hover td').css({
+						'border': '0px',
+						'padding': '0px 8px',
+						'vertical-align': 'middle'
+					});
 
-					// Addin the Ember Components dynamically
+					// Add in the Ember Components dynamically
 					var nameCols = self.$('div.media-list-display-name-col');
 					window.$.each(nameCols, function(idx, nameColDiv) {
-						var nameColComponent = _fileWidget['default'].create({
-							'model': self.get('store').peekRecord('media-default', window.$(nameColDiv).attr('id')),
-							'controller-action': self.get('controller-action')
+						var mediaModel = self.get('store').peekRecord('media-default', window.$(nameColDiv).attr('id'));
+						if(mediaModel.get('type') == 'folder') {
+							var folderWidget = _ember['default'].getOwner(self).lookup('component:media-list-display-folder-widget');
+							folderWidget.setProperties({
+								'model': mediaModel,
+								'controller-action': 'controller-action',
+								'parentView': self,
+								'colElement': window.$(nameColDiv)
+							});
+
+							self.appendChild(folderWidget);
+							folderWidget.append();
+
+							return;
+						}
+
+						var fileWidget = _ember['default'].getOwner(self).lookup('component:media-list-display-file-widget');
+						fileWidget.setProperties({
+							'model': mediaModel,
+							'controller-action': 'controller-action',
+							'parentView': self,
+							'colElement': window.$(nameColDiv)
 						});
 
-						nameColComponent.appendTo(window.$(nameColDiv));
+						self.appendChild(fileWidget);
+						fileWidget.append();
 					});
 				})
 				.catch(function(err) {
@@ -810,24 +827,33 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-list-display-folder-widget');
 		var ListMediaDisplayFolderWidget = _baseWidget['default'].extend({
+			'layoutName': 'components/media-list-display-folder-widget',
 			'attributeBindings': ['style', 'tabindex'],
 
 			'style': _ember['default'].String.htmlSafe('cursor:pointer;'),
 			'tabindex': 0,
 
-			'didRender': function() {
+			'didInsertElement': function() {
 				var self = this;
 				self._super(...arguments);
-/*
-				var nameCols = window.$('div.media-list-display-name-col');
-				window.$.each(nameCols, function(idx, nameColDiv) {
-					if(window.$(nameColDiv).attr('id') != self.get('model').get('id')) {
-						return;
-					}
 
-					self.$().appendTo(window.$(nameColDiv));
-				});
-*/
+				self.get('colElement').html('');
+				self.$().appendTo(self.get('colElement'));
+
+				var myId = Number(self.$().attr('id').replace('ember', '')),
+					otherInsts = self.get('colElement').find('div.ember-view');
+
+				if(otherInsts.length) {
+					var shouldSelfDestruct = false;
+					window.$.each(otherInsts, function(idx, otherInst) {
+						var otherId = Number(window.$(otherInst).attr('id').replace('ember', ''))
+						if(myId == otherId) return;
+						if(myId > otherId) shouldSelfDestruct = true;
+					});
+
+					if(shouldSelfDestruct)
+						self.destroy();
+				}
 			}
 		});
 
@@ -841,6 +867,7 @@ define(
 	function(exports, _ember, _app, _baseWidget) {
 		if(window.developmentMode) console.log('DEFINE: twyr-webapp/components/media-list-display-file-widget');
 		var ListMediaDisplayFileWidget = _baseWidget['default'].extend({
+			'layoutName': 'components/media-list-display-file-widget',
 			'attributeBindings': ['tabindex'],
 			'tabindex': 0,
 
@@ -848,13 +875,23 @@ define(
 				var self = this;
 				self._super(...arguments);
 
-				var nameCols = window.$('div.media-list-display-name-col');
-				window.$.each(nameCols, function(idx, nameColDiv) {
-					if(window.$(nameColDiv).attr('id') != self.get('model').get('id'))
-						return;
+				self.get('colElement').html('');
+				self.$().appendTo(self.get('colElement'));
 
-					self.$().appendTo(window.$(nameColDiv));
-				});
+				var myId = Number(self.$().attr('id').replace('ember', '')),
+					otherInsts = self.get('colElement').find('div.ember-view');
+
+				if(otherInsts.length) {
+					var shouldSelfDestruct = false;
+					window.$.each(otherInsts, function(idx, otherInst) {
+						var otherId = Number(window.$(otherInst).attr('id').replace('ember', ''))
+						if(myId == otherId) return;
+						if(myId > otherId) shouldSelfDestruct = true;
+					});
+
+					if(shouldSelfDestruct)
+						self.destroy();
+				}
 			}
 		});
 
