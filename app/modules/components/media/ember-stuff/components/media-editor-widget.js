@@ -451,7 +451,7 @@ define(
 							}
 						}
 					});
-				}, 1000);
+				}, 500);
 			},
 
 			'willDestroyElement': function() {
@@ -560,7 +560,7 @@ define(
 						'selector': contextMenuSelector,
 						'items': contextMenuItems
 					});
-				}, 1000);
+				}, 500);
 			},
 
 			'willDestroyElement': function() {
@@ -654,7 +654,7 @@ define(
 				self.set('_mediaListDataTable', self.$('table.table-hover').DataTable({
 					'rowId': 'id',
 
-					'lengthMenu': [ [10, 25, 50, -1], [10, 25, 50, 'All'] ],
+					'lengthMenu': [ [1, 5, 10, 25, 50, -1], [1, 5, 10, 25, 50, 'All'] ],
 					'pageLength': -1,
 
 					'columns': [
@@ -701,19 +701,6 @@ define(
 				this._redrawDataTable();
 			}),
 
-			'_onDblClickRow': function(event) {
-				event.preventDefault();
-				event.stopPropagation();
-
-				var rowId = $(event.currentTarget).attr('id'),
-					media = this.get('store').peekRecord('media-default', rowId);
-
-				if(media.get('type') != 'folder')
-					return;
-
-				this.sendAction('controller-action', 'change-folder', rowId);
-			},
-
 			'_redrawDataTable': function() {
 				var self = this;
 
@@ -735,6 +722,7 @@ define(
 
 					// Remove all rows from the table who are not children of the current model
 					var rowIds = self.get('_mediaListDataTable').rows().ids(),
+						rowIdsAdded = [],
 						toBeRemoved = [];
 
 					window.$.each(rowIds, function(index, rowId) {
@@ -757,6 +745,7 @@ define(
 						if(doesAlreadyExist >= 0)
 							return;
 
+						rowIdsAdded.push(child.get('id'));
 						self.get('_mediaListDataTable').row.add({
 							'id': child.get('id'),
 							'name': child.get('name'),
@@ -769,7 +758,6 @@ define(
 
 					// Redraw for display...
 					self.get('_mediaListDataTable').draw();
-					self.$('table.table-hover tr').dblclick(self._onDblClickRow.bind(self));
 					self.$('table.table-hover td').css({
 						'border': '0px',
 						'padding': '0px 8px',
@@ -779,6 +767,9 @@ define(
 					// Add in the Ember Components dynamically
 					var nameCols = self.$('div.media-list-display-name-col');
 					window.$.each(nameCols, function(idx, nameColDiv) {
+						if(rowIdsAdded.indexOf(window.$(nameColDiv).attr('id')) < 0)
+							return;
+
 						var mediaModel = self.get('store').peekRecord('media-default', window.$(nameColDiv).attr('id'));
 						if(mediaModel.get('type') == 'folder') {
 							var folderWidget = _ember['default'].getOwner(self).lookup('component:media-list-display-folder-widget');
@@ -840,20 +831,17 @@ define(
 				self.get('colElement').html('');
 				self.$().appendTo(self.get('colElement'));
 
-				var myId = Number(self.$().attr('id').replace('ember', '')),
-					otherInsts = self.get('colElement').find('div.ember-view');
+				var dataTableElem = window.$(self.get('colElement').parents('table.dataTable')[0]);
+				dataTableElem.on('draw.dt', function() {
+					if(dataTableElem.DataTable().rows().ids().indexOf(self.get('model.id')) >= 0)
+						return;
 
-				if(otherInsts.length) {
-					var shouldSelfDestruct = false;
-					window.$.each(otherInsts, function(idx, otherInst) {
-						var otherId = Number(window.$(otherInst).attr('id').replace('ember', ''))
-						if(myId == otherId) return;
-						if(myId > otherId) shouldSelfDestruct = true;
-					});
+					self.destroy();
+				});
 
-					if(shouldSelfDestruct)
-						self.destroy();
-				}
+				dataTableElem.on('destroy.dt', function() {
+					self.destroy();
+				});
 			}
 		});
 
@@ -878,20 +866,17 @@ define(
 				self.get('colElement').html('');
 				self.$().appendTo(self.get('colElement'));
 
-				var myId = Number(self.$().attr('id').replace('ember', '')),
-					otherInsts = self.get('colElement').find('div.ember-view');
+				var dataTableElem = window.$(self.get('colElement').parents('table.dataTable')[0]);
+				dataTableElem.on('draw.dt', function() {
+					if(dataTableElem.DataTable().rows().ids().indexOf(self.get('model.id')) >= 0)
+						return;
 
-				if(otherInsts.length) {
-					var shouldSelfDestruct = false;
-					window.$.each(otherInsts, function(idx, otherInst) {
-						var otherId = Number(window.$(otherInst).attr('id').replace('ember', ''))
-						if(myId == otherId) return;
-						if(myId > otherId) shouldSelfDestruct = true;
-					});
+					self.destroy();
+				});
 
-					if(shouldSelfDestruct)
-						self.destroy();
-				}
+				dataTableElem.on('destroy.dt', function() {
+					self.destroy();
+				});
 			}
 		});
 
