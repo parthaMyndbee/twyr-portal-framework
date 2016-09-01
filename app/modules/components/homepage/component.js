@@ -32,7 +32,7 @@ var homepageComponent = prime({
 		this._getUserHomeRouteNameAsync = promises.promisify(this._getUserHomeRouteName.bind(this));
 	},
 
-	'_getEmberRoutes': function(user, renderer, callback) {
+	'_getEmberRoutes': function(user, mediaType, renderer, callback) {
 		if(callback) callback(null, [{
 			'name': 'homepage-home',
 			'path': '/',
@@ -42,7 +42,7 @@ var homepageComponent = prime({
 		}]);
 	},
 
-	'_getEmberRouteHandlers': function(user, renderer, callback) {
+	'_getEmberRouteHandlers': function(user, mediaType, renderer, callback) {
 		var self = this;
 
 		self._getUserHomeRouteNameAsync(user)
@@ -103,7 +103,7 @@ var homepageComponent = prime({
 			return null;
 		})
 		.catch(function(err) {
-			loggerSrvc.error(self.name + '::_getEmberRoutes:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
+			loggerSrvc.error(self.name + '::_getUserHomeRouteName:\nArguments: ' + JSON.stringify(arguments, null, '\t') + '\nError: ', err);
 			if(callback) callback(err);
 		});
 	},

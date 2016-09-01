@@ -77,7 +77,7 @@ var modulesComponent = prime({
 		self._checkPermissionAsync(user, self['$moduleManagerPermissionId'])
 		.then(function(hasPermission) {
 			if(hasPermission) {
-				if(callback) callback(null, possibleTemplates);
+				modulesComponent.parent._selectTemplates.call(self, user, mediaType, possibleTemplates, callback);
 				return null;
 			}
 
@@ -90,9 +90,14 @@ var modulesComponent = prime({
 		});
 	},
 
-	'_getEmberRoutes': function(user, renderer, callback) {
+	'_getEmberRoutes': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);
@@ -116,14 +121,19 @@ var modulesComponent = prime({
 			return null;
 		})
 		.catch(function(err) {
-			loggerSrvc.error(self.name + '::_selectTemplates Error: ', err);
+			loggerSrvc.error(self.name + '::_getEmberRoutes Error: ', err);
 			if(callback) callback(err);
 		});
 	},
 
-	'_getEmberRouteHandlers': function(user, renderer, callback) {
+	'_getEmberRouteHandlers': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);
@@ -148,9 +158,14 @@ var modulesComponent = prime({
 		});
 	},
 
-	'_getEmberModels': function(user, renderer, callback) {
+	'_getEmberModels': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);
@@ -177,9 +192,14 @@ var modulesComponent = prime({
 		return null;
 	},
 
-	'_getEmberComponents': function(user, renderer, callback) {
+	'_getEmberComponents': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);
@@ -211,9 +231,14 @@ var modulesComponent = prime({
 		return null;
 	},
 
-	'_getEmberComponentHTMLs': function(user, renderer, callback) {
+	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);

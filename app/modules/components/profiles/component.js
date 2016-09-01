@@ -165,10 +165,10 @@ var profilesComponent = prime({
 			return null;
 		}
 
-		if(callback) callback(null, possibleTemplates);
+		profilesComponent.parent._selectTemplates.call(this, user, mediaType, possibleTemplates, callback);
 	},
 
-	'_getEmberRoutes': function(user, renderer, callback) {
+	'_getEmberRoutes': function(user, mediaType, renderer, callback) {
 		if(!user) {
 			if(callback) callback(null, []);
 			return null;
@@ -183,7 +183,7 @@ var profilesComponent = prime({
 		}]);
 	},
 
-	'_getEmberRouteHandlers': function(user, renderer, callback) {
+	'_getEmberRouteHandlers': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
@@ -203,7 +203,7 @@ var profilesComponent = prime({
 		});
 	},
 
-	'_getEmberModels': function(user, renderer, callback) {
+	'_getEmberModels': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
@@ -223,7 +223,7 @@ var profilesComponent = prime({
 		});
 	},
 
-	'_getEmberComponents': function(user, renderer, callback) {
+	'_getEmberComponents': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
@@ -249,7 +249,7 @@ var profilesComponent = prime({
 		});
 	},
 
-	'_getEmberComponentHTMLs': function(user, renderer, callback) {
+	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 

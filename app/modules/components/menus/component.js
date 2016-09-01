@@ -69,7 +69,7 @@ var menusComponent = prime({
 		self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
 		.then(function(hasPermission) {
 			if(hasPermission) {
-				if(callback) callback(null, possibleTemplates);
+				menusComponent.parent._selectTemplates.call(self, user, mediaType, possibleTemplates, callback);
 				return null;
 			}
 
@@ -82,72 +82,89 @@ var menusComponent = prime({
 		});
 	},
 
-	'_getEmberRoutes': function(user, renderer, callback) {
-		var self = this,
-			emberRoutes = [];
+	'_getEmberRoutes': function(user, mediaType, renderer, callback) {
+		var self = this;
 
-		if(user) {
-			self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
-			.then(function(hasPermission) {
-				if(hasPermission) {
-					emberRoutes.push({
-						'name': 'menus-default',
-						'path': '/menus',
-
-						'parentRoute': null,
-						'subRoutes': []
-					});
-				}
-
-				if(callback) callback(null, emberRoutes);
-				return null;
-			})
-			.catch(function(err) {
-				self.dependencies['logger-service'].error(self.name + '::_getEmberRoutes Error: ', err);
-				if(callback) callback(err);
-			});
-
-			return;
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
 		}
-
-		if(callback) callback(null, emberRoutes);
-	},
-
-	'_getEmberRouteHandlers': function(user, renderer, callback) {
-		var loggerSrvc = this.dependencies['logger-service'],
-			self = this;
 
 		if(!user) {
 			if(callback) callback(null, []);
 			return null;
 		}
 
-		if(user) {
-			self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
-			.then(function(hasPermission) {
-				var promiseResolutions = [];
-				if(hasPermission) {
-					promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/menus-default.ejs'), 'utf8'));
-				}
+		self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
+		.then(function(hasPermission) {
+			var emberRoutes = [];
+			if(hasPermission) {
+				emberRoutes.push({
+					'name': 'menus-default',
+					'path': '/menus',
 
-				return promises.all(promiseResolutions);
-			})
-			.then(function(routeHandlers) {
-				if(callback) callback(null, routeHandlers);
-				return null;
-			})
-			.catch(function(err) {
-				self.dependencies['logger-service'].error(self.name + '::_getEmberRouteHandlers Error: ', err);
-				if(callback) callback(err);
-			});
+					'parentRoute': null,
+					'subRoutes': []
+				});
+			}
 
-			return;
-		}
+			if(callback) callback(null, emberRoutes);
+			return null;
+		})
+		.catch(function(err) {
+			self.dependencies['logger-service'].error(self.name + '::_getEmberRoutes Error: ', err);
+			if(callback) callback(err);
+		});
 	},
 
-	'_getEmberModels': function(user, renderer, callback) {
+	'_getEmberRouteHandlers': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
+		.then(function(hasPermission) {
+			var promiseResolutions = [];
+			if(hasPermission) {
+				promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/menus-default.ejs'), 'utf8'));
+			}
+
+			return promises.all(promiseResolutions);
+		})
+		.then(function(routeHandlers) {
+			if(callback) callback(null, routeHandlers);
+			return null;
+		})
+		.catch(function(err) {
+			self.dependencies['logger-service'].error(self.name + '::_getEmberRouteHandlers Error: ', err);
+			if(callback) callback(err);
+		});
+
+		return;
+	},
+
+	'_getEmberModels': function(user, mediaType, renderer, callback) {
+		var loggerSrvc = this.dependencies['logger-service'],
+			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
+
+		if(!user) {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		self._checkPermissionAsync(user, self['$menuAuthorPermissionId'])
 		.then(function(hasPermission) {
@@ -169,9 +186,14 @@ var menusComponent = prime({
 		});
 	},
 
-	'_getEmberComponents': function(user, renderer, callback) {
+	'_getEmberComponents': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);
@@ -199,9 +221,14 @@ var menusComponent = prime({
 		});
 	},
 
-	'_getEmberComponentHTMLs': function(user, renderer, callback) {
+	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);

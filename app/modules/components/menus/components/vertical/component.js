@@ -72,7 +72,7 @@ var verticalComponent = prime({
 		});
 	},
 
-	'_getEmberComponents': function(user, renderer, callback) {
+	'_getEmberComponents': function(user, mediaType, renderer, callback) {
 		var dbSrvc = this.dependencies['database-service'].knex,
 			loggerSrvc = this.dependencies['logger-service'],
 			self = this;
@@ -99,7 +99,7 @@ var verticalComponent = prime({
 		})
 		.then(function(userHorizontalMenus) {
 			var hasAuthorPermission = userHorizontalMenus.pop();
-			if(hasAuthorPermission) {
+			if(hasAuthorPermission && (mediaType == 'desktop')) {
 				userHorizontalMenus.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/vertical-menu-manager-widget.js'), 'utf8'));
 			}
 
@@ -116,7 +116,7 @@ var verticalComponent = prime({
 		});
 	},
 
-	'_getEmberComponentHTMLs': function(user, renderer, callback) {
+	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback) {
 		var dbSrvc = this.dependencies['database-service'].knex,
 			loggerSrvc = this.dependencies['logger-service'],
 			self = this;
@@ -143,7 +143,7 @@ var verticalComponent = prime({
 		})
 		.then(function(userHorizontalMenus) {
 			var hasAuthorPermission = userHorizontalMenus.pop();
-			if(hasAuthorPermission) {
+			if(hasAuthorPermission && (mediaType == 'desktop')) {
 				userHorizontalMenus.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/vertical-menu-manager-widget.ejs'), 'utf8'));
 			}
 

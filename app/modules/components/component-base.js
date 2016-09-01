@@ -181,7 +181,7 @@ var twyrComponentBase = prime({
 			var promiseResolutions = [];
 
 			selectedTemplates.forEach(function(selectedTemplate) {
-				promiseResolutions.push(self._renderTemplateWidgetsAsync(user, selectedTemplate, renderer));
+				promiseResolutions.push(self._renderTemplateWidgetsAsync(user, selectedTemplate, mediaType, renderer));
 			});
 
 			return promises.all(promiseResolutions);
@@ -190,11 +190,11 @@ var twyrComponentBase = prime({
 		.then(function(renderedTemplates) {
 			var promiseResolutions = [];
 
-			promiseResolutions.push(self._getEmberRoutesAsync(user, renderer));
-			promiseResolutions.push(self._getEmberRouteHandlersAsync(user, renderer));
-			promiseResolutions.push(self._getEmberModelsAsync(user, renderer));
-			promiseResolutions.push(self._getEmberComponentsAsync(user, renderer));
-			promiseResolutions.push(self._getEmberComponentHTMLsAsync(user, renderer));
+			promiseResolutions.push(self._getEmberRoutesAsync(user, mediaType, renderer));
+			promiseResolutions.push(self._getEmberRouteHandlersAsync(user, mediaType, renderer));
+			promiseResolutions.push(self._getEmberModelsAsync(user, mediaType, renderer));
+			promiseResolutions.push(self._getEmberComponentsAsync(user, mediaType, renderer));
+			promiseResolutions.push(self._getEmberComponentHTMLsAsync(user, mediaType, renderer));
 			promiseResolutions.push(renderedTemplates);
 
 			return promises.all(promiseResolutions);
@@ -264,14 +264,37 @@ var twyrComponentBase = prime({
 	},
 
 	'_selectTemplates': function(user, mediaType, possibleTemplates, callback) {
-		if(callback) callback(null, possibleTemplates);
+		var selectedTemplate = null;
+
+		// Step 1: Filter by media type match
+		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
+			return (modTmpl.media.indexOf(mediaType) >= 0);
+		});
+
+		if(selectedTemplate.length) {
+			if(callback) callback(null, selectedTemplate);
+			return;
+		}
+
+		// Step 2: Check for generic match
+		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
+			return (modTmpl.media.indexOf('all') >= 0);
+		});
+
+		if(selectedTemplate.length) {
+			if(callback) callback(null, selectedTemplate);
+			return;
+		}
+
+		// Step 3: If we're still here.... send nothing back
+		if(callback) callback(null, []);
 	},
 
-	'_renderTemplateWidgets': function(user, selectedTemplate, renderer, callback) {
+	'_renderTemplateWidgets': function(user, selectedTemplate, mediaType, renderer, callback) {
 		var self = this,
 			loggerSrvc = self.dependencies['logger-service'];
 
-		self._getTemplateWidgetsAsync(user, selectedTemplate)
+		self._getTemplateWidgetsAsync(user, selectedTemplate, mediaType)
 		.then(function(tmplWithWidgets) {
 			return (self.$templates[tmplWithWidgets.name]).renderAsync(renderer, tmplWithWidgets.configuration);
 		})
@@ -284,17 +307,17 @@ var twyrComponentBase = prime({
 		});
 	},
 
-	'_getTemplateWidgets': function(user, template, callback) {
+	'_getTemplateWidgets': function(user, template, mediaType, callback) {
 		var self = this,
 			widgetsSQL = '',
 			dbSrvc = (self.dependencies['database-service']).knex,
 			loggerSrvc = self.dependencies['logger-service'];
 
 		if(user) {
-			widgetsSQL = 'SELECT Y.position, X.module, X.widget FROM (SELECT id AS widget_id, module, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT permission FROM fn_get_user_permissions(?))) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
+			widgetsSQL = 'SELECT Y.position, X.module, X.widget, X.media FROM (SELECT id AS widget_id, module, media, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT permission FROM fn_get_user_permissions(?))) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
 		}
 		else {
-			widgetsSQL = 'SELECT Y.position, X.module, X.widget FROM (SELECT id AS widget_id, module, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT id FROM module_permissions WHERE module = ? AND name = \'public\')) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
+			widgetsSQL = 'SELECT Y.position, X.module, X.widget, X.media FROM (SELECT id AS widget_id, module, media, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT id FROM module_permissions WHERE module = ? AND name = \'public\')) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
 		}
 
 		dbSrvc.raw(widgetsSQL, [template.module, (user ? user.id : template.module), template.id])
@@ -302,6 +325,9 @@ var twyrComponentBase = prime({
 			var positions = {};
 
 			widgets.rows.forEach(function(widget) {
+				if((widget.media.indexOf('all') < 0) && (widget.media.indexOf(mediaType) < 0))
+					return;
+
 				if(!positions[widget.position])
 					positions[widget.position] = [];
 
@@ -320,23 +346,23 @@ var twyrComponentBase = prime({
 		});
 	},
 
-	'_getEmberRoutes': function(user, renderer, callback) {
+	'_getEmberRoutes': function(user, mediaType, renderer, callback) {
 		if(callback) callback(null, []);
 	},
 
-	'_getEmberRouteHandlers': function(user, renderer, callback) {
+	'_getEmberRouteHandlers': function(user, mediaType, renderer, callback) {
 		if(callback) callback(null, []);
 	},
 
-	'_getEmberModels': function(user, renderer, callback) {
+	'_getEmberModels': function(user, mediaType, renderer, callback) {
 		if(callback) callback(null, []);
 	},
 
-	'_getEmberComponents': function(user, renderer, callback){
+	'_getEmberComponents': function(user, mediaType, renderer, callback){
 		if(callback) callback(null, []);
 	},
 
-	'_getEmberComponentHTMLs': function(user, renderer, callback){
+	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback){
 		if(callback) callback(null, []);
 	},
 

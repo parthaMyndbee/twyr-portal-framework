@@ -105,6 +105,7 @@ var app = prime({
 			self.getClientsideAssetsAsync(user, mediaType, renderAsync)
 			.then(function(indexTemplate) {
 				response.status(200).send(indexTemplate);
+				console.log('MEDIA TYPE: ' + mediaType);
 				return null;
 			})
 			.catch(function(err) {
@@ -127,7 +128,7 @@ var app = prime({
 		})
 		// Step 2: Get the component routes and widgets for this user
 		.then(function(selectedTemplate) {
-			return self._getTemplateWidgetsAsync(user, selectedTemplate);
+			return self._getTemplateWidgetsAsync(user, selectedTemplate, mediaType);
 		})
 		// Step 3: Now get the routes, route handlers, models, etc. required for the Ember.js App from all components
 		.then(function(selectedTemplate) {
@@ -160,7 +161,7 @@ var app = prime({
 			selectedTemplate.configuration.componentHTMLs = _.map(emberStuff, 'componentHTML').join('\n').trim();
 			selectedTemplate.configuration.templates = _.map(emberStuff, 'template').join('\n').trim();
 
-			console.log('returnedRoutes: ' + JSON.stringify(returnedRoutes, null, '\t'));
+//			console.log('returnedRoutes: ' + JSON.stringify(returnedRoutes, null, '\t'));
 			return selectedTemplate;
 		})
 		// Step 6: Render the template HTML with the widgets in their positions
@@ -212,7 +213,7 @@ var app = prime({
 
 		// Step 1: Filter by media type match
 		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return (modTmpl.media == mediaType);
+			return (modTmpl.media.indexOf(mediaType) >= 0);
 		});
 
 		if(selectedTemplate.length) {
@@ -222,7 +223,7 @@ var app = prime({
 
 		// Step 2: Check for generic match
 		selectedTemplate = possibleTemplates.filter(function(modTmpl) {
-			return (modTmpl.media == 'all');
+			return (modTmpl.media.indexOf('all') >= 0);
 		});
 
 		if(selectedTemplate.length) {
@@ -230,20 +231,20 @@ var app = prime({
 			return;
 		}
 
-		// Step 5: If we're still here.... throw an error
+		// Step 3: If we're still here.... throw an error
 		if(callback) callback(new Error('No template match'));
 	},
 
-	'_getTemplateWidgets': function(user, template, callback) {
+	'_getTemplateWidgets': function(user, template, mediaType, callback) {
 		var self = this,
 			widgetsSQL = '',
 			dbSrvc = (self.$services['database-service']).getInterface().knex;
 
 		if(user) {
-			widgetsSQL = 'SELECT Y.position, X.module, X.widget FROM (SELECT id AS widget_id, module, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT permission FROM fn_get_user_permissions(?))) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
+			widgetsSQL = 'SELECT Y.position, X.module, X.media, X.widget FROM (SELECT id AS widget_id, module, media, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT permission FROM fn_get_user_permissions(?))) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
 		}
 		else {
-			widgetsSQL = 'SELECT Y.position, X.module, X.widget FROM (SELECT id AS widget_id, module, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT id FROM module_permissions WHERE module = ? AND name = \'public\')) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
+			widgetsSQL = 'SELECT Y.position, X.module, X.media, X.widget FROM (SELECT id AS widget_id, module, media, ember_component AS widget FROM module_widgets WHERE module IN (SELECT id FROM fn_get_module_descendants(?)) AND permission IN (SELECT id FROM module_permissions WHERE module = ? AND name = \'public\')) X INNER JOIN (SELECT A.template AS template, A.name AS position, B.module_widget AS widget, B.display_order AS display_order FROM module_template_positions A INNER JOIN module_widget_module_template_positions B ON (B.template_position = A.id) WHERE A.template = ?) Y ON (Y.widget = X.widget_id) ORDER BY Y.position, Y.display_order;';
 		}
 
 		dbSrvc.raw(widgetsSQL, [template.module, (user ? user.id : template.module), template.id])
@@ -251,6 +252,9 @@ var app = prime({
 			var positions = {};
 
 			widgets.rows.forEach(function(widget) {
+				if((widget.media.indexOf('all') < 0) && (widget.media.indexOf(mediaType) < 0))
+					return;
+
 				if(!positions[widget.position])
 					positions[widget.position] = [];
 
@@ -270,11 +274,11 @@ var app = prime({
 		var promiseResolutions = [],
 			self = this;
 
-		promiseResolutions.push(self._getEmberRoutesAsync(user, renderer));
-		promiseResolutions.push(self._getEmberRouteHandlersAsync(user, renderer));
-		promiseResolutions.push(self._getEmberModelsAsync(user, renderer));
-		promiseResolutions.push(self._getEmberComponentsAsync(user, renderer));
-		promiseResolutions.push(self._getEmberComponentHTMLsAsync(user, renderer));
+		promiseResolutions.push(self._getEmberRoutesAsync(user, mediaType, renderer));
+		promiseResolutions.push(self._getEmberRouteHandlersAsync(user, mediaType, renderer));
+		promiseResolutions.push(self._getEmberModelsAsync(user, mediaType, renderer));
+		promiseResolutions.push(self._getEmberComponentsAsync(user, mediaType, renderer));
+		promiseResolutions.push(self._getEmberComponentHTMLsAsync(user, mediaType, renderer));
 
 		promises.all(promiseResolutions)
 		.then(function(results) {
@@ -294,11 +298,11 @@ var app = prime({
 		});
 	},
 
-	'_getEmberRoutes': function(user, renderer, callback) {
+	'_getEmberRoutes': function(user, mediaType, renderer, callback) {
 		if(callback) callback(null, []);
 	},
 
-	'_getEmberRouteHandlers': function(user, renderer, callback) {
+	'_getEmberRouteHandlers': function(user, mediaType, renderer, callback) {
 		var self = this,
 			emberStuff = self.$config['ember-stuff'].path;
 
@@ -313,7 +317,7 @@ var app = prime({
 		});
 	},
 
-	'_getEmberModels': function(user, renderer, callback) {
+	'_getEmberModels': function(user, mediaType, renderer, callback) {
 		var self = this,
 			emberStuff = self.$config['ember-stuff'].path;
 
@@ -328,7 +332,7 @@ var app = prime({
 		});
 	},
 
-	'_getEmberComponents': function(user, renderer, callback){
+	'_getEmberComponents': function(user, mediaType, renderer, callback){
 		var self = this,
 			emberStuff = self.$config['ember-stuff'].path;
 
@@ -343,7 +347,7 @@ var app = prime({
 		});
 	},
 
-	'_getEmberComponentHTMLs': function(user, renderer, callback){
+	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback){
 		var self = this,
 			emberStuff = self.$config['ember-stuff'].path;
 

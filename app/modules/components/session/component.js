@@ -30,7 +30,7 @@ var sessionComponent = prime({
 		base.call(this, module);
 	},
 
-	'_getEmberComponents': function(user, renderer, callback) {
+	'_getEmberComponents': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
@@ -59,7 +59,7 @@ var sessionComponent = prime({
 		});
 	},
 
-	'_getEmberComponentHTMLs': function(user, renderer, callback) {
+	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 

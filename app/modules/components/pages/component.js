@@ -161,7 +161,7 @@ var pagesComponent = prime({
 		self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
 		.then(function(hasPermission) {
 			if(hasPermission) {
-				if(callback) callback(null, possibleTemplates);
+				pagesComponent.parent._selectTemplates.call(self, user, mediaType, possibleTemplates, callback);
 				return null;
 			}
 
@@ -174,7 +174,7 @@ var pagesComponent = prime({
 		});
 	},
 
-	'_getEmberRoutes': function(user, renderer, callback) {
+	'_getEmberRoutes': function(user, mediaType, renderer, callback) {
 		var self = this,
 			emberRoutes = [{
 				'name': 'page-view',
@@ -187,7 +187,7 @@ var pagesComponent = prime({
 		if(user) {
 			self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
 			.then(function(hasPermission) {
-				if(hasPermission) {
+				if(hasPermission && (mediaType == 'desktop')) {
 					emberRoutes.push({
 						'name': 'pages-default',
 						'path': '/pages',
@@ -211,7 +211,7 @@ var pagesComponent = prime({
 		if(callback) callback(null, emberRoutes);
 	},
 
-	'_getEmberRouteHandlers': function(user, renderer, callback) {
+	'_getEmberRouteHandlers': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
@@ -229,32 +229,28 @@ var pagesComponent = prime({
 			return null;
 		}
 
-		if(user) {
-			self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
-			.then(function(hasPermission) {
-				var promiseResolutions = [];
-				promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/page-view.ejs'), 'utf8'));
+		self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
+		.then(function(hasPermission) {
+			var promiseResolutions = [];
+			promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/page-view.ejs'), 'utf8'));
 
-				if(hasPermission) {
-					promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/pages-default.ejs'), 'utf8'));
-				}
+			if(hasPermission && (mediaType == 'desktop')) {
+				promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/routeHandlers/pages-default.ejs'), 'utf8'));
+			}
 
-				return promises.all(promiseResolutions);
-			})
-			.then(function(routeHandlers) {
-				if(callback) callback(null, routeHandlers);
-				return null;
-			})
-			.catch(function(err) {
-				self.dependencies['logger-service'].error(self.name + '::_getEmberRouteHandlers Error: ', err);
-				if(callback) callback(err);
-			});
-
-			return;
-		}
+			return promises.all(promiseResolutions);
+		})
+		.then(function(routeHandlers) {
+			if(callback) callback(null, routeHandlers);
+			return null;
+		})
+		.catch(function(err) {
+			self.dependencies['logger-service'].error(self.name + '::_getEmberRouteHandlers Error: ', err);
+			if(callback) callback(err);
+		});
 	},
 
-	'_getEmberModels': function(user, renderer, callback) {
+	'_getEmberModels': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
@@ -272,34 +268,35 @@ var pagesComponent = prime({
 			return null;
 		}
 
-		if(user) {
-			self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
-			.then(function(hasPermission) {
-				var promiseResolutions = [];
-				promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/page-view.js'), 'utf8'));
+		self._checkPermissionAsync(user, self['$pageAuthorPermissionId'])
+		.then(function(hasPermission) {
+			var promiseResolutions = [];
+			promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/page-view.js'), 'utf8'));
 
-				if(hasPermission) {
-					promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/pages-default.js'), 'utf8'));
-				}
+			if(hasPermission && (mediaType == 'desktop')) {
+				promiseResolutions.push(filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/models/pages-default.js'), 'utf8'));
+			}
 
-				return promises.all(promiseResolutions);
-			})
-			.then(function(pageModels) {
-				if(callback) callback(null, pageModels);
-				return null;
-			})
-			.catch(function(err) {
-				self.dependencies['logger-service'].error(self.name + '::_getEmberModels Error: ', err);
-				if(callback) callback(err);
-			});
-
-			return;
-		}
+			return promises.all(promiseResolutions);
+		})
+		.then(function(pageModels) {
+			if(callback) callback(null, pageModels);
+			return null;
+		})
+		.catch(function(err) {
+			self.dependencies['logger-service'].error(self.name + '::_getEmberModels Error: ', err);
+			if(callback) callback(err);
+		});
 	},
 
-	'_getEmberComponents': function(user, renderer, callback) {
+	'_getEmberComponents': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);
@@ -326,9 +323,14 @@ var pagesComponent = prime({
 		});
 	},
 
-	'_getEmberComponentHTMLs': function(user, renderer, callback) {
+	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback) {
 		var loggerSrvc = this.dependencies['logger-service'],
 			self = this;
+
+		if(mediaType != 'desktop') {
+			if(callback) callback(null, []);
+			return null;
+		}
 
 		if(!user) {
 			if(callback) callback(null, []);
