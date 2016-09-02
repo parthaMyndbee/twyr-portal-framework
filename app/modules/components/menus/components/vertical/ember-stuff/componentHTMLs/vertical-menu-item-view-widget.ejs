@@ -21,7 +21,7 @@
 			{{/link-to}}
 		{{/if}}
 		{{#if model.componentMenu.children.length}}
-			<ul class="dropdown-menu" style="width:100%; top:0px; left:100%; margin-top:0px;">
+			<ul class="dropdown-menu" style="min-width:100%; top:0px; left:100%; margin-top:0px;">
 				{{#each model.componentMenu.children as |menuItem|}}
 				{{#if menuItem.shouldDisplay}}
 					{{vertical-component-menu-item-view-widget model=menuItem controller-action="controller-action"}}
@@ -35,7 +35,7 @@
 			{{model.displayName}}
 			<span class="{{caretClass}}" style="margin-left:5px;" />
 		</a>
-		<ul class="dropdown-menu" style="width:100%; top:0px; left:100%; margin-top:0px;">
+		<ul class="dropdown-menu" style="min-width:100%; top:0px; left:100%; margin-top:0px;">
 			{{#each model.sortedMenuItems as |menuItem|}}
 			{{#if menuItem.shouldDisplay}}
 				{{vertical-menu-item-view-widget model=menuItem controller-action="controller-action"}}
@@ -52,7 +52,7 @@
 	{{model.displayName}}
 	<span class="{{caretClass}}" style="margin-left:5px;" />
 </a>
-<ul class="dropdown-menu" style="min-height:100px; width:100%; top:0px; left:100%; margin-top:0px;">
+<ul class="dropdown-menu" style="min-width:100%; top:0px; left:100%; margin-top:0px;">
 	{{#each model.sortedMenuItems as |menuItem|}}
 		{{vertical-component-menu-item-view-widget model=menuItem orientation="horizontal" controller-action="controller-action"}}
 	{{/each}}

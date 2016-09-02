@@ -1,0 +1,45 @@
+<script type="text/x-handlebars" data-template-name="components/tenant-editor-widget">
+<div class="box box-solid" style="text-align:left; box-shadow:none; margin-bottom:0px;">
+	<div class="box-header with-border">
+		<h3 class="box-title">{{model.name}}</h3>
+		<div class="box-tools pull-right">
+		{{#if model.hasDirtyAttributes}}
+			<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "save" model bubbles=false}}>
+				<i class="fa fa-save" />
+				<span style="font-size:12px;">Save</span>
+			</button>
+
+			<button type="button" class="btn btn-flat btn-warning btn-sm" {{action "controller-action" "cancel" model bubbles=false}}>
+				<i class="fa fa-undo" />
+				<span style="font-size:12px;">Cancel</span>
+			</button>
+		{{/if}}
+
+		{{#unless model.isNew}}
+		<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "delete" model bubbles=false}}>
+			<i class="fa fa-trash-o" />
+			<span style="font-size:12px;">Delete</span>
+		</button>
+		{{/unless}}
+		</div>
+	</div>
+	<div class="box-body">
+		<div class="form-group col-md-3">
+			<label>Organization Name</label>
+			{{input type="text" value=model.name class="form-control" placeholder="Organization Name"}}
+		</div>
+		<div class="form-group col-md-3">
+			<label>Parent Organization</label>
+			{{input type="text" value=model.parent.name class="form-control" placeholder="Parent Organization Name" readonly="readonly"}}
+		</div>
+		<div class="form-group col-md-3">
+			<label>Member Since</label>
+			{{input type="text" value=model.formattedCreatedAt class="form-control" placeholder="Created On" readonly="readonly"}}
+		</div>
+		<div class="form-group col-md-3">
+			<label>Last Update</label>
+			{{input type="text" value=model.formattedUpdatedAt class="form-control" placeholder="Updated On" readonly="readonly"}}
+		</div>
+	</div>
+</div>
+</script>

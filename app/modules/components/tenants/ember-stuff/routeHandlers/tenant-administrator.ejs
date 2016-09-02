@@ -1,0 +1,51 @@
+define(
+	'twyr-webapp/routes/tenant-administrator',
+	['exports', 'ember'],
+	function(exports, _ember) {
+		if(window.developmentMode) console.log('DEFINE: twyr-webapp/routes/tenant-administrator');
+		var TenantAdministratorRoute = _ember['default'].Route.extend({
+			'model': function() {
+				return this.store.peekAll('tenant');
+			},
+
+			'setupController': function(controller, model) {
+				controller.set('model', model);
+			},
+
+			'actions': {
+				'willTransition': function(transition) {
+					if(!!transition.data.noCheckDirty) {
+						return true;
+					}
+
+					var dirtyMenus = this.get('controller').get('model').filterBy('hasDirtyAttributes', true);
+					if(dirtyMenus.get('length')) {
+						transition.abort();
+
+						window.$.confirm({
+							'title': 'Unsaved Changes',
+							'text': 'Are you sure you want to navigate away from the Tenant Administrator?<br />You will lose all unsaved changes!',
+
+							'confirmButtonClass': 'btn btn-flat btn-danger',
+							'cancelButtonClass': 'btn btn-flat btn-primary',
+
+							'confirm': function() {
+								transition.data.noCheckDirty = true;
+								transition.retry();
+							},
+
+							'cancel': function() {
+							}
+						});
+
+						return false;
+					}
+
+					return true;
+				}
+			}
+		});
+
+		exports['default'] = TenantAdministratorRoute;
+	}
+);
