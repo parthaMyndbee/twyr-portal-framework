@@ -1,7 +1,6 @@
 exports.config = ({
-	'defaultHomeRoute': 'homepage-home',
-
-	'templates': {
-		'path': './templates'
-	}
+	"templates": {
+		"path": "./templates"
+	},
+	"defaultHomeRoute": "homepage-home"
 });

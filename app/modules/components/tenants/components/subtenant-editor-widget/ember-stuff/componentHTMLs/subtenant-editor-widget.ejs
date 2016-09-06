@@ -1,0 +1,51 @@
+<script type="text/x-handlebars" data-template-name="components/subtenant-editor-widget">
+<div id="subtenant-editor-widget-departments" class="box box-default" style="box-shadow:none; margin-bottom:0px;">
+	<div class="box-header with-border">
+		<h3 class="box-title">Departments</h3>
+		<div class="box-tools pull-right" style="margin-top:5px;">
+			<button class="btn btn-flat btn-success btn-sm" {{action "controller-action" "add-subtenant" "department" bubbles=false}}>
+				<i class="fa fa-plus-circle" />
+				<span style="font-size:12px;">New</span>
+			</button>
+		</div>
+	</div>
+
+	<div class="box-body">
+		<table class="table table-bordered table-hover dataTable" id="subtenant-department-list">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Member Since</th>
+				<th>Last Update</th>
+				<th style="min-width:100px;">&nbsp;</th>
+			</tr>
+		</thead>
+		</table>
+	</div>
+</div>
+
+<div id="subtenant-editor-widget-organizations" class="box box-default" style="box-shadow:none; margin-top:20px;">
+	<div class="box-header with-border">
+		<h3 class="box-title">Suborganizations</h3>
+		<div class="box-tools pull-right" style="margin-top:5px;">
+			<button class="btn btn-flat btn-success btn-sm" {{action "controller-action" "add-subtenant" "organization" bubbles=false}}>
+				<i class="fa fa-plus-circle" />
+				<span style="font-size:12px;">New</span>
+			</button>
+		</div>
+	</div>
+
+	<div class="box-body">
+		<table class="table table-bordered table-hover dataTable" id="subtenant-organization-list">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Member Since</th>
+				<th>Last Update</th>
+				<th style="min-width:100px;">&nbsp;</th>
+			</tr>
+		</thead>
+		</table>
+	</div>
+</div>
+</script>

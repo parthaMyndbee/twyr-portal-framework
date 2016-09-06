@@ -105,7 +105,6 @@ var app = prime({
 			self.getClientsideAssetsAsync(user, mediaType, renderAsync)
 			.then(function(indexTemplate) {
 				response.status(200).send(indexTemplate);
-				console.log('MEDIA TYPE: ' + mediaType);
 				return null;
 			})
 			.catch(function(err) {

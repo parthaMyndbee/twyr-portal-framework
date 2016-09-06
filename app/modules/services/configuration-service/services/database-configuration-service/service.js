@@ -134,6 +134,7 @@ var databaseConfigurationService = prime({
 
 		var cachedModule = self._getCachedModule(module);
 		if(cachedModule) {
+			module.displayName = cachedModule.displayName;
 			if(callback) callback(null, cachedModule['configuration']);
 			return;
 		}
@@ -296,10 +297,11 @@ var databaseConfigurationService = prime({
 				return { 'rows': [] };
 			}
 
-			return self.$database.queryAsync('SELECT A.*, B.configuration FROM fn_get_module_descendants($1) A INNER JOIN modules B ON (A.id = B.id)', [result.rows[0].id]);
+			return self.$database.queryAsync('SELECT A.*, B.display_name, B.configuration FROM fn_get_module_descendants($1) A INNER JOIN modules B ON (A.id = B.id)', [result.rows[0].id]);
 		})
 		.then(function(result) {
 			self['$cachedConfigTree'] = self._reorgConfigsToTree(result.rows, null);
+
 			if(callback) callback(null, true);
 			return null;
 		})
@@ -362,6 +364,7 @@ var databaseConfigurationService = prime({
 			var configObj = {};
 			configObj['id'] = config.id;
 			configObj['name'] = config.name;
+			configObj['displayName'] = config.display_name;
 			configObj['enabled'] = config.enabled;
 			configObj['configuration'] = config.configuration;
 

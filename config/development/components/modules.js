@@ -1,5 +1,5 @@
 exports.config = ({
-	'templates': {
-		'path': './templates'
+	"templates": {
+		"path": "./templates"
 	}
 });

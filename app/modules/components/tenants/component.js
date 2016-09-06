@@ -206,11 +206,12 @@ var tenantsComponent = prime({
 
 			return promises.all([
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/tenant-manager-widget.js'), 'utf8'),
-				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/tenant-tree-widget.js'), 'utf8')
+				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/tenant-tree-widget.js'), 'utf8'),
+				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/components/tenant-editor-widget.js'), 'utf8')
 			]);
 		})
-		.then(function(widgetHTMLs) {
-			if(callback) callback(null, widgetHTMLs);
+		.then(function(widgets) {
+			if(callback) callback(null, widgets);
 			return null;
 		})
 		.catch(function(err) {
@@ -222,7 +223,8 @@ var tenantsComponent = prime({
 	},
 
 	'_getEmberComponentHTMLs': function(user, mediaType, renderer, callback) {
-		var loggerSrvc = this.dependencies['logger-service'],
+		var configSrvc = this.dependencies['configuration-service'],
+			loggerSrvc = this.dependencies['logger-service'],
 			self = this;
 
 		if(mediaType != 'desktop') {
@@ -241,15 +243,46 @@ var tenantsComponent = prime({
 				return '';
 			}
 
+			var renderOptions = { 'components': [] },
+				toBeRemoved = [];
+
+			self.$config.componentDisplayOrder.forEach(function(componentName, index) {
+				if(!self.$components[componentName]) {
+					toBeRemoved.push(index);
+					return;
+				}
+
+				renderOptions.components.push({
+					'name': self.$components[componentName].name,
+					'displayName': self.$components[componentName].displayName
+				});
+			});
+
+			toBeRemoved.reverse();
+			toBeRemoved.forEach(function(idxToSplice) {
+				self.$config.componentDisplayOrder.splice(idxToSplice, 1);
+			});
+
+			Object.keys(self.$components).forEach(function(componentName) {
+				if(self.$config.componentDisplayOrder.indexOf(componentName) >= 0)
+					return;
+
+				self.$config.componentDisplayOrder.push(componentName);
+				renderOptions.components.push({
+					'name': self.$components[componentName].name,
+					'displayName': self.$components[componentName].$config.displayName
+				});
+			});
+
 			return promises.all([
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/tenant-manager-widget.ejs'), 'utf8'),
 				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/tenant-tree-widget.ejs'), 'utf8'),
-				filesystem.readFileAsync(path.join(self.basePath, 'ember-stuff/componentHTMLs/tenant-editor-widget.ejs'), 'utf8')
+				renderer(path.join(self.basePath, 'ember-stuff/componentHTMLs/tenant-editor-widget.ejs'), renderOptions)
 			]);
 		})
 		.then(function(widgetHTMLs) {
 			if(callback) callback(null, widgetHTMLs);
-			return null;
+			return configSrvc.saveConfig(self, self.$config);
 		})
 		.catch(function(err) {
 			loggerSrvc.error(self.name + '::_getEmberComponentHTMLs Error: ', err);

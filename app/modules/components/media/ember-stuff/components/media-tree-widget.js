@@ -14,8 +14,9 @@ define(
 						'multiple': false,
 
 						'themes': {
-							'name': 'proton',
-							'responsive': true
+							'name': 'bootstrap',
+							'icons': false,
+							'responsive': false
 						},
 
 						'data': {

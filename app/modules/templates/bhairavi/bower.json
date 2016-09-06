@@ -31,6 +31,7 @@
   ],
   "dependencies": {
     "bootstrap": "*",
+    "bootstrap-jstree-theme": "*",
     "bootstrap-fileinput": "*",
     "bootstrap-popover-x": "*",
     "croppie": "*",

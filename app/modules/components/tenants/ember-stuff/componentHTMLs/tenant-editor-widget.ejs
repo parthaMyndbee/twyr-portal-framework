@@ -4,22 +4,24 @@
 		<h3 class="box-title">{{model.name}}</h3>
 		<div class="box-tools pull-right">
 		{{#if model.hasDirtyAttributes}}
-			<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "save" model bubbles=false}}>
+			<button type="button" class="btn btn-flat btn-primary btn-sm" {{action "controller-action" "save-organization" model bubbles=false}}>
 				<i class="fa fa-save" />
 				<span style="font-size:12px;">Save</span>
 			</button>
 
-			<button type="button" class="btn btn-flat btn-warning btn-sm" {{action "controller-action" "cancel" model bubbles=false}}>
+			<button type="button" class="btn btn-flat btn-warning btn-sm" {{action "controller-action" "cancel-organization" model bubbles=false}}>
 				<i class="fa fa-undo" />
 				<span style="font-size:12px;">Cancel</span>
 			</button>
 		{{/if}}
 
 		{{#unless model.isNew}}
-		<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "delete" model bubbles=false}}>
-			<i class="fa fa-trash-o" />
-			<span style="font-size:12px;">Delete</span>
-		</button>
+			{{#if model.parent}}
+			<button type="button" class="btn btn-flat btn-danger btn-sm" {{action "controller-action" "delete-organization" model bubbles=false}}>
+				<i class="fa fa-trash-o" />
+				<span style="font-size:12px;">Delete</span>
+			</button>
+			{{/if}}
 		{{/unless}}
 		</div>
 	</div>
@@ -30,7 +32,7 @@
 		</div>
 		<div class="form-group col-md-3">
 			<label>Parent Organization</label>
-			{{input type="text" value=model.parent.name class="form-control" placeholder="Parent Organization Name" readonly="readonly"}}
+			{{input type="text" value=model.parent.name class="form-control" readonly="readonly"}}
 		</div>
 		<div class="form-group col-md-3">
 			<label>Member Since</label>
@@ -41,5 +43,39 @@
 			{{input type="text" value=model.formattedUpdatedAt class="form-control" placeholder="Updated On" readonly="readonly"}}
 		</div>
 	</div>
+
+	<% if(components.length) { %>
+	{{#unless model.isNew}}
+	<div class="nav-tabs-custom" style="margin-top:20px; margin-bottom:0px; box-shadow:none;">
+		<ul class="nav nav-tabs" role="tablist">
+		<% for(var idx=0; idx < components.length; idx++) { %>
+			<% if(idx == 0) { %>
+			<li class="active" role="presentation">
+				<a href="#tenant-editor-<%= components[idx].name %>-tab" role="tab" data-toggle="tab">{{model.name}} <%= components[idx].displayName %></a>
+			</li>
+			<% } else { %>
+			<li role="presentation">
+				<a href="#tenant-editor-<%= components[idx].name %>-tab" role="tab" data-toggle="tab">{{model.name}} <%= components[idx].displayName %></a>
+			</li>
+			<% } %>
+		<% } %>
+		</ul>
+
+		<div class="tab-content" style="padding:0px;">
+		<% for(var idx=0; idx < components.length; idx++) { %>
+			<% if(idx == 0) { %>
+			<div class="tab-pane fade in active" id="tenant-editor-<%= components[idx].name %>-tab">
+				{{<%= components[idx].name %> model=model controller-action="controller-action"}}
+			</div>
+			<% } else { %>
+			<div class="tab-pane fade" id="tenant-editor-<%= components[idx].name %>-tab">
+				{{<%= components[idx].name %> model=model controller-action="controller-action"}}
+			</div>
+			<% } %>
+		<% } %>
+		</div>
+	</div>
+	{{/unless}}
+	<% } %>
 </div>
 </script>

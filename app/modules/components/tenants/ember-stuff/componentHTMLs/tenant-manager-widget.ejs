@@ -6,7 +6,7 @@
 
 	<div class="box-body no-padding">
 		<div id="div-tenant-manager-widget-tree-container" class="col-sm-2" style="padding:0px 0px 10px; background-color:#fafafa;">
-			{{tenant-tree-widget controller-action="controller-action"}}
+			{{tenant-tree-widget selectedTenant=selectedTenant controller-action="controller-action"}}
 		</div>
 		<div id="div-tenant-manager-widget-details-container" class="col-sm-10" style="padding:0px;">
 			{{tenant-editor-widget model=selectedTenant controller-action="controller-action"}}
